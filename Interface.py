@@ -1,6 +1,8 @@
 import cv2
 import json
 from SF6 import SF6
+from youwen import youwen
+
 
 def meterReaderCallBack(image, info):
     """call back function"""
@@ -44,6 +46,8 @@ def getInfo(ID):
     # string to pointer
     if info["type"] == "SF6":
         info["type"] = SF6
+    elif info["type"] == "youwen":
+        info["type"] = youwen
     info["template"] = cv2.imread("template/" + ID + ".jpg")
     return info
 
@@ -64,13 +68,13 @@ def meterReader(image, meterIDs):
         y = info["ROI"]["y"]
         w = info["ROI"]["w"]
         h = info["ROI"]["h"]
-        ROI = image[x:x + h, y:y + w]
+        ROI = image[y:y + h, x:x + w]
         # call back
         results[ID] = meterReaderCallBack(ROI, info)
     return results
 
 
-image = cv2.imread("image/2018-11-20-16-22-02.jpg")
-
-print(meterReader(image, ["1_1"]))
+# image = cv2.imread("image/2018-11-20-16-22-02.jpg")
+image = cv2.imread("image/youwen_1.jpg")
+print(meterReader(image, ["youwen_1"]))
 
