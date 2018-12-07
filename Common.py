@@ -25,6 +25,6 @@ def meterFinderByTemplate(image, template):
         topLeft = minLoc
     else:
         topLeft = maxLoc
-    bottomRight = (topLeft[0] + w, topLeft[1] + h)
+    bottomRight = (topLeft[0] + h, topLeft[1] + w)
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
