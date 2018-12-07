@@ -9,7 +9,7 @@ def SF6(image, info):
     # your method
     print("SF6Reader called!!!")
     # template match
-    meter = meterFinderByTemplate(image, info["name"])
+    meter = meterFinderByTemplate(image, info["template"])
     cv2.imshow("meter", meter)
     cv2.waitKey(0)
 
