@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 def meterFinderByTemplate(image, template):
     """
@@ -28,3 +29,35 @@ def meterFinderByTemplate(image, template):
     bottomRight = (topLeft[0] + h, topLeft[1] + w)
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
+
+class AngleFactory():
+    """method for angle calculation"""
+
+    @staticmethod
+    def __calAngleBetweenTwoVector(vectorA, vectorB):
+        """
+        get angle formed by two vector
+        :param vectorA: vector A
+        :param vectorB: vector B
+        :return: angle
+        """
+        lenA = np.sqrt(vectorA.dot(vectorA))
+        lenB = np.sqrt(vectorB.dot(vectorB))
+        cosAngle = vectorA.dot(vectorB) / (lenA * lenB)
+        angle = np.arccos(cosAngle)
+        return angle
+
+    @classmethod
+    def __calAngleClockwise(self, startPoint, endPoint, centerPoint):
+        """
+        get clockwise angle formed by three point
+        :param startPoint: start point
+        :param endPoint: end point
+        :param centerPoint: center point
+        :return: clockwise angle
+        """
+        vectorA = startPoint - centerPoint
+        vectorB = endPoint - centerPoint
+        angle = self.__calAngleBetweenTwoVector(vectorA, vectorB)
+
+        return angle
