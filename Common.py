@@ -30,7 +30,7 @@ def meterFinderByTemplate(image, template):
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
 
-class AngleFactory():
+class AngleFactory:
     """method for angle calculation"""
 
     @staticmethod
@@ -48,7 +48,7 @@ class AngleFactory():
         return angle
 
     @classmethod
-    def __calAngleClockwise(self, startPoint, endPoint, centerPoint):
+    def __calAngleClockwise(cls, startPoint, endPoint, centerPoint):
         """
         get clockwise angle formed by three point
         :param startPoint: start point
@@ -58,6 +58,26 @@ class AngleFactory():
         """
         vectorA = startPoint - centerPoint
         vectorB = endPoint - centerPoint
-        angle = self.__calAngleBetweenTwoVector(vectorA, vectorB)
+        angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
+
+        # if counter-clockwise
+        if np.cross(vectorA, vectorB) > 0:
+            angle = 2 * np.pi - angle
 
         return angle
+
+    @classmethod
+    def calPointerValueByAngle(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
+        """
+        get value of pointer meter
+        :param startPoint: start point
+        :param endPoint: end point
+        :param centerPoint: center point
+        :param pointerPoint: pointer's outer point
+        :return: value
+        """
+        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+        angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
+        value = angle / angleRange * totalValue + startValue
+
+        return value
