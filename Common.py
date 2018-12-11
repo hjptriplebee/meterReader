@@ -1,8 +1,4 @@
 import cv2
-import numpy as np
-import functools
-import json
-
 
 def meterFinderByTemplate(image, template):
     """

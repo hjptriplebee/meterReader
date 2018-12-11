@@ -1,4 +1,7 @@
 from Common import *
+import numpy as np
+import functools
+import json
 
 def cmp(contour1, contour2):
     return cv2.contourArea(contour2) - cv2.contourArea(contour1)
@@ -10,6 +13,11 @@ def cmpCircle(circle1, circle2):
 
 
 def checkBelometerUpAndDownStatus(image, info):
+    """
+    :param image: input image
+    :param info: image description
+    :return:  dumps string by json format ,such as {"meterId": "VALUE"}.
+    """
     src = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_LINEAR)
     blurred = cv2.GaussianBlur(src, (3, 3), 0, None, 0)
     gray = cv2.cvtColor(blurred, cv2.COLOR_RGB2GRAY, None)
