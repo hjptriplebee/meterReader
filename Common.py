@@ -61,3 +61,4 @@ class AngleFactory():
         angle = self.__calAngleBetweenTwoVector(vectorA, vectorB)
 
         return angle
+
