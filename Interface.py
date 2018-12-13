@@ -1,6 +1,6 @@
 import cv2
 import json
-from SF6 import SF6
+from SF6 import SF6Reader
 from youwen import youwen
 
 
@@ -45,7 +45,7 @@ def getInfo(ID):
     info = json.load(file)
     # string to pointer
     if info["type"] == "SF6":
-        info["type"] = SF6
+        info["type"] = SF6Reader
     elif info["type"] == "youwen":
         info["type"] = youwen
     info["template"] = cv2.imread("template/" + ID + ".jpg")
@@ -72,9 +72,3 @@ def meterReader(image, meterIDs):
         # call back
         results[ID] = meterReaderCallBack(ROI, info)
     return results
-
-
-# image = cv2.imread("image/2018-11-20-16-22-02.jpg")
-image = cv2.imread("image/youwen_1.jpg")
-print(meterReader(image, ["youwen_1"]))
-
