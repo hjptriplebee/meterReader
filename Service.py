@@ -10,7 +10,7 @@ from Interface import meterReader
 
 class meterReaderService:
     """TCP service"""
-    def requestHandler(self, clientSocket, clientAddress):
+    def __requestHandler(self, clientSocket, clientAddress):
         """
         :param clientSocket: client socket
         :param clientAddress: client address
@@ -61,7 +61,7 @@ class meterReaderService:
         while True:
             clientSocket, clientAddress = self.serverSocket.accept()
             # create a new thread th handle connection
-            thread = threading.Thread(target = self.requestHandler, args = (clientSocket, clientAddress))
+            thread = threading.Thread(target = self.__requestHandler, args = (clientSocket, clientAddress))
             thread.start()
 
     def startClient(self, port = 9999):
@@ -87,6 +87,7 @@ class meterReaderService:
         print("data is sent to server!")
         print(self.clientSocket.recv(1024).decode("utf-8"))
         self.clientSocket.close()
+
 
 if __name__ == "__main__":
     test = meterReaderService()
