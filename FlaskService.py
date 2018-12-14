@@ -23,11 +23,28 @@ def getMeterNum(imageID):
 
     return num
 
+def getMeterIDs(imageID):
+    """get id of meters in an image"""
+    meterIDs = []
+    templateDir = 'template/'
+    list = os.listdir(templateDir)
+    for i in range(0, len(list)):
+        path = os.path.join(templateDir, list[i])
+        prefix, suffix = list[i].split(".")
+        prefixImageID = prefix.split("_")[0]
+        if os.path.isfile(path) and suffix == "jpg" and prefixImageID == imageID:
+            meterIDs.append(prefix)
+
+    return meterIDs
+
 @app.route('/', methods=['POST'])
 def meterReaderAPI():
     data = request.get_data().decode("utf-8")
     data = json.loads(data)
-    meterIDs = data["meterIDs"]
+    imageID = data["imageID"]
+
+    meterIDs = getMeterIDs(imageID)
+
     imageByte = data["image"].encode("ascii")
     imageByte = base64.b64decode(imageByte)
     imageArray = np.asarray(bytearray(imageByte), dtype="uint8")
@@ -39,7 +56,7 @@ def meterReaderAPI():
     return sendData
 
 @app.route('/store', methods=['POST'])
-def store():
+def storeAPI():
     data = request.get_data().decode("utf-8")
     data = json.loads(data)
 
