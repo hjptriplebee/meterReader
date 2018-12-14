@@ -56,11 +56,10 @@ def meterFinderBySIFT(image, template):
 
     # match
     bf = cv2.BFMatcher()
+    # k = 2, so each match has 2 points. 2 points are sorted by distance.
     matches = bf.knnMatch(templateDescriptor, imageDescriptor, k=2)
-    for match in matches:
-        print(match)
-    good = [[m] for m, n in matches if m.distance < 0.3 * n.distance]
-    print(good)
+    # The first one is better than the second one
+    good = [[m] for m, n in matches if m.distance < 0.5 * n.distance]
 
     # for debug
     matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good, None, flags=2)
