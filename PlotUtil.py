@@ -1,10 +1,10 @@
-from matplotlib import pyplot as plot
+from matplotlib import pyplot as plt
 import cv2
 
 PLOT_ROW = 9
 PLOT_COL = 2
 
-plot.figure(figsize=(20, 80))
+plt.figure(figsize=(20, 80))
 
 
 def id(index):
@@ -20,22 +20,31 @@ def subImage(src, index=0, figsize=None, plot_row=None, plot_col=None, title=Non
     if plot_col is not None:
         PLOT_COL = plot_col
     if figsize is not None:
-        plot.figure(figsize=figsize)
+        plt.figure(figsize=figsize)
     if index > PLOT_ROW * PLOT_COL:
-        raise Exception("Index over plot size range.")
+        print("Index over plot size range,resize plot size.\n")
+        PLOT_ROW += 1
     if src is None:
         raise Exception("Image is None.Plot error.")
     # print(id(index))
-    if index > 9:
-        plot.figure(figsize=(20, 80))
-        index %= 9
-    plot.subplot(id(index))
+    # if index > 9:
+    #    plot.figure(figsize=(20, 80))
+    #    index %= 9
+    # plot.subplot(id(index))
+    plt.subplot(PLOT_ROW, PLOT_COL, index)
     if cmap is not None:
-        plot.imshow(src, cmap=cmap)
+        plt.imshow(src, cmap=cmap)
     else:
-        plot.imshow(src)
-    plot.title(title)
+        plt.imshow(src)
+    plt.title(title)
+
+
+def plot(src, index, title):
+    global PLOT_ROW, PLOT_COL
+    plt.subplot(PLOT_ROW, PLOT_COL, index)
+    plt.plot(src)
+    plt.title(title)
 
 
 def show():
-    plot.show()
+    plt.show()
