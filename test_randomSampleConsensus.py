@@ -2,6 +2,8 @@ from unittest import TestCase
 import unittest
 import numpy as np
 import RasancFitCircle as rasanc
+import cv2
+import PlotUtil as plot
 
 
 class TestRandomSampleConsensus(TestCase):
@@ -25,11 +27,10 @@ class TestRandomSampleConsensus(TestCase):
             b = np.random.randint(low=0, high=255)
             g = np.random.randint(low=0, high=255)
             r = np.random.randint(low=0, high=255)
-            print((b, g, r))
             circle_img[p[0]][p[1]] = (b, g, r)
         # cv2.circle(circle_img, center=(R, R), radius=R, color=(0, 255, 0), thickness=1)
-        # plot.subImage(src=circle_img, index=1, title='Circle')
-        # plot.show()
+        plot.subImage(src=circle_img, index=1, title='Circle')
+        plot.show()
         best_circle, max_fit_num, best_consensus_pointers = rasanc.randomSampleConsensus(data=pointers,
                                                                                          max_iterations=40,
                                                                                          dst_threshold=50,
@@ -43,7 +44,6 @@ class TestRandomSampleConsensus(TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-
     suite.addTest(TestRandomSampleConsensus('test_randomSampleConsensus'))
     return suite
 

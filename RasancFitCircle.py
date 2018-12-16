@@ -46,6 +46,8 @@ def fitNum(pointers, circle, threshold, inliers, consensus_pointers=None):
     num = 0
     data_size = len(pointers)
     inliers_size = len(inliers)
+    center = (circle[0], circle[1])
+    radius = circle[2]
     for i in range(0, data_size):
         is_inliers = False
         for j in range(0, inliers_size):
@@ -53,7 +55,9 @@ def fitNum(pointers, circle, threshold, inliers, consensus_pointers=None):
                 is_inliers = True
         if is_inliers:
             continue
-        if math.fabs(distance(pointers[i], circle[2])) < threshold:
+        dis = distance(pointers[i], center) - radius
+        print(dis)
+        if math.fabs(distance(pointers[i], center) - radius) < threshold:
             num += 1
             consensus_pointers.append(pointers[i])
     return num
@@ -71,20 +75,28 @@ def getCircle(pointer1, pointer2, pointer3):
     :param pointer3:
     :return:
     """
-    x1 = pointer1[0]
-    x2 = pointer2[0]
-    x3 = pointer3[0]
-
-    y1 = pointer1[1]
-    y2 = pointer1[1]
-    y3 = pointer1[1]
     circle = np.zeros(shape=(3, 1), dtype=np.float16)
-    circle[0] = (x1 * x1 + y1 * y1) * (y2 - y3) + (x2 * x2 + y2 * y2) * (y3 - y1) + (x3 * x3 + y3 * y3) * (y1 - y2)
-    if (2 * (x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2)) != 0:
-        circle[0] /= (2 * (x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2));
-    if (x1 * x1 + y1 * y1) * (x3 - x2) + (x2 * x2 + y2 * y2) * (x1 - x3) + (x3 * x3 + y3 * y3) * (x2 - x1) != 0:
-        circle[1] = (x1 * x1 + y1 * y1) * (x3 - x2) + (x2 * x2 + y2 * y2) * (x1 - x3) + (x3 * x3 + y3 * y3) * (x2 - x1)
-    circle[1] /= (2 * (x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2))
+    x1 = float(pointer1[0])
+    x2 = float(pointer2[0])
+    x3 = float(pointer3[0])
+
+    y1 = float(pointer1[1])
+    y2 = float(pointer2[1])
+    y3 = float(pointer3[1])
+
+    a = x1 - x2
+    b = y1 - y2
+    c = x1 - x3
+    d = y1 - y3
+    e = ((x1 * x1 - x2 * x2) + (y1 * y1 - y2 * y2)) / 2.0
+    f = ((x1 * x1 - x3 * x3) + (y1 * y1 - y3 * y3)) / 2.0
+    det = b * c - a * d
+
+    if math.fabs(det) < 1e-5:
+        circle = [0, 0, -1]
+        return circle
+    circle[0] = -(d * e - b * f) / det
+    circle[1] = -(a * f - c * e) / det
     circle[2] = math.sqrt((circle[0] - x1) * (circle[0] - x1) + (circle[1] - y1) * (circle[1] - y1))
     return circle
 
