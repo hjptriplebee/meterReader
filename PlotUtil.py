@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import cv2
+import time
 
 PLOT_ROW = 9
 PLOT_COL = 2
@@ -46,5 +47,8 @@ def plot(src, index, title):
     plt.title(title)
 
 
-def show():
+def show(save=False):
+    if save:
+        str_time = time.strftime('%m-%d-%m', time.localtime(time.time()))
+        plt.savefig('./output/' + str_time + '.png')
     plt.show()

@@ -4,15 +4,35 @@ import PlotUtil as plot
 import cv2
 
 
-def randomSampleConsensus(data, best_circle=None, max_iterations=None, dst_threshold=None, fit_num_thresh=0):
+def getIteration(inliers_probability, outliers_ratio):
+    not_inliers_p = float(1 - inliers_probability)
+    w = float(1 - outliers_ratio)
+    n = 3
+    return int(np.round(np.log(not_inliers_p) / np.log(1 - np.power(w, n))))
+
+
+def adaptiveRandomSampleConsensus(data, best_circle=None, max_iterations=None, dst_threshold=None, inliers_threshold=0,
+                                  optimal_consensus_num=None):
+    """
+
+    :param data: 一组观测数据,这里指拟合的点数据
+    :param best_circle: 适应于数据的模型,这里指拟合得到的最优圆
+    :param max_iterations: 算法的迭代次数
+    :param dst_threshold: 判定模型是否适用于数据集的数据数目，从随机选取的三个点拟合出一个圆，计算非inliers点与该圆radius的欧式距离distance,若distance > dst_threshold,则认为得到了一个更好的模型
+    :param inliers_threshold: 用于决定数据是否适应于模型的阀值，每次迭代过程产生的拟合圆，要用非inliers点评估该圆的可信度;inliers_threshold = w * |Data Size|
+    :param optimal_consensus_num: 期望的最优结果
+    :return:
+    """
     assert len(data) > 0, 'Input observable data is empty.'
     assert max_iterations is not None, 'Iteration should be specified.'
     assert dst_threshold is not None, 'Threshold should be specified.'
+
     max_fit_num = 0
-    best_error = 0.0
     best_consensus_pointers = []
     data_size = len(data)
-    for i in range(0, max_iterations):
+    if optimal_consensus_num is None:
+        optimal_consensus_num = np.round(data_size * 0.8)
+    for i in range(max_iterations):
         idx1 = np.random.randint(low=0, high=data_size)
         idx2 = np.random.randint(low=0, high=data_size)
         idx3 = np.random.randint(low=0, high=data_size)
@@ -28,13 +48,64 @@ def randomSampleConsensus(data, best_circle=None, max_iterations=None, dst_thres
         circle = getCircle(data[idx1], data[idx2], data[idx3])
         # 求剩余点的拟合程度
         current_fit_num = fitNum(data, circle, dst_threshold, [idx1, idx2, idx3], consensus_pointers)
-        # 如果当前得到的inliers数目超过了拟合的阈值，则认为找到了一个更好的模型
-        if current_fit_num > max_fit_num:
-            # this_error = current_fit_num / data_size
-            if current_fit_num > fit_num_thresh:
-                max_fit_num = current_fit_num
-                best_circle = circle
-                best_consensus_pointers = consensus_pointers
+        # 如果当前得到的inliers数目超过了拟合的阈值，且拟合到的点数量超过了inliers threshold，则认为找到了一个更好的模型
+        if current_fit_num > max_fit_num and current_fit_num > inliers_threshold:
+            max_fit_num = current_fit_num
+            best_circle = circle
+            best_consensus_pointers = consensus_pointers
+        # 如果达到了最优值，结束迭代
+        if current_fit_num >= optimal_consensus_num:
+            break
+    if max_fit_num == 0:
+        print("Could not fit a circle from data.")
+    return best_circle, max_fit_num, best_consensus_pointers
+
+
+def randomSampleConsensus(data, best_circle=None, max_iterations=None, dst_threshold=None, inliers_threshold=0,
+                          optimal_consensus_num=None):
+    """
+
+    :param data: 一组观测数据,这里指拟合的点数据
+    :param best_circle: 适应于数据的模型,这里指拟合得到的最优圆
+    :param max_iterations: 算法的迭代次数
+    :param dst_threshold: 判定模型是否适用于数据集的数据数目，从随机选取的三个点拟合出一个圆，计算非inliers点与该圆radius的欧式距离distance,若distance > dst_threshold,则认为得到了一个更好的模型
+    :param inliers_threshold: 用于决定数据是否适应于模型的阀值，每次迭代过程产生的拟合圆，要用非inliers点评估该圆的可信度;inliers_threshold = w * |Data Size|
+    :param optimal_consensus_num: 期望的最优结果
+    :return:
+    """
+    assert len(data) > 0, 'Input observable data is empty.'
+    assert max_iterations is not None, 'Iteration should be specified.'
+    assert dst_threshold is not None, 'Threshold should be specified.'
+
+    max_fit_num = 0
+    best_consensus_pointers = []
+    data_size = len(data)
+    if optimal_consensus_num is None:
+        optimal_consensus_num = np.round(data_size * 0.8)
+    for i in range(max_iterations):
+        idx1 = np.random.randint(low=0, high=data_size)
+        idx2 = np.random.randint(low=0, high=data_size)
+        idx3 = np.random.randint(low=0, high=data_size)
+        # 假设样本遵循均匀分布，圆的三个点是独立选择的;maxIteration是选取不重复点的上限
+        if idx1 == idx2:
+            continue
+        if idx1 == idx3:
+            continue
+        if idx3 == idx2:
+            continue
+        consensus_pointers = [data[idx1], data[idx2], data[idx3]]
+        # 三点确定一个圆
+        circle = getCircle(data[idx1], data[idx2], data[idx3])
+        # 求剩余点的拟合程度
+        current_fit_num = fitNum(data, circle, dst_threshold, [idx1, idx2, idx3], consensus_pointers)
+        # 如果当前得到的inliers数目超过了拟合的阈值，且拟合到的点数量超过了inliers threshold，则认为找到了一个更好的模型
+        if current_fit_num > max_fit_num and current_fit_num > inliers_threshold:
+            max_fit_num = current_fit_num
+            best_circle = circle
+            best_consensus_pointers = consensus_pointers
+        # 如果达到了最优值，结束迭代
+        if current_fit_num >= optimal_consensus_num:
+            break
     if max_fit_num == 0:
         print("Could not fit a circle from data.")
     return best_circle, max_fit_num, best_consensus_pointers
@@ -55,8 +126,6 @@ def fitNum(pointers, circle, threshold, inliers, consensus_pointers=None):
                 is_inliers = True
         if is_inliers:
             continue
-        dis = distance(pointers[i], center) - radius
-        print(dis)
         if math.fabs(distance(pointers[i], center) - radius) < threshold:
             num += 1
             consensus_pointers.append(pointers[i])
