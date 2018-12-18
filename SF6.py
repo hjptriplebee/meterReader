@@ -11,9 +11,10 @@ def SF6Reader(image, info):
     # template match
     # meter = meterFinderByTemplate(image, info["template"])
     meter = meterFinderBySIFT(image, info["template"])
-    res = AngleFactory.calPointerValueByAngle(np.array([-1, 0]), np.array([0, -1]), np.array([0, 0]), np.array([1, 1]),
+    res = AngleFactory.calPointerValueByOuterPoint(np.array([-1, 0]), np.array([0, -1]), np.array([0, 0]), np.array([1, 1]),
                                               0, 15)
-    # cv2.imshow("meter", meter)
-    # cv2.waitKey(0)
+
+    cv2.imshow("meter", meter)
+    cv2.waitKey(0)
 
     return res
