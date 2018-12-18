@@ -30,6 +30,49 @@ def meterFinderByTemplate(image, template):
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
 
+def meterFinderBySIFT(image, template):
+    """
+    locate meter's bbox
+    :param image: image
+    :param template: template
+    :return: bbox image
+    """
+
+    templateBlurred = cv2.GaussianBlur(template, (3, 3), 0)
+    imageBlurred = cv2.GaussianBlur(image, (3, 3), 0)
+
+    sift = cv2.xfeatures2d.SIFT_create()
+
+    # shape of descriptor n * 128, n is the num of key points.
+    # a row of descriptor is the feature of related key point.
+    templateKeyPoint, templateDescriptor = sift.detectAndCompute(templateBlurred, None)
+    imageKeyPoint, imageDescriptor = sift.detectAndCompute(imageBlurred, None)
+
+    # for debug
+    # templateBlurred = cv2.drawKeypoints(templateBlurred, templateKeyPoint, templateBlurred)
+    # imageBlurred = cv2.drawKeypoints(imageBlurred, imageKeyPoint, imageBlurred)
+    # cv2.imshow("template", templateBlurred)
+    # cv2.imshow("image", imageBlurred)
+
+    # match
+    bf = cv2.BFMatcher()
+    # k = 2, so each match has 2 points. 2 points are sorted by distance.
+    matches = bf.knnMatch(templateDescriptor, imageDescriptor, k=2)
+
+    # The first one is better than the second one
+    good = [[m] for m, n in matches if m.distance < 0.8 * n.distance]
+
+    # del bad match
+    for match in matches:
+        print(match[0].x)
+
+    # for debug
+    matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good, None, flags=2)
+    cv2.imshow("matchImage", matchImage)
+    cv2.waitKey(0)
+
+
+
 class AngleFactory:
     """method for angle calculation"""
 
@@ -67,7 +110,7 @@ class AngleFactory:
         return angle
 
     @classmethod
-    def calPointerValueByAngle(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
+    def calPointerValueByOuterPoint(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
         """
         get value of pointer meter
         :param startPoint: start point
@@ -78,6 +121,31 @@ class AngleFactory:
         """
         angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
+        value = angle / angleRange * totalValue + startValue
+
+        return value
+
+    @classmethod
+    def calPointerValueByPointerVector(cls, startPoint, endPoint, centerPoint, PointerVector, startValue, totalValue):
+        """
+        get value of pointer meter
+        :param startPoint: start point
+        :param endPoint: end point
+        :param centerPoint: center point
+        :param PointerVector: pointer's vector
+        :return: value
+        """
+        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+
+        vectorA = startPoint - centerPoint
+        vectorB = PointerVector
+
+        angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
+
+        # if counter-clockwise
+        if np.cross(vectorA, vectorB) > 0:
+            angle = 2 * np.pi - angle
+
         value = angle / angleRange * totalValue + startValue
 
         return value

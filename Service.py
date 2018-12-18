@@ -10,7 +10,7 @@ from Interface import meterReader
 
 class meterReaderService:
     """TCP service"""
-    def requestHandler(self, clientSocket, clientAddress):
+    def __requestHandler(self, clientSocket, clientAddress):
         """
         :param clientSocket: client socket
         :param clientAddress: client address
@@ -61,7 +61,7 @@ class meterReaderService:
         while True:
             clientSocket, clientAddress = self.serverSocket.accept()
             # create a new thread th handle connection
-            thread = threading.Thread(target = self.requestHandler, args = (clientSocket, clientAddress))
+            thread = threading.Thread(target = self.__requestHandler, args = (clientSocket, clientAddress))
             thread.start()
 
     def startClient(self, port = 9999):
@@ -88,11 +88,14 @@ class meterReaderService:
         print(self.clientSocket.recv(1024).decode("utf-8"))
         self.clientSocket.close()
 
+
 if __name__ == "__main__":
     test = meterReaderService()
-    serverProcess = multiprocessing.Process(target = test.startServer)
-    clientProcess = multiprocessing.Process(target=test.startClient)
-    serverProcess.start()
-    time.sleep(3)
-    clientProcess.start()
+    # serverProcess = multiprocessing.Process(target = test.startServer)
+    # clientProcess = multiprocessing.Process(target=test.startClient)
+    # serverProcess.start()
+    # time.sleep(3)
+    # clientProcess.start()
+    image = cv2.imread("image/2018-11-20-16-22-02.jpg")
+    meterReader(image, ["1_1"])
 
