@@ -58,8 +58,13 @@ def meterFinderBySIFT(image, template):
     bf = cv2.BFMatcher()
     # k = 2, so each match has 2 points. 2 points are sorted by distance.
     matches = bf.knnMatch(templateDescriptor, imageDescriptor, k=2)
+
     # The first one is better than the second one
-    good = [[m] for m, n in matches if m.distance < 0.5 * n.distance]
+    good = [[m] for m, n in matches if m.distance < 0.8 * n.distance]
+
+    # del bad match
+    for match in matches:
+        print(match[0].x)
 
     # for debug
     matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good, None, flags=2)
@@ -105,7 +110,7 @@ class AngleFactory:
         return angle
 
     @classmethod
-    def calPointerValueByAngle(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
+    def calPointerValueByOuterPoint(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
         """
         get value of pointer meter
         :param startPoint: start point
@@ -116,6 +121,31 @@ class AngleFactory:
         """
         angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
+        value = angle / angleRange * totalValue + startValue
+
+        return value
+
+    @classmethod
+    def calPointerValueByPointerVector(cls, startPoint, endPoint, centerPoint, PointerVector, startValue, totalValue):
+        """
+        get value of pointer meter
+        :param startPoint: start point
+        :param endPoint: end point
+        :param centerPoint: center point
+        :param PointerVector: pointer's vector
+        :return: value
+        """
+        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+
+        vectorA = startPoint - centerPoint
+        vectorB = PointerVector
+
+        angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
+
+        # if counter-clockwise
+        if np.cross(vectorA, vectorB) > 0:
+            angle = 2 * np.pi - angle
+
         value = angle / angleRange * totalValue + startValue
 
         return value

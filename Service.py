@@ -91,9 +91,11 @@ class meterReaderService:
 
 if __name__ == "__main__":
     test = meterReaderService()
-    serverProcess = multiprocessing.Process(target = test.startServer)
-    clientProcess = multiprocessing.Process(target=test.startClient)
-    serverProcess.start()
-    time.sleep(3)
-    clientProcess.start()
+    # serverProcess = multiprocessing.Process(target = test.startServer)
+    # clientProcess = multiprocessing.Process(target=test.startClient)
+    # serverProcess.start()
+    # time.sleep(3)
+    # clientProcess.start()
+    image = cv2.imread("image/2018-11-20-16-22-02.jpg")
+    meterReader(image, ["1_1"])
 
