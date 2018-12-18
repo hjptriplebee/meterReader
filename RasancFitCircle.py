@@ -105,6 +105,7 @@ def randomSampleConsensus(data, best_circle=None, max_iterations=None, dst_thres
             best_consensus_pointers = consensus_pointers
         # 如果达到了最优值，结束迭代
         if current_fit_num >= optimal_consensus_num:
+            print("Algorithm in-advance termination,current iteration:{},actual requested {}".format(i, max_iterations))
             break
     if max_fit_num == 0:
         print("Could not fit a circle from data.")

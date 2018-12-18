@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import json
+import RasancFitCircle as rasan
 import PlotUtil as plot
 
 plot_img_index = 0
@@ -103,8 +104,39 @@ def recognizePointerInstrument(image, info):
         rgb_src[int(centroid[0]), int(centroid[1])] = (0, 255, 0)
     plot.subImage(src=rgb_src, index=inc(), title="Centroids")
     # plot.subImage(src=src, index=inc(), title='Line')
+    rasan_iteration = rasan.getIteration(0.7, 0.3)
+    avg_circle = np.zeros(3, dtype=np.float64)
+    avg_fit_num = 0
+    dst_threshold = 40
+    period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
+    iter_time = 5  # 启动rasanc拟合算法的固定次数
+    hit_time = 0 # 成功拟合到圆的次数
+    # 为了确保拟合所得的圆的确信度，多次拟合求平均值
+    for i in range(iter_time):
+        best_circle, max_fit_num, best_consensus_pointers = rasan.randomSampleConsensus(centroids,
+                                                                                        max_iterations=period_rasanc_time,
+                                                                                        dst_threshold=dst_threshold,
+                                                                                        inliers_threshold=len(
+                                                                                            centroids) / 2,
+                                                                                        optimal_consensus_num=int(
+                                                                                            len(centroids) * 0.8))
+        if max_fit_num > 0:
+            hit_time += 1
+            avg_circle += best_circle
+            avg_fit_num += max_fit_num
+    if hit_time > 0:
+        avg_circle /= hit_time
+        avg_fit_num /= hit_time
+    # 求平均值减少误差
+    if avg_fit_num > len(centroids) / 2:
+        cv2.circle(rgb_src, center=(np.int(avg_circle[0]), np.int(avg_circle[1])), radius=np.int(avg_circle[2]),
+                   color=(0, 0, 255),
+                   thickness=2,
+                   lineType=cv2.LINE_AA)
+        plot.subImage(src=rgb_src, index=inc(), title='Fitted Circle')
+    else:
+        print("Fitting Circle Failed.")
     plot.show()
-    cv2.waitKey(0)
 
 
 def on_touch(val):
@@ -156,5 +188,6 @@ def compareEqualizeHistBetweenDiffEnvironment():
 
 
 if __name__ == '__main__':
-    recognizePointerInstrument(cv2.imread("image/SF6/IMG_7638.JPG"), None)
+    recognizePointerInstrument(cv2.imread("image/SF6/IMG_DOUBLE.JPG"), None)
+
     # compareEqualizeHistBetweenDiffEnvironment()
