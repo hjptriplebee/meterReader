@@ -117,8 +117,8 @@ def fitNum(pointers, circle, threshold, inliers, consensus_pointers=None):
     num = 0
     data_size = len(pointers)
     inliers_size = len(inliers)
-    center = (circle[0], circle[1])
-    radius = circle[2]
+    center = (np.float64(circle[0]), np.float64(circle[1]))
+    radius = np.float64(circle[2])
     for i in range(0, data_size):
         is_inliers = False
         for j in range(0, inliers_size):
