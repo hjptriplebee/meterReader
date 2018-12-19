@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
 
 def meterFinderByTemplate(image, template):
     """
@@ -58,14 +59,46 @@ def meterFinderBySIFT(image, template):
     bf = cv2.BFMatcher()
     # k = 2, so each match has 2 points. 2 points are sorted by distance.
     matches = bf.knnMatch(templateDescriptor, imageDescriptor, k=2)
+
     # The first one is better than the second one
-    good = [[m] for m, n in matches if m.distance < 0.5 * n.distance]
+    good = [[m] for m, n in matches if m.distance < 0.7 * n.distance]
+
+    # distance matrix
+    templatePointMatrix = np.array([list(templateKeyPoint[p[0].queryIdx].pt) for p in good])
+    imagePointMatrux = np.array([list(imageKeyPoint[p[0].trainIdx].pt) for p in good])
+    templatePointDistanceMatrix = pairwise_distances(templatePointMatrix, metric="euclidean")
+    imagePointDistanceMatrix = pairwise_distances(imagePointMatrux, metric="euclidean")
+
+    # del bad match
+    good2 = []
+    distances = []
+    maxAbnormalNum = 15
+    for i in range(len(good)):
+        diff = abs(templatePointDistanceMatrix[i] - imagePointDistanceMatrix[i])
+        # distance between distance features
+        diff.sort()
+        distances.append(np.sqrt(np.sum(np.square(diff[:-maxAbnormalNum]))))
+
+    averageDistance = np.average(distances)
+    good2 = [good[i] for i in range(len(good)) if distances[i] < 2 * averageDistance]
 
     # for debug
-    matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good, None, flags=2)
-    cv2.imshow("matchImage", matchImage)
-    cv2.waitKey(0)
+    # matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good2, None, flags=2)
+    # cv2.imshow("matchImage", matchImage)
+    # cv2.waitKey(0)
 
+    matchPointMatrix = np.array([list(imageKeyPoint[p[0].trainIdx].pt) for p in good2])
+
+    # for p1, p2 in matchPointMatrix:
+    #     cv2.circle(image, (int(p1), int(p2)), 0, (255, 0, 0), thickness=50)
+    #     print(p1, p2)
+    # cv2.imshow("matchImage", image)
+    minX = int(np.min(matchPointMatrix[:, 0]))
+    maxX = int(np.max(matchPointMatrix[:, 0]))
+    minY = int(np.min(matchPointMatrix[:, 1]))
+    maxY = int(np.max(matchPointMatrix[:, 1]))
+
+    return image[minY:maxY, minX:maxX]
 
 
 class AngleFactory:
@@ -105,7 +138,7 @@ class AngleFactory:
         return angle
 
     @classmethod
-    def calPointerValueByAngle(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
+    def calPointerValueByOuterPoint(cls, startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue):
         """
         get value of pointer meter
         :param startPoint: start point
@@ -116,6 +149,31 @@ class AngleFactory:
         """
         angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
+        value = angle / angleRange * totalValue + startValue
+
+        return value
+
+    @classmethod
+    def calPointerValueByPointerVector(cls, startPoint, endPoint, centerPoint, PointerVector, startValue, totalValue):
+        """
+        get value of pointer meter
+        :param startPoint: start point
+        :param endPoint: end point
+        :param centerPoint: center point
+        :param PointerVector: pointer's vector
+        :return: value
+        """
+        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+
+        vectorA = startPoint - centerPoint
+        vectorB = PointerVector
+
+        angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
+
+        # if counter-clockwise
+        if np.cross(vectorA, vectorB) > 0:
+            angle = 2 * np.pi - angle
+
         value = angle / angleRange * totalValue + startValue
 
         return value
