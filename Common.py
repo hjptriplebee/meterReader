@@ -104,7 +104,7 @@ class AngleFactory:
         angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
 
         # if counter-clockwise
-        if np.cross(vectorA, vectorB) > 0:
+        if np.cross(vectorA, vectorB) < 0:
             angle = 2 * np.pi - angle
 
         return angle
@@ -122,7 +122,7 @@ class AngleFactory:
         angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
         value = angle / angleRange * totalValue + startValue
-
+        print(angleRange/np.pi*180, angle/np.pi*180)
         return value
 
     @classmethod
