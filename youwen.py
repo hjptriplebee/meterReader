@@ -1,6 +1,6 @@
 from Common import *
 
-ifshow = True
+ifshow = False
 
 red_range = [ np.array([156, 120, 80]), np.array([179, 240, 220])]
 white_range = [ np.array([0, 0, 200]), np.array([180, 30, 255])]
@@ -20,17 +20,15 @@ def color_detection(image, color):
         cv2.imshow("inRange", mask)
         cv2.waitKey(0)
 
-    size = mask.shape[::-1]
     mask = cv2.resize(mask, (0, 0), fx=0.5, fy=0.5)
-    kernel_1 = np.ones((3, 3), np.uint8)
-    kernel_2 = np.ones((5, 5), np.uint8)
+    kernel = np.ones((3, 3), np.uint8)
 
-    mask = cv2.dilate(mask, kernel_1, 1)
+    mask = cv2.dilate(mask, kernel,)
     if ifshow:
         cv2.imshow("dilate", mask)
         cv2.waitKey(0)
 
-    mask = cv2.erode(mask, kernel_1)
+    mask = cv2.erode(mask, kernel)
     if ifshow:
         cv2.imshow("erode", mask)
         cv2.waitKey(0)
@@ -64,9 +62,6 @@ def contours_check(image, center):
     for i in range(len(contours)):
         rec = cv2.minAreaRect(contours[i])
         area = cv2.contourArea(contours[i])
-        print(area/(rec[1][0]*rec[1][1]+1), area)
-        # print(rec)
-        # print(cv2.contourArea(contours[i])/(rec[1][0]*rec[1][1]))
         if area/(rec[1][0]*rec[1][1]+1) < 0.7 or area > 1400 or area < 500:
             continue
         else:
@@ -96,12 +91,13 @@ def youwen(image, info):
     start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
     center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
-    cv2.imshow("input", image)
-    cv2.waitKey(0)
+    if ifshow:
+        cv2.imshow("input", image)
+        cv2.waitKey(0)
 
     meter = meterFinderByTemplate(image, info["template"])
     h, w, _ = meter.shape
-    print("origin shape", h, w)
+    # print("origin shape", h, w)
 
     fixHeight = 300
     fixWidth = int(meter.shape[1] / meter.shape[0] * fixHeight)
@@ -118,21 +114,21 @@ def youwen(image, info):
     mask_meter_red = color_detection(meter, red_range)
     point_red = contours_check(mask_meter_red, center)
     degree_red = AngleFactory.calPointerValueByOuterPoint(start, end, center, point_red, info["startValue"], info["totalValue"])
-    print("red degree {:.2f}".format(degree_red))
-
     cv2.destroyAllWindows()
-
     mask_meter_white = color_detection(meter, white_range)
     point_white = contours_check(mask_meter_white, center)
     degree_white = AngleFactory.calPointerValueByOuterPoint(start, end, center, point_white, info["startValue"], info["totalValue"])
-    print("white degree {:.2f}".format(degree_white))
 
-    cv2.circle(meter, (start[0], start[1]), 5, (0, 0, 255), -1)
-    cv2.circle(meter, (end[0], end[1]), 5, (0, 0, 255), -1)
-    cv2.circle(meter, (center[0], center[1]), 5, (0, 0, 255), -1)
-    cv2.circle(meter, (point_white[0], point_white[1]), 5, (255, 255, 255), -1)
-    cv2.circle(meter, (point_red[0], point_red[1]), 5, (0, 0, 255), -1)
-    cv2.imshow("meter", meter)
-    cv2.waitKey(0)
+
+    if ifshow:
+        print("white degree {:.2f}".format(degree_white))
+        print("red degree {:.2f}".format(degree_red))
+        cv2.circle(meter, (start[0], start[1]), 5, (0, 0, 255), -1)
+        cv2.circle(meter, (end[0], end[1]), 5, (0, 0, 255), -1)
+        cv2.circle(meter, (center[0], center[1]), 5, (0, 0, 255), -1)
+        cv2.circle(meter, (point_white[0], point_white[1]), 5, (255, 255, 255), -1)
+        cv2.circle(meter, (point_red[0], point_red[1]), 5, (0, 0, 255), -1)
+        cv2.imshow("meter", meter)
+        cv2.waitKey(0)
 
     return int(degree_red*100)/100, int(degree_white*100)/100
