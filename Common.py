@@ -93,6 +93,7 @@ def meterFinderBySIFT(image, template):
     #     cv2.circle(image, (int(p1), int(p2)), 0, (255, 0, 0), thickness=50)
     #     print(p1, p2)
     # cv2.imshow("matchImage", image)
+
     minX = int(np.min(matchPointMatrix[:, 0]))
     maxX = int(np.max(matchPointMatrix[:, 0]))
     minY = int(np.min(matchPointMatrix[:, 1]))
@@ -132,7 +133,7 @@ class AngleFactory:
         angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
 
         # if counter-clockwise
-        if np.cross(vectorA, vectorB) > 0:
+        if np.cross(vectorA, vectorB) < 0:
             angle = 2 * np.pi - angle
 
         return angle
@@ -171,7 +172,7 @@ class AngleFactory:
         angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
 
         # if counter-clockwise
-        if np.cross(vectorA, vectorB) > 0:
+        if np.cross(vectorA, vectorB) < 0:
             angle = 2 * np.pi - angle
 
         value = angle / angleRange * totalValue + startValue
