@@ -2,25 +2,25 @@
       "distance": 10.0,
       "horizontal": 10.0,
       "vertical": 20.0,
-      "name": "youwen_5",
+      "name": "youwen_6",
       "type": "youwen",
       "ROI": {
-          "x": 5,
-          "y":5,
-          "w": 700,
-          "h": 900
+          "x": 345,
+          "y":467,
+          "w": 200,
+          "h": 400
       },
       "startPoint": {
-          "x": 73,
-          "y": 324
+          "x": 26,
+          "y": 88
       },
       "endPoint": {
-          "x": 315,
-          "y": 336
+          "x": 99,
+          "y": 86
       },
       "centerPoint": {
-          "x": 209,
-          "y": 228
+          "x": 59,
+          "y": 54
       },
       "startValue": 0.0,
       "totalValue": 150.0

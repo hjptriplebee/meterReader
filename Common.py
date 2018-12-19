@@ -151,7 +151,7 @@ class AngleFactory:
         angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
         value = angle / angleRange * totalValue + startValue
-        print(angleRange/np.pi*180, angle/np.pi*180)
+
         return value
 
     @classmethod
