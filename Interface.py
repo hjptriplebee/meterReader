@@ -2,6 +2,7 @@ import cv2
 import json
 from SF6 import SF6Reader
 from youwen import youwen
+from pressure import pressure
 
 
 def meterReaderCallBack(image, info):
@@ -48,6 +49,8 @@ def getInfo(ID):
         info["type"] = SF6Reader
     elif info["type"] == "youwen":
         info["type"] = youwen
+    elif info["type"] == "pressure":
+        info["type"] = pressure
     info["template"] = cv2.imread("template/" + ID + ".jpg")
     return info
 
