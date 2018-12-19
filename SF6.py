@@ -78,7 +78,7 @@ def SF6Reader(image, info):
     res = AngleFactory.calPointerValueByOuterPoint(np.array(startPoint), np.array(endPoint), np.array(centerPoint),
                                                    np.array(point), startValue, totalValue)
 
-    cv2.imshow("meter", meter)
-    cv2.waitKey(0)
+    # cv2.imshow("meter", meter)
+    # cv2.waitKey(0)
 
     return res
