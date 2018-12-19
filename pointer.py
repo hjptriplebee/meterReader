@@ -3,6 +3,7 @@ import cv2
 import json
 import RasancFitCircle as rasan
 import PlotUtil as plot
+import DrawSector as ds
 
 plot_img_index = 0
 window_name = "Meter Line Connection"
@@ -110,7 +111,7 @@ def recognizePointerInstrument(image, info):
     dst_threshold = 40
     period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
     iter_time = 5  # 启动rasanc拟合算法的固定次数
-    hit_time = 0 # 成功拟合到圆的次数
+    hit_time = 0  # 成功拟合到圆的次数
     # 为了确保拟合所得的圆的确信度，多次拟合求平均值
     for i in range(iter_time):
         best_circle, max_fit_num, best_consensus_pointers = rasan.randomSampleConsensus(centroids,
@@ -128,14 +129,24 @@ def recognizePointerInstrument(image, info):
         avg_circle /= hit_time
         avg_fit_num /= hit_time
     # 求平均值减少误差
+    center = (np.int(avg_circle[0]), np.int(avg_circle[1]))
+    radius = np.int(avg_circle[2])
     if avg_fit_num > len(centroids) / 2:
-        cv2.circle(rgb_src, center=(np.int(avg_circle[0]), np.int(avg_circle[1])), radius=np.int(avg_circle[2]),
+        cv2.circle(rgb_src, center, radius,
                    color=(0, 0, 255),
                    thickness=2,
                    lineType=cv2.LINE_AA)
         plot.subImage(src=rgb_src, index=inc(), title='Fitted Circle')
     else:
         print("Fitting Circle Failed.")
+    patch_degree = 5
+    masks = ds.buildCounterClockWiseSectorMasks(center, radius, canny.shape, patch_degree, (255, 0, 0),reverse=True)
+    mask_res = []
+    for mask in masks:
+        mask_res.append(cv2.bitwise_and(canny, mask))
+    for res in mask_res:
+        index = inc()
+        plot.subImage(src=res, index=index, title='Mask Res :' + str(index), cmap='gray')
     plot.show()
 
 
@@ -188,6 +199,6 @@ def compareEqualizeHistBetweenDiffEnvironment():
 
 
 if __name__ == '__main__':
-    recognizePointerInstrument(cv2.imread("image/SF6/IMG_DOUBLE.JPG"), None)
+    recognizePointerInstrument(cv2.imread("image/SF6/IMG_7640.JPG"), None)
 
     # compareEqualizeHistBetweenDiffEnvironment()
