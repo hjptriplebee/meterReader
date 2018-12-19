@@ -1,8 +1,6 @@
 from Common import *
 
-import math
 import numpy as np
-
 
 def pressure(image, info):
 	"""
@@ -27,18 +25,16 @@ def pressure(image, info):
 	center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
 	totalvalue = info["totalValue"]
 	startvalue = info["startValue"]
-	# print("start: ", start, " end:", end, " center:", center)
-	# print("pointer:", pointer)
-	# print(startvalue, totalvalue)
 	result = AngleFactory.calPointerValueByPointerVector(start, end, center, pointer, startvalue, totalvalue)
-	print("result: ", result)
-	
 	return result
 
 
-
-
 def getLine(img):
+	"""
+	draw pointer line on the image
+	:param img:
+	:return: first detected line
+	"""
 	img = cv2.GaussianBlur(img, (3, 3), 0)
 	# cv2.imshow("GaussianBlur ", img)
 	edges = cv2.Canny(img, 100, 200, apertureSize=3)
@@ -66,6 +62,14 @@ def getLine(img):
 
 
 def getPointer(x0, y0, width, height):
+	"""
+	limit line in the image
+	:param x0:
+	:param y0:
+	:param width: image width
+	:param height: image height
+	:return: two point of the detected line
+	"""
 	xcenter = int(width / 2)
 	ycenter = int(height / 2)
 	if xcenter < x0 or (xcenter == x0 and ycenter > y0):

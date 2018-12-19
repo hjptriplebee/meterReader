@@ -75,6 +75,3 @@ def meterReader(image, meterIDs):
         # call back
         results[ID] = meterReaderCallBack(ROI, info)
     return results
-
-# image = cv2.imread("image/pressure.jpg")
-# print(meterReader(image, ["pressure"]))
