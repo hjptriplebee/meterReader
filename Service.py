@@ -96,6 +96,6 @@ if __name__ == "__main__":
     # serverProcess.start()
     # time.sleep(3)
     # clientProcess.start()
-    image = cv2.imread("image/2018-11-20-16-22-02.jpg")
-    meterReader(image, ["1_1"])
+    image = cv2.imread("image/SF6_1.JPG")
+    print(meterReader(image, ["SF6_1"]))
 
