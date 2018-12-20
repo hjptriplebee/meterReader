@@ -53,6 +53,9 @@ def recognizePointerInstrument(image, info):
     cv2.convertScaleAbs(grad_x, grad_x)
     cv2.convertScaleAbs(grad_y, grad_y)
     grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
+    plot.subImage(cmap='gray', src=grad, title="grad", index=inc())
+    grad = cv2.GaussianBlur(grad, (3, 3), sigmaX=0, sigmaY=0)
+    plot.subImage(src=grad, index=inc(), title='BlurredGrad', cmap='gray')
     # get binarization image by Otsu'algorithm
     ret, ostu = cv2.threshold(grad, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     adaptive = cv2.adaptiveThreshold(grad, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
@@ -61,32 +64,34 @@ def recognizePointerInstrument(image, info):
     # plot.subImage(cmap='gray', src=gray, title='gray', index=inc())
     # plot.subImage(cmap='gray', src=grad_x, title="GradX", index=inc())
     # plot.subimage(cmap='gray', src=grad_y, title="grady", index=inc())
-    plot.subImage(cmap='gray', src=grad, title="grad", index=inc())
     # plot.subimage(cmap='gray', src=otsu, title="otsu", index=inc())
     # plot.subimage(cmap='gray', src=adaptive, title="adaptive", index=inc())
-
     plot.subImage(cmap='gray', src=canny, title="Canny", index=inc())
-    kernel = cv2.getStructuringElement(ksize=(5, 5), shape=cv2.MORPH_ELLIPSE)
+    dilate_kernel = cv2.getStructuringElement(ksize=(3, 3), shape=cv2.MORPH_ELLIPSE)
+    erode_kernel = cv2.getStructuringElement(ksize=(5, 5), shape=cv2.MORPH_ELLIPSE)
     kernel_cy = cv2.getStructuringElement(ksize=(2, 2), shape=cv2.MORPH_CROSS)
     ed_canny = cv2.erode(canny, kernel_cy)
     ed_canny = cv2.dilate(ed_canny, kernel_cy)
-    plot.subImage(src=ed_canny, index=inc(), title='EDCanny', cmap='gray')
-    threshold = cv2.dilate(threshold, kernel)
-    threshold = cv2.erode(threshold, kernel)
-    canny = cv2.dilate(canny, kernel)
-    canny = cv2.erode(canny, kernel)
+    # plot.subImage(src=ed_canny, index=inc(), title='EDCanny', cmap='gray')
+    threshold = cv2.dilate(threshold, dilate_kernel)
+    threshold = cv2.erode(threshold, dilate_kernel)
+    canny = cv2.dilate(canny, dilate_kernel)
+    dilate_canny = canny.copy()
+    plot.subImage(src=ed_canny, index=inc(), title="EDCanny", cmap='gray')
+    plot.subImage(src=canny, index=inc(), title='DilatedCanny', cmap='gray')
+    canny = cv2.erode(canny, erode_kernel)
+    canny = cv2.dilate(canny, dilate_kernel)
     # cv2.createTrackbar("Kernel:", window_name, 1, 20, dilate_erode)
     # cv2.imshow(window_name, otsu)
-    plot.subImage(cmap='gray', src=threshold, title='DilateAndErodeThresh', index=inc())
+    # plot.subImage(cmap='gray', src=threshold, title='DilateAndErodeThresh', index=inc())
     plot.subImage(cmap='gray', src=canny, title='DilateAndErodeCanny', index=inc())
-
     img, contours, hierarchy = cv2.findContours(canny, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE)
     # filter some large contours, the pixel number of scale line should be small enough.
     # and the algorithm will find the pixel belong to the scale line as we need.
-    contours = [c for c in contours if len(c) < 45]
+    contours = [c for c in contours if len(c) < 30]
     ## Draw Contours
     src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
-    cv2.drawContours(src, contours, -1, (0, 255, 0), thickness=1)
+    cv2.drawContours(src, contours, -1, (0, 255, 0), thickness=cv2.FILLED)
     plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), title='Contours', index=inc())
 
     # C. Figuring out Centroids of the Scale Lines
@@ -102,13 +107,15 @@ def recognizePointerInstrument(image, info):
     #     p2 = (int(centroids[i + 1][0]), int(centroids[i + 1][1]))
     #     cv2.line(src, p1, p2, color=(0, 255, 0), thickness=3)
     for centroid in centroids:
-        rgb_src[int(centroid[0]), int(centroid[1])] = (0, 255, 0)
-    plot.subImage(src=rgb_src, index=inc(), title="Centroids")
-    # plot.subImage(src=src, index=inc(), title='Line')
+        # rgb_src[int(centroid[0]), int(centroid[1])] = (0, 255, 0)
+        r = np.random.randint(0, 256)
+        g = np.random.randint(0, 256)
+        b = np.random.randint(0, 256)
+        cv2.circle(rgb_src, (np.int64(centroid[0]), np.int64(centroid[1])), radius=4, color=(r, g, b), thickness=2)
     rasan_iteration = rasan.getIteration(0.7, 0.3)
     avg_circle = np.zeros(3, dtype=np.float64)
     avg_fit_num = 0
-    dst_threshold = 40
+    dst_threshold = 35
     period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
     iter_time = 5  # 启动rasanc拟合算法的固定次数
     hit_time = 0  # 成功拟合到圆的次数
@@ -139,30 +146,36 @@ def recognizePointerInstrument(image, info):
         plot.subImage(src=rgb_src, index=inc(), title='Fitted Circle')
     else:
         print("Fitting Circle Failed.")
-    patch_degree = 5
-    masks, mask_centroids = ds.buildCounterClockWiseSectorMasks(center, 1 / 3 * radius, canny.shape, patch_degree,
+    pointer_mask, theta = pointerMaskByLine(dilate_canny, center, radius, 0, 360)
+    print("Theta:", theta)
+    plot.subImage(src=pointer_mask, index=inc(), title='Pointer', cmap='gray')
+    # patch_degree = 5
+    # mask_res = []
+    # areas = []
+    # patch_index = 0
+    # pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius)
+    # mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
+    # print("Max Area: ", mask_res[0][1])
+    # print("Degree: ", patch_degree * mask_res[0][0])
+    # for res in mask_res[0:5]:
+    #    index = inc()
+    #    plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
+    plot.show()
+
+
+def pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius):
+    mask_res = []
+    masks, mask_centroids = ds.buildCounterClockWiseSectorMasks(center, radius, canny.shape, patch_degree,
                                                                 (255, 0, 0),
                                                                 reverse=True)
-    mask_res = []
-    areas = []
-    patch_index = 0
     for mask in masks:
         and_mask = cv2.bitwise_and(mask, canny)
+        areas.append(and_mask)
         # mask_res.append((patch_index, np.sum(and_mask), and_mask))
         mask_res.append((patch_index, np.sum(and_mask)))
         patch_index += 1
     mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
-    print(mask_res[:][:])
-    print(mask_res[0])
-    print("Max Area: ", mask_res[0][1])
-    print("Degree: ", patch_degree * mask_res[0][0])
-    # for res in mask_res[10:15]:
-    #    index = inc()
-    #    plot.subImage(src=res[2], index=index, title='Mask Res :' + str(index), cmap='gray')
-    mask = np.zeros(shape=(canny.shape[0] + 2, canny.shape[1] + 2), dtype=np.uint8)
-    cv2.floodFill(canny, mask, mask_centroids[mask_res[1][0]], newVal=(255, 0, 255), loDiff=0, upDiff=0)
-    plot.subImage(cmap='gray', src=canny, title='CannyConnectivity', index=inc())
-    plot.show()
+    return mask_res
 
 
 def on_touch(val):
@@ -213,7 +226,61 @@ def compareEqualizeHistBetweenDiffEnvironment():
     plot.show()
 
 
-if __name__ == '__main__':
-    recognizePointerInstrument(cv2.imread("image/SF6/IMG_7640.JPG"), None)
+def pointerMaskByLine(src, center, radius, low, high):
+    """
+    :param high:圆的搜索范围
+    :param low: 圆的搜索范围
+    :param src: 二值图
+    :param center: 刻度盘的圆心
+    :return: 无指针图
+    """
+    _shape = src.shape
+    img = src.copy()
+    # _img1 = cv2.erode(_img1, kernel3, iterations=1)
+    # _img1 = cv2.dilate(_img1, kernel3, iterations=1)
+    # 157=pi/2*100
+    mask_intensity = 0
+    mask_theta = 0
+    iteration = int(high - low / 360)
+    for i in range(iteration):
+        pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
+        # theta = float(i) * 0.01
+        theta = float(i / 180 * np.pi)
+        y1 = int(center[1] - np.sin(theta) * radius)
+        x1 = int(center[0] + np.cos(theta) * radius)
+        # cv2.circle(black_img, (x1, y1), 2, 255, 3)
+        # cv2.circle(black_img, (item[0], item[1]), 2, 255, 3)
+        cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, 5)
+        and_img = cv2.bitwise_and(pointer_mask, img)
+        not_zero_intensity = cv2.countNonZero(and_img)
+        if not_zero_intensity > mask_intensity:
+            mask_intensity = not_zero_intensity
+            mask_theta = theta
+        # imwrite(dir_path+'/2_line1.jpg', black_img)
 
+    pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
+    y1 = int(center[1] - np.sin(mask_theta) * radius)
+    x1 = int(center[0] + np.cos(mask_theta) * radius)
+    cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, 8)
+    #
+    # black_img1 = np.zeros([_shape[0], _shape[1]], np.uint8)
+    # r = item[2]-20 if item[2]==_heart[1][2] else _heart[1][2]+ _heart[0][1]-_heart[1][1]-20
+    # y1 = int(item[1] - math.sin(mask_theta) * (r))
+    # x1 = int(item[0] + math.cos(mask_theta) * (r))
+    # cv2.line(black_img1, (item[0], item[1]), (x1, y1), 255, 7)
+    # src = cv2.subtract(src, line_mask)
+    # img = cv2.subtract(img, line_mask)
+    mask_theta = 180 - mask_theta * 180 / np.pi
+    if mask_theta < 0:
+        mask_theta = 360 - mask_theta
+    return pointer_mask, mask_theta
+
+
+if __name__ == '__main__':
+    # 纯粹圆盘无干扰
+    recognizePointerInstrument(cv2.imread("image/SF6/IMG_7640.JPG"), None)
+    # SF6
+    # recognizePointerInstrument(cv2.imread("image/SF6/IMG_7586_1.JPG"), None)
+    # youwen
+    # recognizePointerInstrument(cv2.imread("image/SF6/IMG_7666.JPG"), None)
     # compareEqualizeHistBetweenDiffEnvironment()
