@@ -15,12 +15,13 @@ def drawApproSectorMask(dst, begin_pointer, end_pointer, center, color, thicknes
     cv2.line(dst, begin_pointer, center, color=color, thickness=thickness, lineType=lineType)
     cv2.line(dst, center, end_pointer, color=color, thickness=thickness, lineType=lineType)
     cv2.floodFill(dst, mask=mask, seedPoint=sector_center, newVal=color, loDiff=0, upDiff=0)
-    return dst
+    return x, y
 
 
 def buildCounterClockWiseSectorMasks(center, radius, shape, patch_degree, color, reverse=False, masks=None):
     iteration = int(360 / patch_degree)
     reverse_flag = 1
+    centorids = []
     if masks is None:
         masks = []
     if reverse:
@@ -35,6 +36,9 @@ def buildCounterClockWiseSectorMasks(center, radius, shape, patch_degree, color,
         y1 = y_theta1 * radius + center[1]
         x2 = x_theta2 * radius + center[0]
         y2 = y_theta2 * radius + center[1]
-        drawApproSectorMask(mask, (x1, y1), (x2, y2), center, color, thickness=2, lineType=cv2.FILLED)
+        centroid_x, centroid_y = drawApproSectorMask(mask, (x1, y1), (x2, y2), center, color, thickness=2,
+                                                     lineType=cv2.FILLED)
         masks.append(mask)
-    return masks
+        centorids.append((np.uint64(centroid_x), np.uint64(centroid_y)))
+
+    return masks, centorids

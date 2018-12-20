@@ -140,13 +140,28 @@ def recognizePointerInstrument(image, info):
     else:
         print("Fitting Circle Failed.")
     patch_degree = 5
-    masks = ds.buildCounterClockWiseSectorMasks(center, radius, canny.shape, patch_degree, (255, 0, 0),reverse=True)
+    masks, mask_centroids = ds.buildCounterClockWiseSectorMasks(center, 1 / 3 * radius, canny.shape, patch_degree,
+                                                                (255, 0, 0),
+                                                                reverse=True)
     mask_res = []
+    areas = []
+    patch_index = 0
     for mask in masks:
-        mask_res.append(cv2.bitwise_and(canny, mask))
-    for res in mask_res:
-        index = inc()
-        plot.subImage(src=res, index=index, title='Mask Res :' + str(index), cmap='gray')
+        and_mask = cv2.bitwise_and(mask, canny)
+        # mask_res.append((patch_index, np.sum(and_mask), and_mask))
+        mask_res.append((patch_index, np.sum(and_mask)))
+        patch_index += 1
+    mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
+    print(mask_res[:][:])
+    print(mask_res[0])
+    print("Max Area: ", mask_res[0][1])
+    print("Degree: ", patch_degree * mask_res[0][0])
+    # for res in mask_res[10:15]:
+    #    index = inc()
+    #    plot.subImage(src=res[2], index=index, title='Mask Res :' + str(index), cmap='gray')
+    mask = np.zeros(shape=(canny.shape[0] + 2, canny.shape[1] + 2), dtype=np.uint8)
+    cv2.floodFill(canny, mask, mask_centroids[mask_res[1][0]], newVal=(255, 0, 255), loDiff=0, upDiff=0)
+    plot.subImage(cmap='gray', src=canny, title='CannyConnectivity', index=inc())
     plot.show()
 
 
