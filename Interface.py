@@ -3,6 +3,7 @@ import json
 from SF6 import SF6Reader
 from youwen import youwen
 from pressure import pressure
+from absorb import *
 from bileiqi_1 import *
 
 def meterReaderCallBack(image, info):
@@ -44,6 +45,7 @@ def getInfo(ID):
     """
     file = open("config/" + ID + ".json")
     info = json.load(file)
+    print(info["type"])
     # string to pointer
     if info["type"] == "SF6":
         info["type"] = SF6Reader
@@ -53,7 +55,12 @@ def getInfo(ID):
         info["type"] = pressure
     elif info["type"] == "bileiqi_1":
         info["type"] = bileiqi_1
-    info["template"] = cv2.imread("template/" + ID + ".jpg")
+    elif info["type"] == "absorb":
+        print("absorb")
+        info["type"] =absorb
+
+    #info["template"] = cv2.imread("template/" + ID + ".jpg")
+    print(info["type"])
     return info
 
 
