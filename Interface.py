@@ -54,7 +54,7 @@ def getInfo(ID):
         info["type"] = youwen
     elif info["type"] == "pressure":
         info["type"] = pressure
-    elif info["type"] == "bileiqi_1":
+    elif info["type"] == "bileiqi":
         info["type"] = bileiqi_1
     elif info["type"] == "blenometer":
         info["type"] = bleno.checkBleno
