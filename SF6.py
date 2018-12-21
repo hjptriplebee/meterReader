@@ -1,6 +1,5 @@
 from Common import *
 
-#hello
 def SF6Reader(image, info):
     """
     :param image: ROI image

@@ -4,7 +4,6 @@
       "vertical": 20.0,
       "name": "C_1_4",
       "type": "CGreen",
-      "template": "template.jpg",
       "ROI": {
           "x": 200,
           "y": 200,

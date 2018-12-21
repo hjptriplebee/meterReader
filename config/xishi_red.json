@@ -4,7 +4,6 @@
       "vertical": 20.0,
       "name": "C_1_1",
       "type": "CYRed",
-      "template": "../templates/C_1_1.png",
       "ROI": {
           "x": 800,
           "y": 400,
