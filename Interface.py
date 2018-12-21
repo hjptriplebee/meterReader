@@ -54,8 +54,8 @@ def getInfo(ID):
         info["type"] = youwen
     elif info["type"] == "pressure":
         info["type"] = pressure
-    elif info["type"] == "bileiqi_1":
-        info["type"] = bileiqi_1
+    elif info["type"] == "bileiqi1":
+        info["type"] = bileiqi1
     elif info["type"] == "blenometer":
         info["type"] = bleno.checkBleno
     info["template"] = cv2.imread("template/" + ID + ".jpg")

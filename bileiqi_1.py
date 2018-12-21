@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import cv2 as cv
+from Common import *
 from keras.models import load_model
 def levelAngle(x1,y1,x2,y2):  #求角度 指针向量的两个点
     """
@@ -30,11 +31,15 @@ def line_detect(gray,low_thres=40,high_thres=110):
         linepoint.append(line[0])
 
     return linepoint
-def bileiqi_1(src,info):
+def bileiqi1(src,info):
     """
     :param src: ROI
     :return:value
     """
+    src = meterFinderBySIFT(src, info["template"])
+    cv2.imshow("src", src)
+    cv2.waitKey(0)
+
     low_thres=40     #Canny检测的高低阈值
     high_thres=100
     src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
@@ -44,6 +49,8 @@ def bileiqi_1(src,info):
     # 闭操作
     src_close = cv.morphologyEx(src_bin, cv.MORPH_CLOSE, kernel)
     image, contours, h = cv.findContours(src_close, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+
+    minrect = []
     for i in range(len(contours)):
         rect = cv.minAreaRect(contours[i])
         if (rect[1][0] > (src.shape[1] * 0.5) and rect[1][1] > (src.shape[0] * 0.3) and rect[1][0] < (
