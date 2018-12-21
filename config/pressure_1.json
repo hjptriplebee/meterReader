@@ -1,0 +1,62 @@
+{
+  "distance": 10.0,
+  "horizontal": 10.0,
+  "vertical": 20.0,
+  "name": "1_1",
+  "type": "SF6",
+  "ROI": {
+    "x": 200,
+    "y": 200,
+    "w": 1520,
+    "h": 680
+  },
+  "startPoint": {
+    "x": 121,
+    "y": 334
+  },
+  "endPoint": {
+    "x": 334,
+    "y": 347
+  },
+  "centerPoint": {
+    "x": 229,
+    "y": 246
+  },
+  "startValue": 0.0,
+  "totalValue": 2.5,
+  "unit": "Mpa",
+  "enableFit" : false,
+  "enableEqualizeHistogram":false,
+  "interferences": [
+    [
+      109,
+      217,
+      35,
+      136
+    ],
+    [
+      181,
+      177,
+      61,
+      25
+    ],
+    [
+      262,
+      233,
+      40,
+      6
+    ],
+    [
+      143,
+      334,
+      173,
+      242
+    ],
+    [
+      151,
+      230,
+      51,
+      112
+    ]
+  ]
+}

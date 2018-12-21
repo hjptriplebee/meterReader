@@ -2,8 +2,10 @@ import numpy as np
 import cv2
 import json
 import RasancFitCircle as rasan
+import Common as com
 import PlotUtil as plot
 import DrawSector as ds
+import ROIUtil as roiutil
 
 plot_img_index = 0
 window_name = "Meter Line Connection"
@@ -17,7 +19,6 @@ def inc():
 
 
 def recognizePointerInstrument(image, info):
-    global window_name, kernel_size, max_kernel_size, ed_src
     doEqualizeHist = False
     if image is None:
         print("Open Error.Image is empty.")
@@ -57,9 +58,9 @@ def recognizePointerInstrument(image, info):
     grad = cv2.GaussianBlur(grad, (3, 3), sigmaX=0, sigmaY=0)
     plot.subImage(src=grad, index=inc(), title='BlurredGrad', cmap='gray')
     # get binarization image by Otsu'algorithm
-    ret, ostu = cv2.threshold(grad, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    adaptive = cv2.adaptiveThreshold(grad, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-    threshold = ostu
+    # ret, ostu = cv2.threshold(grad, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # adaptive = cv1.adaptiveThreshold(grad, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+    # threshold = ostu
     canny = cv2.Canny(src, 75, 75 * 2)
     # plot.subImage(cmap='gray', src=gray, title='gray', index=inc())
     # plot.subImage(cmap='gray', src=grad_x, title="GradX", index=inc())
@@ -67,58 +68,92 @@ def recognizePointerInstrument(image, info):
     # plot.subimage(cmap='gray', src=otsu, title="otsu", index=inc())
     # plot.subimage(cmap='gray', src=adaptive, title="adaptive", index=inc())
     plot.subImage(cmap='gray', src=canny, title="Canny", index=inc())
-    dilate_kernel = cv2.getStructuringElement(ksize=(3, 3), shape=cv2.MORPH_ELLIPSE)
-    erode_kernel = cv2.getStructuringElement(ksize=(5, 5), shape=cv2.MORPH_ELLIPSE)
-    kernel_cy = cv2.getStructuringElement(ksize=(2, 2), shape=cv2.MORPH_CROSS)
-    ed_canny = cv2.erode(canny, kernel_cy)
-    ed_canny = cv2.dilate(ed_canny, kernel_cy)
+    dilate_kernel = cv2.getStructuringElement(ksize=(5, 5), shape=cv2.MORPH_ELLIPSE)
+    erode_kernel = cv2.getStructuringElement(ksize=(3, 3), shape=cv2.MORPH_ELLIPSE)
     # plot.subImage(src=ed_canny, index=inc(), title='EDCanny', cmap='gray')
-    threshold = cv2.dilate(threshold, dilate_kernel)
-    threshold = cv2.erode(threshold, dilate_kernel)
-    canny = cv2.dilate(canny, dilate_kernel)
+    # threshold = cv2.dilate(threshold, dilate_kernel)
+    # threshold = cv2.erode(threshold, dilate_kernel)
+    # canny = cv2.dilate(canny, dilate_kernel)
     dilate_canny = canny.copy()
-    plot.subImage(src=ed_canny, index=inc(), title="EDCanny", cmap='gray')
     plot.subImage(src=canny, index=inc(), title='DilatedCanny', cmap='gray')
-    canny = cv2.erode(canny, erode_kernel)
     canny = cv2.dilate(canny, dilate_kernel)
+    canny = cv2.erode(canny, erode_kernel)
+    zhang_thinning = cv2.ximgproc.thinning(canny, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
+    # guo_thinning = cv2.ximgproc.thinning(canny, thinningType=cv2.ximgproc.THINNING_GUOHALL)
+    plot.subImage(cmap='gray', src=zhang_thinning, title='ZhangeThinning', index=inc())
+    # plot.subImage(cmap='gray', src=guo_thinning, title='GuoThinning', index=inc())
     # cv2.createTrackbar("Kernel:", window_name, 1, 20, dilate_erode)
     # cv2.imshow(window_name, otsu)
     # plot.subImage(cmap='gray', src=threshold, title='DilateAndErodeThresh', index=inc())
     plot.subImage(cmap='gray', src=canny, title='DilateAndErodeCanny', index=inc())
+    # find contours ,at least included all lines
     img, contours, hierarchy = cv2.findContours(canny, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE)
     # filter some large contours, the pixel number of scale line should be small enough.
     # and the algorithm will find the pixel belong to the scale line as we need.
-    contours = [c for c in contours if len(c) < 30]
+    contours = [c for c in contours if len(c) < 40]
     ## Draw Contours
     src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
     cv2.drawContours(src, contours, -1, (0, 255, 0), thickness=cv2.FILLED)
-    plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), title='Contours', index=inc())
-
+    prasan_iteration = rasan.getIteration(0.7, 0.3)
+    avg_circle = np.zeros(3, dtype=np.float64)
+    avg_fit_num = 0
+    dst_threshold = 35
+    period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
+    iter_time = 5  # 启动rasanc拟合算法的固定次数
+    hit_time = 0  # 成功拟合到圆的次数lot.subImage(src=src, title='Contours', index=inc())
     # C. Figuring out Centroids of the Scale Lines
+    theta = 0
+    total = info['totalValue']
+    start_ptr = info['startPoint']
+    end_ptr = info['endPoint']
+    assert start_ptr is not None
+    assert end_ptr is not None
+    assert total is not None
+    center = 0
+    radius = 0
+    if info['enableFit']:
+        center, radius = figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_threshold, hit_time,
+                                                        iter_time, period_rasanc_time, rgb_src)
+    else:
+        center = info['centerPoint']
+        assert center is not None
+        radius_1 = np.sqrt(np.power(start_ptr['x'] - center['x'], 2) + np.power(start_ptr['y'] - center['y'], 2))
+        radius_2 = np.sqrt(np.power(end_ptr['x'] - center['x'], 2) + np.power(end_ptr['y'] - center['y'], 2))
+        radius = (radius_1 + radius_2) / 2
+        center = (center['x'], center['y'])
+    pointer_mask, theta = pointerMaskByLine(dilate_canny, center, radius, 0, 360)
+    print("Theta:", theta)
+    plot.subImage(src=pointer_mask, index=inc(), title='Pointer', cmap='gray')
+    # patch_degree = 5
+    # mask_res = []
+    # areas = []
+    # patch_index = 0
+    # pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius)
+    # mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
+    # print("Max Area: ", mask_res[0][1])
+    # print("Degree: ", patch_degree * mask_res[0][0])
+    # for res in mask_res[0:5]:
+    #    index = inc()
+    #    plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
+    plot.show()
+
+
+def figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_threshold, hit_time, iter_time,
+                                   period_rasanc_time, rgb_src):
     centroids = []
     mut = []
     for contour in contours:
         mu = cv2.moments(contour)
         if mu['m00'] != 0:
             centroids.append((mu['m10'] / mu['m00'], mu['m01'] / mu['m00']))
-    length = len(centroids)
-    # for i in range(0, length - 1):
-    #     p1 = (int(centroids[i][0]), int(centroids[i][1]))
-    #     p2 = (int(centroids[i + 1][0]), int(centroids[i + 1][1]))
-    #     cv2.line(src, p1, p2, color=(0, 255, 0), thickness=3)
+    fitted_circle_img = rgb_src.copy()
     for centroid in centroids:
         # rgb_src[int(centroid[0]), int(centroid[1])] = (0, 255, 0)
         r = np.random.randint(0, 256)
         g = np.random.randint(0, 256)
         b = np.random.randint(0, 256)
-        cv2.circle(rgb_src, (np.int64(centroid[0]), np.int64(centroid[1])), radius=4, color=(r, g, b), thickness=2)
-    rasan_iteration = rasan.getIteration(0.7, 0.3)
-    avg_circle = np.zeros(3, dtype=np.float64)
-    avg_fit_num = 0
-    dst_threshold = 35
-    period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
-    iter_time = 5  # 启动rasanc拟合算法的固定次数
-    hit_time = 0  # 成功拟合到圆的次数
+        cv2.circle(fitted_circle_img, (np.int64(centroid[0]), np.int64(centroid[1])), radius=4, color=(r, g, b),
+                   thickness=2)
     # 为了确保拟合所得的圆的确信度，多次拟合求平均值
     for i in range(iter_time):
         best_circle, max_fit_num, best_consensus_pointers = rasan.randomSampleConsensus(centroids,
@@ -139,37 +174,55 @@ def recognizePointerInstrument(image, info):
     center = (np.int(avg_circle[0]), np.int(avg_circle[1]))
     radius = np.int(avg_circle[2])
     if avg_fit_num > len(centroids) / 2:
-        cv2.circle(rgb_src, center, radius,
+        cv2.circle(fitted_circle_img, center, radius,
                    color=(0, 0, 255),
                    thickness=2,
                    lineType=cv2.LINE_AA)
-        plot.subImage(src=rgb_src, index=inc(), title='Fitted Circle')
+        cv2.circle(fitted_circle_img, center, radius=6, color=(0, 0, 255), thickness=2)
+        plot.subImage(src=fitted_circle_img, index=inc(), title='Fitted Circle')
     else:
         print("Fitting Circle Failed.")
-    pointer_mask, theta = pointerMaskByLine(dilate_canny, center, radius, 0, 360)
-    print("Theta:", theta)
-    plot.subImage(src=pointer_mask, index=inc(), title='Pointer', cmap='gray')
-    # patch_degree = 5
-    # mask_res = []
-    # areas = []
-    # patch_index = 0
-    # pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius)
-    # mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
-    # print("Max Area: ", mask_res[0][1])
-    # print("Degree: ", patch_degree * mask_res[0][0])
-    # for res in mask_res[0:5]:
-    #    index = inc()
-    #    plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
-    plot.show()
+    return center, radius
 
 
-def pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius):
+def extractLines(gray):
+    p_lines = cv2.HoughLinesP(gray, 1, np.pi / 180, threshold=5, minLineLength=1, maxLineGap=10)
+    lines = cv2.HoughLines(gray, 1, np.pi / 180, threshold=5)
+    p_src_lines = np.zeros(shape=(gray.shape[0], gray[1], 3), dtype=np.uint8)
+    src_lines = np.zeros(shape=(gray.shape[0], gray[1], 3), dtype=np.uint8)
+    for line in p_lines[0]:
+        r = np.random.randint(0, 256)
+        g = np.random.randint(0, 256)
+        b = np.random.randint(0, 256)
+        cv2.line(p_src_lines, (line[0], line[1]), (line[2], line[3]), color=(r, g, b), thickness=1)
+        cv2.circle(p_src_lines, (line[0], line[1]), radius=4, color=(r, g, b), thickness=1)
+        cv2.circle(p_src_lines, (line[2], line[3]), radius=4, color=(r, g, b), thickness=1)
+    for line in lines[0]:
+        r = np.random.randint(0, 256)
+        g = np.random.randint(0, 256)
+        cb = np.random.randint(0, 256)
+        rho = line[0]
+        theta = line[1]
+        a = np.cos(theta)
+        b = np.sin(theta)
+        x0 = a * rho
+        y0 = b * rho
+        ptr1 = (np.int(x0 + 1000 * (-b)), np.int(y0 + 1000 * a))
+        ptr2 = (np.int(x0 - 1000 * (-b)), np.int(y0 - 1000 * a))
+        cv2.line(src_lines, ptr1, ptr2, color=(r, g, cb), thickness=1)
+        cv2.circle(src_lines, ptr1, radius=4, color=(r, g, cb), thickness=1)
+        cv2.circle(src_lines, ptr2, radius=4, color=(r, g, cb), thickness=1)
+    return lines[0], p_lines[0], src_lines, p_src_lines
+
+
+def pointerMaskBySector(areas, gray, center, patch_degree, radius):
     mask_res = []
-    masks, mask_centroids = ds.buildCounterClockWiseSectorMasks(center, radius, canny.shape, patch_degree,
+    patch_index = 0
+    masks, mask_centroids = ds.buildCounterClockWiseSectorMasks(center, radius, gray.shape, patch_degree,
                                                                 (255, 0, 0),
                                                                 reverse=True)
     for mask in masks:
-        and_mask = cv2.bitwise_and(mask, canny)
+        and_mask = cv2.bitwise_and(mask, gray)
         areas.append(and_mask)
         # mask_res.append((patch_index, np.sum(and_mask), and_mask))
         mask_res.append((patch_index, np.sum(and_mask)))
@@ -276,9 +329,48 @@ def pointerMaskByLine(src, center, radius, low, high):
     return pointer_mask, mask_theta
 
 
+drawing = False  # 是否开始画图
+mode = True  # True：画矩形，False：画圆
+start = (-1, -1)
+
+
+def mouse_event(event, x, y, flags, param):
+    global start, drawing, mode
+
+    # 左键按下：开始画图
+    if event == cv2.EVENT_LBUTTONDOWN:
+        drawing = True
+        start = (x, y)
+    # 鼠标移动，画图
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if drawing:
+            if mode:
+                cv2.rectangle(img, start, (x, y), (0, 255, 0), 1)
+            else:
+                cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+    # 左键释放：结束画图
+    elif event == cv2.EVENT_LBUTTONUP:
+        drawing = False
+        if mode:
+            cv2.rectangle(img, start, (x, y), (0, 255, 0), 1)
+        else:
+            cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+
+
 if __name__ == '__main__':
+    img = cv2.imread('image/SF6/IMG_7640.JPG')
+
+    src = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
+    file = open('config/pressure_1.json')
+    info = json.load(file)
+    print(info['interferences'])
+    print(info['enableFit'])
     # 纯粹圆盘无干扰
-    recognizePointerInstrument(cv2.imread("image/SF6/IMG_7640.JPG"), None)
+    recognizePointerInstrument(img, info)
+    # ROI 选择\
+    # regions = roiutil.selectROI(src)
+    # print(regions)
+
     # SF6
     # recognizePointerInstrument(cv2.imread("image/SF6/IMG_7586_1.JPG"), None)
     # youwen
