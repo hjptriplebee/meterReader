@@ -3,6 +3,7 @@ import numpy as np
 import cv2 as cv
 from Common import *
 from keras.models import load_model
+from Common import *
 def levelAngle(x1,y1,x2,y2):  #求角度 指针向量的两个点
     """
     :param x1: point1_x
@@ -25,23 +26,25 @@ def line_detect(gray,low_thres=40,high_thres=110):
     :return: two points of line
     """
     edges = cv.Canny(gray, low_thres, high_thres, apertureSize=3)
-    linepoint=[]
+    linepoint = []
     lines = cv.HoughLinesP(edges, 1, np.pi / 180, 30, minLineLength=25, maxLineGap=2)
     for line in lines:
         linepoint.append(line[0])
 
     return linepoint
+
 def bileiqi1(src,info):
     """
     :param src: ROI
     :return:value
     """
     src = meterFinderBySIFT(src, info["template"])
-    cv2.imshow("src", src)
-    cv2.waitKey(0)
+    # cv2.imshow("src", src)
+    # cv2.waitKey(0)
 
     low_thres=40     #Canny检测的高低阈值
     high_thres=100
+
     src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
     src_gray = cv.equalizeHist(src_gray)
     thres, src_bin = cv.threshold(src_gray, 100, 255, cv.THRESH_BINARY)
@@ -51,6 +54,7 @@ def bileiqi1(src,info):
     image, contours, h = cv.findContours(src_close, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     minrect = []
+
     for i in range(len(contours)):
         rect = cv.minAreaRect(contours[i])
         if (rect[1][0] > (src.shape[1] * 0.5) and rect[1][1] > (src.shape[0] * 0.3) and rect[1][0] < (
@@ -91,7 +95,7 @@ def bileiqi1(src,info):
                 Aline.append(line)
         if (len(Aline) == 1 or low_thres == 120):
             # print("%f度" % levelAngle(Aline[0][0], Aline[0][1], Aline[0][2], Aline[0][3]))
-            angle=levelAngle(Aline[0][0], Aline[0][1], Aline[0][2], Aline[0][3])
+            angle = levelAngle(Aline[0][0], Aline[0][1], Aline[0][2], Aline[0][3])
             break
         else:
             low_thres += 1
@@ -124,10 +128,10 @@ def bileiqi1(src,info):
     src_num = src_bin[int(newpoints[1][1]) + 5:int(newpoints[0][1] - 5),
               int(newpoints[1][0]) + 10:int(newpoints[2][0]) - 5]
     # 进行数字分割
-    _,src_num_open=cv.threshold(src_num,50,255,cv.THRESH_BINARY)
+    _,src_num_open = cv.threshold(src_num,50,255,cv.THRESH_BINARY)
 
     model = load_model('my_model.h5')
-    Num=''
+    Num = ''
     for i in range(2):
         number = src_num_open[:, i * src_num_open.shape[1] // 2:(i + 1) * src_num_open.shape[1] // 2]
         number = cv.resize(number, (28, 28))
@@ -140,8 +144,8 @@ def bileiqi1(src,info):
             if (max < result[0][i]):
                 max = result[0][i]
                 num = i
-        Num+=repr(num)
+        Num += repr(num)
 
-    return angle,Num
+    return angle , Num
 
 
