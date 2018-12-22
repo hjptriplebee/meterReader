@@ -1,7 +1,5 @@
 import numpy as np
 import math
-import PlotUtil as plot
-import cv2
 
 
 def getIteration(inliers_probability, outliers_ratio):

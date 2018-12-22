@@ -1,19 +1,29 @@
 import cv2
 import numpy as np
-import PlotUtil as plot
 
 
-def drawApproSectorMask(dst, begin_pointer, end_pointer, center, color, thickness, lineType):
-    x = (begin_pointer[0] + end_pointer[0] + center[0]) / 3
-    y = (begin_pointer[1] + end_pointer[1] + center[1]) / 3
+def drawApproSectorMask(dst, begin_point, end_point, center, color, thickness, lineType):
+    """
+    draw sector mask
+    :param dst: 
+    :param begin_point: 
+    :param end_point: 
+    :param center: 
+    :param color: 
+    :param thickness: 
+    :param lineType: 
+    :return:sector shape masks 
+    """
+    x = (begin_point[0] + end_point[0] + center[0]) / 3
+    y = (begin_point[1] + end_point[1] + center[1]) / 3
     sector_center = (np.int64(x), np.int64(y))
     mask = np.zeros((dst.shape[0] + 2, dst.shape[1] + 2, 1), dtype=np.uint8)
-    begin_pointer = (np.int64(begin_pointer[0]), np.int64(begin_pointer[1]))
-    end_pointer = (np.int64(end_pointer[0]), np.int64(end_pointer[1]))
+    begin_point = (np.int64(begin_point[0]), np.int64(begin_point[1]))
+    end_point = (np.int64(end_point[0]), np.int64(end_point[1]))
     center = (np.int64(center[0]), np.int64(center[1]))
-    cv2.line(dst, begin_pointer, end_pointer, color=color, thickness=thickness, lineType=lineType)
-    cv2.line(dst, begin_pointer, center, color=color, thickness=thickness, lineType=lineType)
-    cv2.line(dst, center, end_pointer, color=color, thickness=thickness, lineType=lineType)
+    cv2.line(dst, begin_point, end_point, color=color, thickness=thickness, lineType=lineType)
+    cv2.line(dst, begin_point, center, color=color, thickness=thickness, lineType=lineType)
+    cv2.line(dst, center, end_point, color=color, thickness=thickness, lineType=lineType)
     cv2.floodFill(dst, mask=mask, seedPoint=sector_center, newVal=color, loDiff=0, upDiff=0)
     return x, y
 

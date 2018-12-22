@@ -1,10 +1,8 @@
 from unittest import TestCase
 import tabulate as table
-import unittest
 import numpy as np
-import RasancFitCircle as rasanc
 import cv2
-import PlotUtil as plot
+from uitl import PlotUtil as plot, RasancFitCircle as rasanc
 
 plot_index = 0
 

@@ -1,8 +1,6 @@
 from unittest import TestCase
 # from DrawSector import drawApproSectorMask
-import DrawSector as ds
-import numpy as np
-import PlotUtil as plot
+from uitl import PlotUtil as plot, DrawSector as ds
 
 
 class TestDrawApproSectorMask(TestCase):

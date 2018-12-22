@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
+
 def meterFinderByTemplate(image, template):
     """
     locate meter's bbox
@@ -30,6 +31,7 @@ def meterFinderByTemplate(image, template):
     bottomRight = (topLeft[0] + h, topLeft[1] + w)
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
+
 
 def meterFinderBySIFT(image, template):
     """
@@ -158,6 +160,7 @@ class AngleFactory:
     def calPointerValueByPointerVector(cls, startPoint, endPoint, centerPoint, PointerVector, startValue, totalValue):
         """
         get value of pointer meter
+        注意传入相对圆心的向量
         :param startPoint: start point
         :param endPoint: end point
         :param centerPoint: center point
@@ -172,6 +175,32 @@ class AngleFactory:
         angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
 
         # if counter-clockwise
+        if np.cross(vectorA, vectorB) < 0:
+            angle = 2 * np.pi - angle
+
+        value = angle / angleRange * totalValue + startValue
+
+        return value
+
+    @classmethod
+    def calPointerValueByPoint(cls, startPoint, endPoint, centerPoint, point, startValue, totalValue):
+        """
+        由三个点返回仪表值,区分@calPointerValueByPointerVector
+        :param startPoint: 起点
+        :param endPoint: 终点
+        :param centerPoint:
+        :param point:
+        :param startValue:
+        :param totalValue:
+        :return:
+        """
+        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+
+        vectorA = startPoint - centerPoint
+        vectorB = point - centerPoint
+
+        angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
+
         if np.cross(vectorA, vectorB) < 0:
             angle = 2 * np.pi - angle
 
