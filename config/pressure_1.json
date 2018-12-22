@@ -25,9 +25,10 @@
   "startValue": 0.0,
   "totalValue": 2.5,
   "unit": "Mpa",
-  "enableFit" : false,
-  "enableEqualizeHistogram":false,
-  "interferences": [
+  "enableFit": false,
+  "enableEqualizeHistogram": false,
+  "enableCleanNoisedRegion": true ,
+  "noisedRegion": [
     [
       109,
       217,
@@ -57,6 +58,42 @@
       230,
       51,
       112
+    ],
+    [
+      260,
+      228,
+      44,
+      31
+    ],
+    [
+      325,
+      210,
+      24,
+      34
+    ],
+    [
+      296,
+      300,
+      38,
+      31
+    ],
+    [
+      164,
+      142,
+      20,
+      24
+    ],
+    [
+      107,
+      213,
+      40,
+      33
+    ],
+    [
+      128,
+      300,
+      31,
+      29
     ]
   ]
 }

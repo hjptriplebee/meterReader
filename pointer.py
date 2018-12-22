@@ -111,49 +111,78 @@ def recognizePointerInstrument(image, info):
     assert total is not None
     center = 0
     radius = 0
+    # 使用拟合方式求表盘的圆,进而求出圆心
     if info['enableFit']:
         center, radius = figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_threshold, hit_time,
-                                                        iter_time, period_rasanc_time, rgb_src)
+                                                        iter_time, period_rasanc_time)
+    # 使用标定信息
     else:
         center = info['centerPoint']
         assert center is not None
+        # 起点和始点连接，分别求一次半径,并得到平均值
         radius_1 = np.sqrt(np.power(start_ptr['x'] - center['x'], 2) + np.power(start_ptr['y'] - center['y'], 2))
         radius_2 = np.sqrt(np.power(end_ptr['x'] - center['x'], 2) + np.power(end_ptr['y'] - center['y'], 2))
-        radius = (radius_1 + radius_2) / 2
-        center = (center['x'], center['y'])
-    pointer_mask, theta = pointerMaskByLine(dilate_canny, center, radius, 0, 360)
+        radius = np.int64((radius_1 + radius_2) / 2)
+        center = (np.int64(center['x']), np.int64(center['y']))
+
+    # 清楚可被清除的噪声区域，噪声区域(文字、刻度数字、商标等)的area 可能与指针区域的area形似,应该被清除，
+    # 防止在识别指针时出现干扰。值得注意，如果当前指针覆盖了该干扰区域，指针的一部分可能也会被清除
+    dilate_canny = cleanNoisedRegions(dilate_canny, info, src)
+    # 用直线Mask求指针区域
+    pointer_mask, theta, line_ptr1, line_ptr2 = pointerMaskByLine(dilate_canny, center, radius, 0, 360)
     print("Theta:", theta)
     plot.subImage(src=pointer_mask, index=inc(), title='Pointer', cmap='gray')
-    # patch_degree = 5
-    # mask_res = []
-    # areas = []
-    # patch_index = 0
-    # pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius)
-    # mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
-    # print("Max Area: ", mask_res[0][1])
-    # print("Degree: ", patch_degree * mask_res[0][0])
-    # for res in mask_res[0:5]:
-    #    index = inc()
-    #    plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
+    drawDial(center, radius, rgb_src)
     plot.show()
 
 
+def cleanNoisedRegions(dilate_canny, info, src):
+    if info['noisedRegion'] is not None:
+        region_roi = info['noisedRegion']
+        for roi in region_roi:
+            mask = cv2.bitwise_not(np.zeros(shape=(src.shape[0], src.shape[1]), dtype=np.uint8))
+            mask[roi[1]:roi[1] + roi[3], roi[0]:roi[0] + roi[2]] = 0
+            dilate_canny = cv2.bitwise_and(dilate_canny, mask)
+        plot.subImage(src=dilate_canny, index=inc(), title='CleanNoisedRegion', cmap='gray')
+    return dilate_canny
+
+
+def drawDial(center, radius, rgb_src):
+    fitted_circle_img = rgb_src.copy()
+    cv2.circle(fitted_circle_img, center, radius,
+               color=(0, 0, 255),
+               thickness=2,
+               lineType=cv2.LINE_AA)
+    cv2.circle(fitted_circle_img, center, radius=6, color=(0, 0, 255), thickness=2)
+    plot.subImage(src=fitted_circle_img, index=inc(), title='Circle')
+
+
+# patch_degree = 5
+# mask_res = []
+# areas = []
+# patch_index = 0
+# pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius)
+# mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
+# print("Max Area: ", mask_res[0][1])
+# print("Degree: ", patch_degree * mask_res[0][0])
+# for res in mask_res[0:5]:
+#    index = inc()
+#    plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
+
+
 def figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_threshold, hit_time, iter_time,
-                                   period_rasanc_time, rgb_src):
+                                   period_rasanc_time):
     centroids = []
-    mut = []
     for contour in contours:
         mu = cv2.moments(contour)
         if mu['m00'] != 0:
             centroids.append((mu['m10'] / mu['m00'], mu['m01'] / mu['m00']))
-    fitted_circle_img = rgb_src.copy()
-    for centroid in centroids:
-        # rgb_src[int(centroid[0]), int(centroid[1])] = (0, 255, 0)
-        r = np.random.randint(0, 256)
-        g = np.random.randint(0, 256)
-        b = np.random.randint(0, 256)
-        cv2.circle(fitted_circle_img, (np.int64(centroid[0]), np.int64(centroid[1])), radius=4, color=(r, g, b),
-                   thickness=2)
+    # for centroid in centroids:
+    #     # rgb_src[int(centroid[0]), int(centroid[1])] = (0, 255, 0)
+    #     r = np.random.randint(0, 256)
+    #     g = np.random.randint(0, 256)
+    #     b = np.random.randint(0, 256)
+
     # 为了确保拟合所得的圆的确信度，多次拟合求平均值
     for i in range(iter_time):
         best_circle, max_fit_num, best_consensus_pointers = rasan.randomSampleConsensus(centroids,
@@ -174,15 +203,10 @@ def figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_thresh
     center = (np.int(avg_circle[0]), np.int(avg_circle[1]))
     radius = np.int(avg_circle[2])
     if avg_fit_num > len(centroids) / 2:
-        cv2.circle(fitted_circle_img, center, radius,
-                   color=(0, 0, 255),
-                   thickness=2,
-                   lineType=cv2.LINE_AA)
-        cv2.circle(fitted_circle_img, center, radius=6, color=(0, 0, 255), thickness=2)
-        plot.subImage(src=fitted_circle_img, index=inc(), title='Fitted Circle')
+        return center, radius
     else:
         print("Fitting Circle Failed.")
-    return center, radius
+        return (0, 0), 0
 
 
 def extractLines(gray):
@@ -276,7 +300,6 @@ def compareEqualizeHistBetweenDiffEnvironment():
     # cv2.waitkey(0)
     # plot.subimage(cmap='gray', src=hist_np1, title="histnp1", index=inc())
     # plot.subimage(cmap='gray', src=hist_np2, title="histnp2", index=inc())
-    plot.show()
 
 
 def pointerMaskByLine(src, center, radius, low, high):
@@ -326,7 +349,7 @@ def pointerMaskByLine(src, center, radius, low, high):
     mask_theta = 180 - mask_theta * 180 / np.pi
     if mask_theta < 0:
         mask_theta = 360 - mask_theta
-    return pointer_mask, mask_theta
+    return pointer_mask, mask_theta, (center[0], center[1]), (x1, y1)
 
 
 drawing = False  # 是否开始画图
@@ -363,8 +386,6 @@ if __name__ == '__main__':
     src = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
     file = open('config/pressure_1.json')
     info = json.load(file)
-    print(info['interferences'])
-    print(info['enableFit'])
     # 纯粹圆盘无干扰
     recognizePointerInstrument(img, info)
     # ROI 选择\

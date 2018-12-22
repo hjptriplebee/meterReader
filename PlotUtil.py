@@ -5,7 +5,7 @@ import time
 PLOT_ROW = 9
 PLOT_COL = 2
 
-plt.figure(figsize=(20, 80))
+plt.figure(figsize=(20, 100))
 
 
 def id(index):
