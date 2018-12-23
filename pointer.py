@@ -1,6 +1,6 @@
 import json
 from Common import *
-from uitl import PlotUtil as plot, RasancFitCircle as rasan, DrawSector as ds
+from uitl import PlotUtil as plot, RasancFitCircle as rasan, DrawSector as ds, ROIUtil as roiutil
 
 plot_img_index = 0
 ed_src = None
@@ -17,7 +17,10 @@ def recognizePointerInstrument(image, info):
     if image is None:
         print("Open Error.Image is empty.")
         return
-    src = cv2.resize(image, (0, 0), fx=0.2, fy=0.2)
+    pyramid = 0.2
+    if info['pyramid'] is not None:
+        pyramid = info['pyramid']
+    src = cv2.resize(image, (0, 0), fx=pyramid, fy=pyramid)
     rgb_src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
     # plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), index=inc(), title="Src")
     # A. The Template Image Processing
@@ -111,7 +114,7 @@ def recognizePointerInstrument(image, info):
     radius = 0
     # 使用拟合方式求表盘的圆,进而求出圆心
     if info['enableFit']:
-        center, radius = figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_threshold, hit_time,
+        center, radius = figureOutDialCircleByScaleLine(contours, dst_threshold ,
                                                         iter_time, period_rasanc_time)
     # 使用标定信息
     else:
@@ -128,7 +131,7 @@ def recognizePointerInstrument(image, info):
     # dilate_canny = cleanNoisedRegions(dilate_canny, info, src)
     zhang_thinning = cleanNoisedRegions(zhang_thinning, info, src.shape)
     # 用直线Mask求指针区域
-    pointer_mask, theta, line_ptr = pointerMaskByLine(zhang_thinning, center, radius, 0, 360, gradient=0.5,
+    pointer_mask, theta, line_ptr = pointerMaskByLine(dilate_canny, center, radius, 0, 360, gradient=0.5,
                                                       ptr_resolution=15)
     # 求始点与水平线
     res = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr,
@@ -139,9 +142,19 @@ def recognizePointerInstrument(image, info):
     # plot.subImage(src=pointer_mask, index=inc(), title='PointerMask', cmap='gray')
     # plot.subImage(src=cv2.bitwise_or(dilate_canny, pointer_mask), index=inc(), title='Pointer', cmap='gray')
     # drawDialFeature(center, end_ptr, radius, rgb_src, start_ptr)
+    plot.show()
 
 
 def drawDialFeature(center, end_ptr, radius, rgb_src, start_ptr):
+    """
+    绘图功能函数，绘出表盘的大致区域
+    :param center:
+    :param end_ptr:
+    :param radius:
+    :param rgb_src:
+    :param start_ptr:
+    :return:
+    """
     fitted_circle_img = drawDial((center[0], center[1]), radius, rgb_src)
     cv2.circle(img=fitted_circle_img, center=(start_ptr[0], start_ptr[1]),
                color=(np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)),
@@ -153,6 +166,11 @@ def drawDialFeature(center, end_ptr, radius, rgb_src, start_ptr):
 
 
 def cvtPtrDic2D(dic_ptr):
+    """
+    point.x,point.y转numpy数组
+    :param dic_ptr:
+    :return:
+    """
     if dic_ptr['x'] and dic_ptr['y'] is not None:
         dic_ptr = np.array([dic_ptr['x'], dic_ptr['y']])
     else:
@@ -161,6 +179,11 @@ def cvtPtrDic2D(dic_ptr):
 
 
 def cv2PtrTuple2D(tuple):
+    """
+    tuple 转numpy 数组
+    :param tuple:
+    :return:
+    """
     if tuple[0] and tuple[1] is not None:
         tuple = np.array([tuple[0], tuple[1]])
     else:
@@ -169,6 +192,13 @@ def cv2PtrTuple2D(tuple):
 
 
 def cleanNoisedRegions(src, info, shape):
+    """
+    根据标定信息清楚一些有干扰性的区域
+    :param src:
+    :param info:
+    :param shape:
+    :return:
+    """
     if info['noisedRegion'] is not None:
         region_roi = info['noisedRegion']
         for roi in region_roi:
@@ -203,8 +233,19 @@ def drawDial(center, radius, rgb_src):
 #    # plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
 
 
-def figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_threshold, hit_time, iter_time,
+def figureOutDialCircleByScaleLine(contours, dst_threshold,  iter_time,
                                    period_rasanc_time):
+    """
+    无圆心、半径标定情况，根据刻度线拟合出表盘的圆模型
+    :param contours: 刻度轮廓
+    :param dst_threshold: 被视为inliers的阈值
+    :param iter_time: 执行rasanc算法的次数
+    :param period_rasanc_time: 每趟rasanc 的迭代次数
+    :return: 拟合得到的圆心、半径
+    """
+    avg_circle = np.array([0, 0])
+    avg_fit_num = 0
+    hit_time = 0
     centroids = []
     for contour in contours:
         mu = cv2.moments(contour)
@@ -243,6 +284,11 @@ def figureOutDialCircleByScaleLine(avg_circle, avg_fit_num, contours, dst_thresh
 
 
 def extractLines(gray):
+    """
+    HoughLine的随机方法、全参数空间方法找直线方程
+    :param gray:输入的灰度图
+    :return:
+    """
     p_lines = cv2.HoughLinesP(gray, 1, np.pi / 180, threshold=5, minLineLength=1, maxLineGap=10)
     lines = cv2.HoughLines(gray, 1, np.pi / 180, threshold=5)
     p_src_lines = np.zeros(shape=(gray.shape[0], gray[1], 3), dtype=np.uint8)
@@ -273,6 +319,18 @@ def extractLines(gray):
 
 
 def pointerMaskBySector(areas, gray, center, patch_degree, radius):
+    """
+    用扇形遮罩的方法求直线位置。函数接受一个已经被灰度/二值化的图，图中默认保留了比较清晰的指针轮廓，
+    该方法将圆的表盘分成360 / patch_degree 个区域，每个区域近似一个扇形，计算每个扇形面积的灰度和，
+    然后在所有扇形区域中取出面积最大的那一个，如果处理预处理妥当，指针应该位于灰度值最大的区域.算法的
+    精度决定于patch_degree的大小
+    :param areas: 每个遮罩取出的区域
+    :param gray: 灰度图
+    :param center:圆的中心
+    :param patch_degree:每个扇形区域所占的角度,该值越小，产生的遮罩越多，获取到的区域越细小
+    :param radius: 圆的半径
+    :return: 以(index,sum)形式组织的有序列表，index是扇形递增的序号，即每个扇形所在的区域向量与水平线夹角为index * patch_degree度
+    """
     mask_res = []
     patch_index = 0
     masks, mask_centroids = ds.buildCounterClockWiseSectorMasks(center, radius, gray.shape, patch_degree,
@@ -398,47 +456,22 @@ def pointerMaskByLine(src, center, radius, low, high, gradient=1.0, ptr_resoluti
     return pointer_mask, best_theta, (x1, y1)
 
 
-drawing = False  # 是否开始画图
-mode = True  # True：画矩形，False：画圆
-start = (-1, -1)
+def demarcate_roi(img_dir):
+    # ROI 选择\
+    src = cv2.resize(cv2.imread(img_dir), (0, 0), fx=0.2, fy=0.2)
+    regions = roiutil.selectROI(src)
+    print(regions)
 
 
-def mouse_event(event, x, y, flags, param):
-    global start, drawing, mode
-
-    # 左键按下：开始画图
-    if event == cv2.EVENT_LBUTTONDOWN:
-        drawing = True
-        start = (x, y)
-    # 鼠标移动，画图
-    elif event == cv2.EVENT_MOUSEMOVE:
-        if drawing:
-            if mode:
-                cv2.rectangle(img, start, (x, y), (0, 255, 0), 1)
-            else:
-                cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
-    # 左键释放：结束画图
-    elif event == cv2.EVENT_LBUTTONUP:
-        drawing = False
-        if mode:
-            cv2.rectangle(img, start, (x, y), (0, 255, 0), 1)
-        else:
-            cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+def reg_ptr(img_dir, config):
+    img = cv2.imread(img_dir)
+    file = open(config)
+    info = json.load(file)
+    assert info is not None
+    recognizePointerInstrument(img, info)
 
 
 if __name__ == '__main__':
-    img = cv2.imread('image/SF6/IMG_7640.JPG')
-    src = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
-    file = open('config/pressure_1.json')
-    info = json.load(file)
-    # 纯粹圆盘无干扰
-    recognizePointerInstrument(img, info)
-    # ROI 选择\
-    # regions = roiutil.selectROI(src)
-    # print(regions)
-
-    # SF6
-    # recognizePointerInstrument(cv2.imread("image/SF6/IMG_7586_1.JPG"), None)
-    # youwen
-    # recognizePointerInstrument(cv2.imread("image/SF6/IMG_7666.JPG"), None)
-    # compareEqualizeHistBetweenDiffEnvironment()
+    # reg_ptr('image/SF6/IMG_7640.JPG', 'config/pressure_1.json')
+    reg_ptr('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
+    # demarcate_roi('image/SF6/IMG_7666.JPG')
