@@ -55,7 +55,7 @@ def getBlock(image,size=30):
     :return:
     '''
     #the block is 30*30
-    print(image)
+    # print(image)
     h,w ,_= image.shape
     h_blocks = []
 
@@ -103,22 +103,22 @@ def getCircle(img):
 
     circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 50, param1=80, param2=30, minRadius=10, maxRadius=40)
     cp_img = None
-    print(circles)
+    # print(circles)
     #if circles != None:
     for circle in circles[0]:
-        print(circle[2])
+        # print(circle[2])
 
         x = int(circle[0])
         y = int(circle[1])
 
         r = int(circle[2])
-        print("r========" + str(r))
+        # print("r========" + str(r))
 
         # img = cv2.circle(img, (x, y), r, (0, 0, 255), 1, 8, 0)
 
         cp_img = img[y - 10:y + 30, x - 10:x + 30]
 
-    cv2.imwrite("cut.jpg", cp_img)
+    # cv2.imwrite("cut.jpg", cp_img)
 
     return cp_img
 
@@ -137,8 +137,8 @@ def switch(image, info):
 
     vectors = getBlock(image,5)
 
-    print("----vectors")
-    print(vectors)
+    # print("----vectors")
+    # print(vectors)
 
     #find red  range 0-40
     red_num,red_per = countTarPer(vectors, 10,"red")
