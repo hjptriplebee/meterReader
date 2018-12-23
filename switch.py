@@ -48,55 +48,6 @@ def GetHsvProperty(h,s,v):
 
     return h_ave,s_ave,v_ave,h_var,s_var,v_var
 
-#针对红颜色吸湿器,备用
-def RedReader(image, info):
-
-    # init below vars ,
-    h_ave = -1
-    s_ave = -1
-    v_ave = -1
-    h_var = -1
-    s_var = -1
-    v_var = -1
-    """
-    :param image: ROI image
-    :param info: information for this meter
-    :return: {
-       color:
-       h_ave:
-       s_ave:
-       v_ave:
-       h_var:
-       s_var:
-       v_var:
-    }
-    """
-    #Gamma transformation of original image
-    image = gamma(image,0.2)
-
-    #the step need
-    cv2.imwrite("gamma.jpg",image)
-    image = cv2.imread("gamma.jpg")
-
-    meter = meterFinderByTemplate(image, info["template"])
-
-    h,s,v = HSV(meter)
-    h_ave,s_ave,v_ave,h_var,s_var,v_var = GetHsvProperty(h,s,v)
-    cv2.imwrite("meter.jpg",meter)
-
-    res = {
-       'color':-1,
-        'h_ave':h_ave,
-       's_ave':s_ave,
-       'v_ave':v_ave,
-       'h_var':h_var,
-       's_var':s_var,
-       'v_var':v_var
-    }
-    res = json.dumps(res)
-
-    return res
-
 def getBlock(image,size=30):
     '''
      :param img: 300*300
@@ -104,6 +55,7 @@ def getBlock(image,size=30):
     :return:
     '''
     #the block is 30*30
+    print(image)
     h,w ,_= image.shape
     h_blocks = []
 
@@ -125,49 +77,83 @@ def getBlock(image,size=30):
 
 def countTarPer(h_vec,thre,which):
     n = 0
-    N = 0
+    N = 1
     if which =="red":
         for d in h_vec:
             N = N+1
             if d < thre:
                 n=n+1
-    elif which =="blue":
+    elif which =="green":
         for d in h_vec:
             N=N+1
-            if d>100 and d<thre:
+            if d>35 and d<thre:
                 n=n+1
 
 
     return n,float(n/N)
 
-def absorb(image, info):
+#use hough get circle
+def getCircle(img):
+
+    result = cv2.blur(img, (5, 5))
+
+    gray = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+
+    canny = cv2.Canny(img, 40, 80)
+
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 50, param1=80, param2=30, minRadius=10, maxRadius=40)
+    cp_img = None
+    print(circles)
+    #if circles != None:
+    for circle in circles[0]:
+        print(circle[2])
+
+        x = int(circle[0])
+        y = int(circle[1])
+
+        r = int(circle[2])
+        print("r========" + str(r))
+
+        # img = cv2.circle(img, (x, y), r, (0, 0, 255), 1, 8, 0)
+
+        cp_img = img[y - 10:y + 30, x - 10:x + 30]
+
+    cv2.imwrite("cut.jpg", cp_img)
+
+    return cp_img
+
+
+def switch(image, info):
 
     # the second par need to be altered according to conditions,such as red or blue
-    image = gamma(image, 0.9)
+    image = gamma(image, 0.6)
     # the step need
     cv2.imwrite("gamma.jpg", image)
 
     image = cv2.imread("gamma.jpg")
 
-    vectors = getBlock(image)
+    # use hough to locate the circle
+    image = getCircle(image)
 
-    # print("----vectors")
-    # print(vectors)
+    vectors = getBlock(image,5)
+
+    print("----vectors")
+    print(vectors)
 
     #find red  range 0-40
-    red_num,red_per = countTarPer(vectors, 40,"red")
+    red_num,red_per = countTarPer(vectors, 10,"red")
     #find blue range
-    blue_num, blue_per = countTarPer(vectors, 120, "blue")
+    blue_num, blue_per = countTarPer(vectors, 77, "green")
     color = ""
     num = -1
     per = -1
     # the step of red is prior
-    if red_num>10:
+    if red_num>5:
         color = "red"
         num = red_num
         per = red_per
-    elif red_num<10:
-        color = "blue"
+    elif red_num<5:
+        color = "green"
         num = blue_num
         per = blue_per
 
