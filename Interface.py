@@ -1,5 +1,6 @@
 import cv2
 import json
+import Blenometer as bleno
 from SF6 import SF6Reader
 from youwen import youwen
 from pressure import pressure
@@ -7,9 +8,11 @@ from absorb import *
 from switch import *
 from bileiqi_1 import *
 
+
 def meterReaderCallBack(image, info):
     """call back function"""
     return info["type"](image, info)
+
 
 def getInfo(ID):
     """
@@ -53,8 +56,10 @@ def getInfo(ID):
         info["type"] = youwen
     elif info["type"] == "pressure":
         info["type"] = pressure
-    elif info["type"] == "bileiqi_1":
-        info["type"] = bileiqi_1
+    elif info["type"] == "bileiqi1":
+        info["type"] = bileiqi1
+    elif info["type"] == "blenometer":
+        info["type"] = bleno.checkBleno
     elif info["type"] == "absorb":
         info["type"] =absorb
     elif info["type"] == "switch":

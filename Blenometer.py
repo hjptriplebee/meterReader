@@ -3,6 +3,7 @@ import numpy as np
 import functools
 import json
 
+
 def cmp(contour1, contour2):
     return cv2.contourArea(contour2) - cv2.contourArea(contour1)
 
@@ -10,7 +11,8 @@ def cmp(contour1, contour2):
 def cmpCircle(circle1, circle2):
     return circle2[2] - circle1[2]
 
-def checkBelometerUpAndDownStatus(image, info):
+
+def checkBleno(image, info):
     """
     :param image: input image
     :param info: image description
@@ -85,12 +87,13 @@ def checkBelometerUpAndDownStatus(image, info):
     # cv2.imshow("meter", meter)
     # cv2.waitKey(0)
 
+
 def readBlenometerStatus(image, info):
     print("Blenometer Reader called!!!")
     if image is None:
         print("Resolve Image Error.Inupt image is Empty.")
         return
-    return checkBelometerUpAndDownStatus(image, info)
+    return checkBleno(image, info)
 
 # test interface
 
