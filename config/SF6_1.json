@@ -23,5 +23,6 @@
           "y": 435
       },
       "startValue": -0.1,
-      "totalValue": 1.0
+      "totalValue": 1.0,
+      "result": 0.72
 }
