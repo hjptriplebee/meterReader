@@ -76,6 +76,7 @@ def getBlock(image,size=30):
     return h_blocks
 
 def countTarPer(h_vec,thre,which):
+    green_range_below = 35
     n = 0
     N = 1
     if which =="red":
@@ -86,9 +87,8 @@ def countTarPer(h_vec,thre,which):
     elif which =="green":
         for d in h_vec:
             N=N+1
-            if d>35 and d<thre:
+            if d>green_range_below and d<thre:
                 n=n+1
-
 
     return n,float(n/N)
 
@@ -122,16 +122,17 @@ def getCircle(img):
 
     return cp_img
 
-
 def switch(image, info):
 
+    switch_thre = 0.6
+    red_range_above = 10
+    green_range_above = 77
+    red_num_thre = 5
     # the second par need to be altered according to conditions,such as red or blue
-    image = gamma(image, 0.6)
+    image = gamma(image, switch_thre)
     # the step need
     cv2.imwrite("gamma.jpg", image)
-
     image = cv2.imread("gamma.jpg")
-
     # use hough to locate the circle
     image = getCircle(image)
 
@@ -139,30 +140,28 @@ def switch(image, info):
 
     # print("----vectors")
     # print(vectors)
-
     #find red  range 0-40
-    red_num,red_per = countTarPer(vectors, 10,"red")
+    red_num,red_per = countTarPer(vectors, red_range_above,"red")
     #find blue range
-    blue_num, blue_per = countTarPer(vectors, 77, "green")
+    green_num, green_per = countTarPer(vectors, green_range_above, "green")
     color = ""
     num = -1
     per = -1
     # the step of red is prior
-    if red_num>5:
+    if red_num>red_num_thre:
         color = "red"
         num = red_num
         per = red_per
-    elif red_num<5:
+    elif red_num<red_num_thre:
         color = "green"
-        num = blue_num
-        per = blue_per
+        num = green_num
+        per = green_per
 
     res = {
         'color': color,
         'num':num,
         'per':per
     }
-
     res = json.dumps(res)
 
     return res

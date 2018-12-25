@@ -124,6 +124,9 @@ def getBlock(image,size=30):
     return h_blocks
 
 def countTarPer(h_vec,thre,which):
+
+    blue_below_thre = 100
+
     n = 0
     N = 0
     if which =="red":
@@ -134,7 +137,7 @@ def countTarPer(h_vec,thre,which):
     elif which =="blue":
         for d in h_vec:
             N=N+1
-            if d>100 and d<thre:
+            if d>blue_below_thre and d<thre:
                 n=n+1
 
 
@@ -142,8 +145,13 @@ def countTarPer(h_vec,thre,which):
 
 def absorb(image, info):
 
+    red_range_thre = 40
+    blue_range_thre = 120
+    red_num_thre = 10
+
     # the second par need to be altered according to conditions,such as red or blue
-    image = gamma(image, 0.9)
+    image = gamma(image, 0.4)
+    #image = np.power(image / float(np.max(image)), 0.4)
     # the step need
     cv2.imwrite("gamma.jpg", image)
 
@@ -153,20 +161,20 @@ def absorb(image, info):
 
     # print("----vectors")
     # print(vectors)
-
     #find red  range 0-40
-    red_num,red_per = countTarPer(vectors, 40,"red")
+
+    red_num,red_per = countTarPer(vectors, red_range_thre,"red")
     #find blue range
-    blue_num, blue_per = countTarPer(vectors, 120, "blue")
+    blue_num, blue_per = countTarPer(vectors, blue_range_thre, "blue")
     color = ""
     num = -1
     per = -1
     # the step of red is prior
-    if red_num>10:
+    if red_num> red_num_thre:
         color = "red"
         num = red_num
         per = red_per
-    elif red_num<10:
+    elif red_num< red_num_thre:
         color = "blue"
         num = blue_num
         per = blue_per
