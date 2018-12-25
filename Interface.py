@@ -4,6 +4,8 @@ import Blenometer as bleno
 from SF6 import SF6Reader
 from youwen import youwen
 from pressure import pressure
+from absorb import *
+from switch import *
 from bileiqi_1 import *
 
 
@@ -58,6 +60,11 @@ def getInfo(ID):
         info["type"] = bileiqi1
     elif info["type"] == "blenometer":
         info["type"] = bleno.checkBleno
+    elif info["type"] == "absorb":
+        info["type"] =absorb
+    elif info["type"] == "switch":
+        info["type"] =switch
+
     info["template"] = cv2.imread("template/" + ID + ".jpg")
     return info
 
