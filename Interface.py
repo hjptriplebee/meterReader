@@ -1,13 +1,19 @@
 import cv2
 import json
+from Blenometer import checkBleno
 from SF6 import SF6Reader
+from Remember import remember
 from youwen import youwen
 from pressure import pressure
-from bileiqi_1 import *
+from absorb import absorb
+from switch import switch
+from bileiqi_1 import bileiqi1
+
 
 def meterReaderCallBack(image, info):
     """call back function"""
     return info["type"](image, info)
+
 
 def getInfo(ID):
     """
@@ -51,8 +57,19 @@ def getInfo(ID):
         info["type"] = youwen
     elif info["type"] == "pressure":
         info["type"] = pressure
-    elif info["type"] == "bileiqi_1":
-        info["type"] = bileiqi_1
+    elif info["type"] == "bileiqi1":
+        info["type"] = bileiqi1
+    elif info["type"] == "blenometer":
+        info["type"] = checkBleno
+    elif info["type"] == "absorb":
+        info["type"] =absorb
+    elif info["type"] == "switch":
+        info["type"] =switch
+    elif info["type"] == "remember":
+        info["type"] = remember
+    else:
+        print("meter type not support!")
+
     info["template"] = cv2.imread("template/" + ID + ".jpg")
     return info
 
