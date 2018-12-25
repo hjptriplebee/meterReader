@@ -1,6 +1,7 @@
 import json
 from Common import *
 from uitl import PlotUtil as plot, RasancFitCircle as rasan, DrawSector as ds, ROIUtil as roiutil
+import math
 
 plot_img_index = 0
 ed_src = None
@@ -104,6 +105,9 @@ def recognizePointerInstrument(image, info):
     total = info['totalValue']
     start_ptr = info['startPoint']
     end_ptr = info['endPoint']
+    ptr_resolution = info['ptrResolution']
+    if ptr_resolution is None:
+        ptr_resolution = 15
     assert start_value is not None
     assert start_ptr is not None
     assert end_ptr is not None
@@ -114,7 +118,7 @@ def recognizePointerInstrument(image, info):
     radius = 0
     # 使用拟合方式求表盘的圆,进而求出圆心
     if info['enableFit']:
-        center, radius = figureOutDialCircleByScaleLine(contours, dst_threshold ,
+        center, radius = figureOutDialCircleByScaleLine(contours, dst_threshold,
                                                         iter_time, period_rasanc_time)
     # 使用标定信息
     else:
@@ -130,9 +134,20 @@ def recognizePointerInstrument(image, info):
     # 防止在识别指针时出现干扰。值得注意，如果当前指针覆盖了该干扰区域，指针的一部分可能也会被清除
     # dilate_canny = cleanNoisedRegions(dilate_canny, info, src)
     zhang_thinning = cleanNoisedRegions(zhang_thinning, info, src.shape)
+    dilate_canny = cleanNoisedRegions(dilate_canny, info, src.shape)
     # 用直线Mask求指针区域
-    pointer_mask, theta, line_ptr = pointerMaskByLine(dilate_canny, center, radius, 0, 360, gradient=0.5,
-                                                      ptr_resolution=15)
+    hlt = np.array([center[0] + radius, center[1]])  # 通过圆心的水平线与圆的右交点
+    # start_degree = math.degrees(AngleFactory.calAngleClockwise(hlt, start_ptr, center))
+    # end_degree = math.degrees(AngleFactory.calAngleClockwise(end_ptr, hlt, center))
+    # 计算夹角
+    start_radians = AngleFactory.calAngleClockwise(hlt, start_ptr, center)
+    end_radians = AngleFactory.calAngleClockwise(end_ptr, hlt, center)
+    # print("Start degree:", start_degree)
+    # print("End degree:", end_degree)
+    pointer_mask, theta, line_ptr = pointerMaskByLine(dilate_canny, center, radius, start_radians, end_radians,
+                                                      patch_degree=0.5,
+                                                      ptr_resolution=ptr_resolution)
+
     # 求始点与水平线
     res = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr,
                                               centerPoint=center,
@@ -140,7 +155,7 @@ def recognizePointerInstrument(image, info):
                                               totalValue=total)
     print(res)
     # plot.subImage(src=pointer_mask, index=inc(), title='PointerMask', cmap='gray')
-    # plot.subImage(src=cv2.bitwise_or(dilate_canny, pointer_mask), index=inc(), title='Pointer', cmap='gray')
+    plot.subImage(src=cv2.bitwise_or(dilate_canny, pointer_mask), index=inc(), title='Pointer', cmap='gray')
     # drawDialFeature(center, end_ptr, radius, rgb_src, start_ptr)
     plot.show()
 
@@ -233,7 +248,7 @@ def drawDial(center, radius, rgb_src):
 #    # plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
 
 
-def figureOutDialCircleByScaleLine(contours, dst_threshold,  iter_time,
+def figureOutDialCircleByScaleLine(contours, dst_threshold, iter_time,
                                    period_rasanc_time):
     """
     无圆心、半径标定情况，根据刻度线拟合出表盘的圆模型
@@ -343,7 +358,7 @@ def pointerMaskBySector(areas, gray, center, patch_degree, radius):
         mask_res.append((patch_index, np.sum(and_mask)))
         patch_index += 1
     mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
-    return mask_res
+    return mask_res, mask_res[0][1] * patch_degree
 
 
 def on_touch(val):
@@ -393,30 +408,39 @@ def compareEqualizeHistBetweenDiffEnvironment():
     # # plot.subImage(cmap='gray', src=hist_np2, title="histnp2", index=inc())
 
 
-def pointerMaskByLine(src, center, radius, low, high, gradient=1.0, ptr_resolution=5):
+def pointerMaskByLine(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5,
+                      low_ptr_color=np.array([0, 0, 221]), up_ptr_color=np.array([180, 30, 255])):
     """
+    接收一张预处理过的二值图（默认较完整保留了指针信息），从通过圆心水平线右边的点开始，连接圆心顺时针建立直线遮罩，取出遮罩范围下的区域,
+    计算对应区域灰度和，灰度和最大的区域即为指针所在的位置。直线遮罩的粗细程度、搜索的梯度决定了算法侦测指针的细粒度。该算法适合搜索指针形状
+    为直线的仪表盘，原理与@pointerMaskBySector类似。
+    :param low_ptr_color: 指针的HSV颜色空间的下界
+    :param up_ptr_color:  指针的HSV颜色空间的上界
+    :param radians_low:圆的搜索范围(弧度制表示)
+    :param radians_high:圆的搜索范围(弧度制表示)
     :param src: 二值图
     :param center: 刻度盘的圆心
-    :param radius:
-    :param low: 圆的搜索范围
-    :param high:圆的搜索范围
-    :param gradient:搜索梯度，默认每次一度
+    :param radius: 圆的半径
+    :param patch_degree:搜索梯度，默认每次一度
     :param ptr_resolution: 指针的粗细程度
-    :return: 指针遮罩
+    :return: 指针遮罩、直线与圆相交的点
     """
     _shape = src.shape
     img = src.copy()
+    # 弧度转化为角度值
+    low = math.degrees(radians_low)
+    high = math.degrees(radians_high)
     # _img1 = cv2.erode(_img1, kernel3, iterations=1)
     # _img1 = cv2.dilate(_img1, kernel3, iterations=1)
     # 157=pi/2*100
     mask_info = []
     max_area = 0
     best_theta = 0
-    iteration = int((high - low) / gradient)
+    iteration = np.abs(int((high - low) / patch_degree))
     for i in range(iteration):
         pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
         # theta = float(i) * 0.01
-        theta = float(i * gradient / 180 * np.pi)
+        theta = float(i * patch_degree / 180 * np.pi)
         y1 = int(center[1] - np.sin(theta) * radius)
         x1 = int(center[0] + np.cos(theta) * radius)
         # cv2.circle(black_img, (x1, y1), 2, 255, 3)

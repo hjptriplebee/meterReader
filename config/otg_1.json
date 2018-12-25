@@ -23,6 +23,7 @@
     "x": 191,
     "y": 188
   },
+  "ptrResolution": 5,
   "startValue": 0.0,
   "totalValue": 150.0,
   "unit": "Mpa",

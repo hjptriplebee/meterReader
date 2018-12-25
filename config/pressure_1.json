@@ -4,6 +4,7 @@
   "vertical": 20.0,
   "name": "1_1",
   "type": "SF6",
+  "pyramid": 0.2,
   "ROI": {
     "x": 200,
     "y": 200,
@@ -28,6 +29,8 @@
   "enableFit": false,
   "enableEqualizeHistogram": false,
   "enableCleanNoisedRegion": true ,
+  "ptr_resolution": 10,
+  "ptrResolution": 15,
   "noisedRegion": [
     [
       109,

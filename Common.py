@@ -122,7 +122,7 @@ class AngleFactory:
         return angle
 
     @classmethod
-    def __calAngleClockwise(cls, startPoint, endPoint, centerPoint):
+    def calAngleClockwise(cls, startPoint, endPoint, centerPoint):
         """
         get clockwise angle formed by three point
         :param startPoint: start point
@@ -150,8 +150,8 @@ class AngleFactory:
         :param pointerPoint: pointer's outer point
         :return: value
         """
-        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
-        angle = cls.__calAngleClockwise(startPoint, pointerPoint, centerPoint)
+        angleRange = cls.calAngleClockwise(startPoint, endPoint, centerPoint)
+        angle = cls.calAngleClockwise(startPoint, pointerPoint, centerPoint)
         value = angle / angleRange * totalValue + startValue
 
         return value
@@ -167,7 +167,7 @@ class AngleFactory:
         :param PointerVector: pointer's vector
         :return: value
         """
-        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+        angleRange = cls.calAngleClockwise(startPoint, endPoint, centerPoint)
 
         vectorA = startPoint - centerPoint
         vectorB = PointerVector
@@ -194,7 +194,7 @@ class AngleFactory:
         :param totalValue:
         :return:
         """
-        angleRange = cls.__calAngleClockwise(startPoint, endPoint, centerPoint)
+        angleRange = cls.calAngleClockwise(startPoint, endPoint, centerPoint)
 
         vectorA = startPoint - centerPoint
         vectorB = point - centerPoint
