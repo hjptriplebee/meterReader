@@ -1,0 +1,15 @@
+{
+      "distance": 10.0,
+      "horizontal": 10.0,
+      "vertical": 20.0,
+      "name": "switch",
+      "type": "switch",
+      "ROI": {
+          "x": 236,
+          "y": 77,
+          "w": 250,
+          "h": 250
+      }
+
+
+}

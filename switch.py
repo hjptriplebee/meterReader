@@ -134,8 +134,11 @@ def switch(image, info):
     cv2.imwrite("gamma.jpg", image)
     image = cv2.imread("gamma.jpg")
     # use hough to locate the circle
-    image = getCircle(image)
+    # to compatible yaxi test images ,we annotate the way to search circle by hough
+    # the test result is good
+    #image = getCircle(image)
 
+    # cv2.imwrite("temp.jpg",image)
     vectors = getBlock(image,5)
 
     # print("----vectors")
