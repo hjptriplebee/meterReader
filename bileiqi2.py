@@ -1,28 +1,27 @@
 import cv2
-from Common import *
+from Common import AngleFactory,meterFinderByTemplate
 from num_reading import get_value
 import math
 def bileiqi_2(image,info):
     """
     :param image:whole image
-    :param info:bileiqi_2 config
+    :param info:bileiqi2 config
     :return:
     """
     # your method
-    print("YouWen Reader called!!!")
+    print("bileiqi Reader called!!!")
     # template match
-    print(info["template"])
+    #print(info["template"])
     meter = meterFinderByTemplate(image, info["template"])
-    #pointer value reading & number reading
-    n_value,p_value=bileiqi_pointer_reading(meter,info["totalValue"],info["num_size"])
+    n_value,p_value=bileiqi_pointer_num_reading(meter,info["totalValue"],info["numSize"])
     return p_value,n_value
-def _CalculateLineAngle(p1, p2):
+def __CalculateLineAngle(p1, p2):
 	xDis = p2[0] - p1[0]
 	yDis = p2[1] - p1[1]
 	angle = math.atan2(yDis, xDis)
 	angle = angle / math.pi *180
 	return angle;
-def _rotateImage(img,degree,pt1,pt2,pt3,pt4):
+def __rotateImage(img,degree,pt1,pt2,pt3,pt4):
     height,width=img.shape[:2]
     heightNew = int(width * math.fabs(math.sin(degree)) + height * math.fabs(math.cos(degree)))
     widthNew = int(height * math.fabs(math.sin(degree)) + width * math.fabs(math.cos(degree)))
@@ -40,27 +39,17 @@ def _rotateImage(img,degree,pt1,pt2,pt3,pt4):
     return imgOut
 
 def get_num_area(image,box):
+    #get number area
     imgResize=cv2.resize(image,(500,500))
     pt1=box[0]
     pt2=box[1]
     pt3=box[2]
     pt4=box[3]
-    angle=_CalculateLineAngle(pt1,pt4)
-    imgRotation=_rotateImage(imgResize,angle,pt1,pt2,pt3,pt4)
+    angle=__CalculateLineAngle(pt1,pt4)
+    imgRotation=__rotateImage(imgResize,angle,pt1,pt2,pt3,pt4)
     return imgRotation
-def __calAngleBetweenTwoVector(vectorA, vectorB):
-    """
-    get angle formed by two vector
-    :param vectorA: vector A
-    :param vectorB: vector B
-    :return: angle
-    """
-    lenA = np.sqrt(vectorA.dot(vectorA))
-    lenB = np.sqrt(vectorB.dot(vectorB))
-    cosAngle = vectorA.dot(vectorB) / (lenA * lenB)
-    angle = np.arccos(cosAngle)
-    return angle
-def bileiqi_pointer_reading(image,totalValue,num):
+def bileiqi_pointer_num_reading(image,totalValue,num):
+    #pointer value reading & number reading
     image=cv2.resize(image,(500,500))
     Img=image
     R=Img.shape[0]//2
@@ -151,16 +140,14 @@ def bileiqi_pointer_reading(image,totalValue,num):
     print("pointerPoint:",pointerPoint)
     centerPoint=[R,R]
     print("center_point:",centerPoint)
-    angleRange=__calAngleBetweenTwoVector(startPoint-centerPoint,endPoint-centerPoint)
-    angle = __calAngleBetweenTwoVector(startPoint - centerPoint, pointerPoint - centerPoint)
+    angleRange=AngleFactory.__calAngleBetweenTwoVector(startPoint-centerPoint,endPoint-centerPoint)
+    angle = AngleFactory.__calAngleBetweenTwoVector(startPoint - centerPoint, pointerPoint - centerPoint)
 
     value = angle / angleRange * totalValue + 0.0
     print("p_value",value)
 
     num_img = get_num_area(image, box)
     results = get_value(num_img, num)
-    return box,results
+    return value,results
 
-if __name__ == '__main__':
-    img=cv2.imread("template/bileiqi_2.jpg")
-    box,_=bileiqi_pointer_reading(img,10,3)
+
