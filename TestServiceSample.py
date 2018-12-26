@@ -37,6 +37,14 @@ def startClient():
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     print(r.text)
 
+    image = open("image/pressure_1.jpg", "rb")
+    imageByte = base64.b64encode(image.read())
+    data = json.dumps({
+        "image": imageByte.decode("ascii"),
+        "imageID": "pressure"
+    })
+    r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+    print(r.text)
 
 if __name__ == "__main__":
 

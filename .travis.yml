@@ -9,6 +9,7 @@ sudo: false #有定制化开发环境需要，默认false，不开启容器，�
 before_install:
   - pip install tensorflow #加sudo默认系统环境里的python，使用虚拟环境需加-E参数
   - pip install keras
+  - pip install opencv
   - pip install codecov
   - pip install coverage
 

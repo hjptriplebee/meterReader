@@ -8,8 +8,6 @@ def pressure(image, info):
 	:param info: information for this meter
 	:return: value
 	"""
-	# your method
-	print("Rressure Reader called!!!")
 	# template match
 	meter = meterFinderByTemplate(image, info["template"])
 	# cv2.imshow("meter", meter)

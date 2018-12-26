@@ -87,7 +87,7 @@ def youwen(image, info):
     :return: value
     """
     # your method
-    print("YouWen Reader called!!!")
+
     start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
     center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
