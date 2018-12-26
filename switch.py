@@ -2,6 +2,17 @@ import json
 import numpy as np
 import cv2
 
+#type transform
+def getMatInt(Mat):
+
+    d = Mat.shape
+    for i in range(d[2]):
+        for n in range(d[0]):
+            for m in range(d[1]):
+                Mat[n,m,i] = int(Mat[n,m,i])
+                # print(Mat[n,m,i])
+    Mat = Mat.astype(np.uint8)
+    return Mat
 def gamma(image,thre):
     '''
     :param image: numpy type
@@ -12,8 +23,8 @@ def gamma(image,thre):
     # we can change thre accoding  to real condition
     # thre = 0.3
     out = np.power(f, thre)
-
-    return out*255.0
+    out = getMatInt(out * 255)
+    return out
 
 def backGamma(image,thre):
     '''
@@ -123,16 +134,18 @@ def getCircle(img):
     return cp_img
 
 def switch(image, info):
-
-    switch_thre = info["switch_threshold"]
-    red_range_above = info["red_range_above"]
-    green_range_above = info["green_range_above"]
-    red_num_thre = info["red_num_threshold"]
+    color = ""
+    num = -1
+    per = -1
+    switch_thre = info["switchThreshold"]
+    red_range_above = info["redRangeAbove"]
+    green_range_above = info["greenRangeAbove"]
+    red_num_thre = info["redNumThreshold"]
+    green_num_thre = info["greenNumThreshold"]
     # the second par need to be altered according to conditions,such as red or blue
     image = gamma(image, switch_thre)
     # the step need
-    cv2.imwrite("gamma.jpg", image)
-    image = cv2.imread("gamma.jpg")
+
     # use hough to locate the circle
     # to compatible yaxi test images ,we annotate the way to search circle by hough
     # the test result is good
@@ -145,20 +158,19 @@ def switch(image, info):
     # print(vectors)
     #find red  range 0-40
     red_num,red_per = countTarPer(vectors, red_range_above,"red")
-    #find blue range
-    green_num, green_per = countTarPer(vectors, green_range_above, "green")
-    color = ""
-    num = -1
-    per = -1
+
     # the step of red is prior
     if red_num>red_num_thre:
         color = "red"
         num = red_num
         per = red_per
-    elif red_num<red_num_thre:
-        color = "green"
-        num = green_num
-        per = green_per
+    else:
+        # find blue range
+        green_num, green_per = countTarPer(vectors, green_range_above, "green")
+        if green_num>=green_num_thre:
+            color = "green"
+            num = green_num
+            per = green_per
 
     res = {
         'color': color,

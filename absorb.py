@@ -2,18 +2,32 @@ import json
 import numpy as np
 import cv2
 
+#type transform
+def getMatInt(Mat):
+
+    d = Mat.shape
+    for i in range(d[2]):
+        for n in range(d[0]):
+            for m in range(d[1]):
+                Mat[n,m,i] = int(Mat[n,m,i])
+
+    Mat = Mat.astype(np.uint8)
+    return Mat
+
 def gamma(image,thre):
     '''
     :param image: numpy type
            thre:float
     :return: image numpy
     '''
+
     f = image / 255.0
     # we can change thre accoding  to real condition
     # thre = 0.3
     out = np.power(f, thre)
+    out = getMatInt(out*255)
 
-    return out*255.0
+    return out
 
 def backGamma(image,thre):
     '''
@@ -115,12 +129,6 @@ def getBlock(image,size=30):
             # print(h)
             h_avg,_,_,_,_,_ = GetHsvProperty(h, s, v)
             h_blocks.append(h_avg)
-
-
-    # print(img.shape)
-    # print(h_blocks)
-    # print(len(h_blocks))
-
     return h_blocks
 
 def countTarPer(h_vec,thre,which):
@@ -144,40 +152,33 @@ def countTarPer(h_vec,thre,which):
     return n,float(n/N)
 
 def absorb(image, info):
-
-    red_range_thre = info["red_range_threshold"]
-    blue_range_thre = info["blue_range_threshold"]
-    red_num_thre = info["red_num_threshold"]
-
-    # the second par need to be altered according to conditions,such as red or blue
-    image = gamma(image, 0.4)
-    #image = np.power(image / float(np.max(image)), 0.4)
-    # the step need
-    cv2.imwrite("gamma.jpg", image)
-
-    image = cv2.imread("gamma.jpg")
-
-    vectors = getBlock(image)
-
-    # print("----vectors")
-    # print(vectors)
-    #find red  range 0-40
-
-    red_num,red_per = countTarPer(vectors, red_range_thre,"red")
-    #find blue range
-    blue_num, blue_per = countTarPer(vectors, blue_range_thre, "blue")
+    #vars init
     color = ""
     num = -1
     per = -1
+    red_range_thre = info["redRangeThreshold"]
+    blue_range_thre = info["blueRangeThreshold"]
+    red_num_thre = info["redNumThreshold"]
+    blue_num_thre = info["blueNumThre"]
+    # the second par need to be altered according to conditions,such as red or blue
+    image = gamma(image, 0.4)
+    vectors = getBlock(image)
+    #find red  range 0-40
+    red_num,red_per = countTarPer(vectors, red_range_thre,"red")
+
     # the step of red is prior
-    if red_num> red_num_thre:
+    if red_num>=red_num_thre:
         color = "red"
         num = red_num
         per = red_per
-    elif red_num< red_num_thre:
-        color = "blue"
-        num = blue_num
-        per = blue_per
+    else:
+        # find blue range
+        blue_num, blue_per = countTarPer(vectors, blue_range_thre, "blue")
+
+        if blue_num>=blue_num_thre:
+            color = "blue"
+            num = blue_num
+            per = blue_per
 
     res = {
         'color': color,

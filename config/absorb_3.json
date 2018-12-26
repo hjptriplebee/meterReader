@@ -10,9 +10,10 @@
           "w": 300,
           "h": 300
       },
-      "red_range_threshold":40,
-      "blue_range_threshold":120,
-      "red_num_threshold":10
+      "redRangeThreshold":40,
+      "blueRangeThreshold":120,
+      "redNumThreshold":10,
+       "blueNumThre":10
 
 
 }

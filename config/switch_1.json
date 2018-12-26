@@ -10,10 +10,11 @@
           "w": 300,
           "h": 300
       },
-      "switch_threshold":0.6,
-      "red_range_above":10,
-      "green_range_above":77,
-      "red_num_threshold":5
+      "switchThreshold":0.6,
+      "redRangeAbove":10,
+      "greenRangeAbove":77,
+      "redNumThreshold":5,
+      "greenNumThreshold":5
 
 
 }
