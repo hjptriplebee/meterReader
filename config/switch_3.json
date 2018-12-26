@@ -9,7 +9,11 @@
           "y": 77,
           "w": 250,
           "h": 250
-      }
+      },
+      "switch_threshold":0.6,
+      "red_range_above":10,
+      "green_range_above":77,
+      "red_num_threshold":5
 
 
 }

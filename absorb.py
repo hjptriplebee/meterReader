@@ -145,9 +145,9 @@ def countTarPer(h_vec,thre,which):
 
 def absorb(image, info):
 
-    red_range_thre = 40
-    blue_range_thre = 120
-    red_num_thre = 10
+    red_range_thre = info["red_range_threshold"]
+    blue_range_thre = info["blue_range_threshold"]
+    red_num_thre = info["red_num_threshold"]
 
     # the second par need to be altered according to conditions,such as red or blue
     image = gamma(image, 0.4)

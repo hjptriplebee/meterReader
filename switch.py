@@ -124,10 +124,10 @@ def getCircle(img):
 
 def switch(image, info):
 
-    switch_thre = 0.6
-    red_range_above = 10
-    green_range_above = 77
-    red_num_thre = 5
+    switch_thre = info["switch_threshold"]
+    red_range_above = info["red_range_above"]
+    green_range_above = info["green_range_above"]
+    red_num_thre = info["red_num_threshold"]
     # the second par need to be altered according to conditions,such as red or blue
     image = gamma(image, switch_thre)
     # the step need

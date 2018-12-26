@@ -9,7 +9,10 @@
           "y": 450,
           "w": 300,
           "h": 300
-      }
+      },
+      "red_range_threshold":40,
+      "blue_range_threshold":120,
+      "red_num_threshold":10
 
 
 }
