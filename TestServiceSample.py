@@ -1,21 +1,53 @@
-from Common import *
-from Interface import *
 import requests
 import base64
 import json
-from flask import Flask
+import os
+import time
+import multiprocessing
 
-# test reader interface
-image = open("image/bileiqi1_1.jpg", "rb")
-imageByte = base64.b64encode(image.read())
-data = json.dumps({
-    "image": imageByte.decode("ascii"),
-    "imageID": "bileiqi1"
-})
+def startServer():
+    os.system("python FlaskService.py")
 
-r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+def startClient():
+    # test reader interface
+    image = open("image/bileiqi1_1.jpg", "rb")
+    imageByte = base64.b64encode(image.read())
+    data = json.dumps({
+        "image": imageByte.decode("ascii"),
+        "imageID": "bileiqi1"
+    })
+    r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+    print(r.text)
 
-print(r.text)
+    image = open("image/SF6_1.jpg", "rb")
+    imageByte = base64.b64encode(image.read())
+    data = json.dumps({
+        "image": imageByte.decode("ascii"),
+        "imageID": "SF6"
+    })
+    r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+    print(r.text)
+
+    image = open("image/youwen_1.jpg", "rb")
+    imageByte = base64.b64encode(image.read())
+    data = json.dumps({
+        "image": imageByte.decode("ascii"),
+        "imageID": "youwen"
+    })
+    r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+    print(r.text)
+
+
+if __name__ == "__main__":
+
+    serverProcess = multiprocessing.Process(target=startServer)
+    clientProcess = multiprocessing.Process(target=startClient)
+    serverProcess.start()
+    time.sleep(20)
+    clientProcess.start()
+
+
+
 
 
 # test store interface
