@@ -36,6 +36,4 @@ def get_value(img,n):
         print("predict number:",prediction[0])
         results.append(prediction[0])
     return results
-if __name__ == '__main__':
-    img1=cv2.imread("s.jpg")
-    get_value(img1,2)
+
