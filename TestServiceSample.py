@@ -8,7 +8,7 @@ import multiprocessing
 def startServer():
     os.system("python FlaskService.py")
 
-def startClient():
+def startClient(results):
     # test reader interface
     image = open("image/bileiqi1_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -18,7 +18,9 @@ def startClient():
     })
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
-    print(receive["a"])
+    print(receive)
+    if "bileiqi1_1" in receive:
+        results.append(False)
 
     image = open("image/SF6_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -53,13 +55,16 @@ def startClient():
 if __name__ == "__main__":
 
     serverProcess = multiprocessing.Process(target=startServer)
-    clientProcess = multiprocessing.Process(target=startClient)
+    results = multiprocessing.Manager().list()
+    clientProcess = multiprocessing.Process(target=startClient, args=(results,))
     serverProcess.start()
     time.sleep(20)
-
     clientProcess.start()
     clientProcess.join()
     serverProcess.terminate()
+    for result in results:
+        if result == False:
+            exit(100)
 
 
 
