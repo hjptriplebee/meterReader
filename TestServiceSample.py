@@ -17,7 +17,10 @@ def startClient():
         "imageID": "bileiqi1"
     })
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-    print(r.text)
+    receive = json.loads(r.text)
+    print(receive)
+    if "bileiqi1_1" in receive:
+       raise RuntimeError("testError")
 
     image = open("image/SF6_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -26,7 +29,8 @@ def startClient():
         "imageID": "SF6"
     })
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-    print(r.text)
+    receive = json.loads(r.text)
+    print(receive)
 
     image = open("image/youwen_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -35,7 +39,8 @@ def startClient():
         "imageID": "youwen"
     })
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-    print(r.text)
+    receive = json.loads(r.text)
+    print(receive)
 
     image = open("image/pressure_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -44,7 +49,8 @@ def startClient():
         "imageID": "pressure"
     })
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-    print(r.text)
+    receive = json.loads(r.text)
+    print(receive)
 
 if __name__ == "__main__":
 
@@ -53,6 +59,7 @@ if __name__ == "__main__":
     serverProcess.start()
     time.sleep(20)
     clientProcess.start()
+
 
 
 
