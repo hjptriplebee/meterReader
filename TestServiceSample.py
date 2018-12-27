@@ -18,8 +18,7 @@ def startClient():
     })
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
-    print(receive)
-    test = receive["bileiqi"]
+    print(receive["a"])
 
     image = open("image/SF6_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -57,7 +56,10 @@ if __name__ == "__main__":
     clientProcess = multiprocessing.Process(target=startClient)
     serverProcess.start()
     time.sleep(20)
+
     clientProcess.start()
+    clientProcess.join()
+    serverProcess.terminate()
 
 
 
