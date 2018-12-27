@@ -37,7 +37,6 @@ def line_detect(gray, low_thres=40, high_thres=110):
             linepoint.append(line[0])
     except:
         linepoint.append((0, 0, 1, 0))  # 随机给一条直线
-
     return linepoint
 
 
