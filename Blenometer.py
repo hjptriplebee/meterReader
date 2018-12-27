@@ -69,18 +69,17 @@ def checkBleno(image, info):
     if info is not None:
         if y_roi + h_roi / 2 > center_y:
             res[info["name"]] = {"value": "Up"}
-            print("Status : Up\n")
         else:
             res[info["name"]] = {"value": "Down"}
     else:
         print("Meter info is not provided.Return error message.")
         res['error'] = 'Lost Meter Id.'
     rgb_roi = src[y_roi: y_roi + h_roi, x_roi: x_roi + w_roi]
-    cv2.circle(rgb_roi, (min_center[0], min_center[1]), min_center[2], (255, 0, 0), cv2.LINE_4)
-    cv2.imshow("ROI", rgb_roi)
-    cv2.waitKey(0)
+    # cv2.circle(rgb_roi, (min_center[0], min_center[1]), min_center[2], (255, 0, 0), cv2.LINE_4)
+    # cv2.imshow("ROI", rgb_roi)
+    # cv2.waitKey(0)
 
-    return json.dumps(res)
+    return res
     # template match
     # meter = meterFinderByTemplate(image, info["template"])
 
@@ -91,7 +90,7 @@ def checkBleno(image, info):
 def readBlenometerStatus(image, info):
     print("Blenometer Reader called!!!")
     if image is None:
-        print("Resolve Image Error.Inupt image is Empty.")
+        print("Resolve Image Error.Inppt image is Empty.")
         return
     return checkBleno(image, info)
 

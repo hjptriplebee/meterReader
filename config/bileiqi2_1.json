@@ -2,9 +2,9 @@
       "distance": 10.0,
       "horizontal": 10.0,
       "vertical": 20.0,
-      "name": "bileiqi_2",
-      "type": "bileiqi",
-      "template": "bileiqi_2.jpg",
+      "name": "bileiqi2_1",
+      "type": "bileiqi2",
+      "template": "bileiqi2_1.jpg",
       "ROI": {
           "x": 200,
           "y": 200,
