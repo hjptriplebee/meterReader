@@ -19,8 +19,10 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
-    if "bileiqi1_1" in receive:
+    if not "bileiqi1_1" in receive:
         results.append(False)
+    else:
+        results.append(True)
 
     image = open("image/SF6_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -31,6 +33,10 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
+    if not "SF6_1" in receive:
+        results.append(False)
+    else:
+        results.append(True)
 
     image = open("image/youwen_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -41,6 +47,10 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
+    if not "youwen_1" in receive:
+        results.append(False)
+    else:
+        results.append(True)
 
     image = open("image/pressure_1.jpg", "rb")
     imageByte = base64.b64encode(image.read())
@@ -51,6 +61,10 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
+    if not "pressure_1" in receive:
+        results.append(False)
+    else:
+        results.append(True)
 
 if __name__ == "__main__":
 
