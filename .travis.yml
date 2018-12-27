@@ -7,9 +7,14 @@ notifications:      # 邮箱通知
 sudo: false #有定制化开发环境需要，默认false，不开启容器，编译效率高
 
 before_install:
-  - pip install tensorflow #加sudo默认系统环境里的python，使用虚拟环境需加-E参数
+  - pip install numpy==1.15.2 #加sudo默认系统环境里的python，使用虚拟环境需加-E参数
+  - pip install scipy
+  - pip install scikit-learn
+  - pip install flask
+  - pip install tensorflow==1.7.1
   - pip install keras
-  - pip install opencv
+  - pip install opencv-python==3.4.2.16
+  - pip install opencv-contrib-python==3.4.2.16
   - pip install codecov
   - pip install coverage
 
