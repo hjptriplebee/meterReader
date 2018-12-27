@@ -2,7 +2,7 @@ import cv2
 from Common import AngleFactory,meterFinderByTemplate
 from num_reading import get_value
 import math
-def bileiqi_2(image,info):
+def bileiqi2(image, info):
     """
     :param image:whole image
     :param info:bileiqi2 config

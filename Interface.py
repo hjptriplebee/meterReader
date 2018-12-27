@@ -7,7 +7,8 @@ from youwen import youwen
 from pressure import pressure
 from absorb import absorb
 from switch import switch
-from bileiqi_1 import bileiqi1
+from bileiqi1 import bileiqi1
+# from bileiqi2 import bileiqi2
 
 
 def meterReaderCallBack(image, info):
@@ -59,12 +60,14 @@ def getInfo(ID):
         info["type"] = pressure
     elif info["type"] == "bileiqi1":
         info["type"] = bileiqi1
+    # elif info["type"] == "bileiqi2":
+    #     info["type"] = bileiqi2
     elif info["type"] == "blenometer":
         info["type"] = checkBleno
     elif info["type"] == "absorb":
-        info["type"] =absorb
+        info["type"] = absorb
     elif info["type"] == "switch":
-        info["type"] =switch
+        info["type"] = switch
     elif info["type"] == "remember":
         info["type"] = remember
     else:
