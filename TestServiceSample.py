@@ -3,8 +3,8 @@ import base64
 import json
 import os
 import time
-import multiprocessing
 import cv2
+import multiprocessing
 from Interface import meterReader
 
 def startServer():
@@ -23,9 +23,6 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
-
-    image = cv2.imread("image/bileiqi1_1.jpg")
-    receive2 = meterReader(image, ["bileiqi1_1"])
 
     if not "bileiqi1_1" in receive:
         results.append(False)
@@ -58,9 +55,6 @@ def startClient(results):
     receive = json.loads(r.text)
     print(receive)
 
-    image = cv2.imread("image/SF6_1.jpg")
-    receive2 = meterReader(image, ["SF6_1"])
-
     if not "SF6_1" in receive:
         results.append(False)
     else:
@@ -76,9 +70,6 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
-
-    image = cv2.imread("image/youwen_4.jpg")
-    receive2 = meterReader(image, ["youwen_4"])
 
     if not "youwen_4" in receive:
         results.append(False)
@@ -96,9 +87,6 @@ def startClient(results):
     receive = json.loads(r.text)
     print(receive)
 
-    image = cv2.imread("image/pressure_1.jpg")
-    receive2 = meterReader(image, ["pressure_1"])
-
     if not "pressure_1" in receive:
         results.append(False)
     else:
@@ -114,9 +102,6 @@ def startClient(results):
     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
     receive = json.loads(r.text)
     print(receive)
-
-    image = cv2.imread("image/absorb_1.jpg")
-    receive2 = meterReader(image, ["absorb_1"])
 
     if not "absorb_1" in receive:
         results.append(False)
@@ -134,9 +119,6 @@ def startClient(results):
     receive = json.loads(r.text)
     print(receive)
 
-    image = cv2.imread("image/switch_1.jpg")
-    receive2 = meterReader(image, ["switch_1"])
-
     if not "switch_1" in receive:
         results.append(False)
     else:
@@ -153,13 +135,33 @@ def startClient(results):
     receive = json.loads(r.text)
     print(receive)
 
-    image = cv2.imread("image/blenometer_1.jpg")
-    receive2 = meterReader(image, ["blenometer_1"])
-
     if not "blenometer_1" in receive:
         results.append(False)
     else:
         results.append(True)
+
+def codecov():
+    image = cv2.imread("image/bileiqi1_1.jpg")
+    receive2 = meterReader(image, ["bileiqi1_1"])
+
+    image = cv2.imread("image/SF6_1.jpg")
+    receive2 = meterReader(image, ["SF6_1"])
+
+    image = cv2.imread("image/youwen_4.jpg")
+    receive2 = meterReader(image, ["youwen_4"])
+
+    image = cv2.imread("image/pressure_1.jpg")
+    receive2 = meterReader(image, ["pressure_1"])
+
+    image = cv2.imread("image/absorb_1.jpg")
+    receive2 = meterReader(image, ["absorb_1"])
+
+    image = cv2.imread("image/switch_1.jpg")
+    receive2 = meterReader(image, ["switch_1"])
+
+    image = cv2.imread("image/blenometer_1.jpg")
+    receive2 = meterReader(image, ["blenometer_1"])
+
 
 if __name__ == "__main__":
 
@@ -171,6 +173,9 @@ if __name__ == "__main__":
     clientProcess.start()
     clientProcess.join()
     serverProcess.terminate()
+
+    codecov()
+
     for result in results:
         if result == False:
             exit(100)
