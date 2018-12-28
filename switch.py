@@ -2,6 +2,17 @@ import json
 import numpy as np
 import cv2
 
+#type transform
+def getMatInt(Mat):
+
+    d = Mat.shape
+    for i in range(d[2]):
+        for n in range(d[0]):
+            for m in range(d[1]):
+                Mat[n,m,i] = int(Mat[n,m,i])
+                # print(Mat[n,m,i])
+    Mat = Mat.astype(np.uint8)
+    return Mat
 def gamma(image,thre):
     '''
     :param image: numpy type
@@ -12,8 +23,8 @@ def gamma(image,thre):
     # we can change thre accoding  to real condition
     # thre = 0.3
     out = np.power(f, thre)
-
-    return out*255.0
+    out = getMatInt(out * 255)
+    return out
 
 def backGamma(image,thre):
     '''
@@ -76,6 +87,7 @@ def getBlock(image,size=30):
     return h_blocks
 
 def countTarPer(h_vec,thre,which):
+    green_range_below = 35
     n = 0
     N = 1
     if which =="red":
@@ -86,9 +98,8 @@ def countTarPer(h_vec,thre,which):
     elif which =="green":
         for d in h_vec:
             N=N+1
-            if d>35 and d<thre:
+            if d>green_range_below and d<thre:
                 n=n+1
-
 
     return n,float(n/N)
 
@@ -122,47 +133,50 @@ def getCircle(img):
 
     return cp_img
 
-
 def switch(image, info):
-
+    color = ""
+    num = -1
+    per = -1
+    switch_thre = info["switchThreshold"]
+    red_range_above = info["redRangeAbove"]
+    green_range_above = info["greenRangeAbove"]
+    red_num_thre = info["redNumThreshold"]
+    green_num_thre = info["greenNumThreshold"]
     # the second par need to be altered according to conditions,such as red or blue
-    image = gamma(image, 0.6)
+    image = gamma(image, switch_thre)
     # the step need
-    cv2.imwrite("gamma.jpg", image)
-
-    image = cv2.imread("gamma.jpg")
 
     # use hough to locate the circle
-    image = getCircle(image)
+    # to compatible yaxi test images ,we annotate the way to search circle by hough
+    # the test result is good
+    #image = getCircle(image)
 
+    # cv2.imwrite("temp.jpg",image)
     vectors = getBlock(image,5)
 
     # print("----vectors")
     # print(vectors)
-
     #find red  range 0-40
-    red_num,red_per = countTarPer(vectors, 10,"red")
-    #find blue range
-    blue_num, blue_per = countTarPer(vectors, 77, "green")
-    color = ""
-    num = -1
-    per = -1
+    red_num,red_per = countTarPer(vectors, red_range_above,"red")
+
     # the step of red is prior
-    if red_num>5:
+    if red_num>red_num_thre:
         color = "red"
         num = red_num
         per = red_per
-    elif red_num<5:
-        color = "green"
-        num = blue_num
-        per = blue_per
+    else:
+        # find blue range
+        green_num, green_per = countTarPer(vectors, green_range_above, "green")
+        if green_num>=green_num_thre:
+            color = "green"
+            num = green_num
+            per = green_per
 
     res = {
         'color': color,
         'num':num,
         'per':per
     }
-
     res = json.dumps(res)
 
     return res

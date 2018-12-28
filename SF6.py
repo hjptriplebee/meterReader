@@ -6,8 +6,6 @@ def SF6Reader(image, info):
     :param info: information for this meter
     :return: value
     """
-    # your method
-    print("SF6Reader called!!!")
 
     # get info
     startPoint = (info["startPoint"]["x"], info["startPoint"]["y"])

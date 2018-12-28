@@ -13,7 +13,7 @@
       "redRangeThreshold":40,
       "blueRangeThreshold":120,
       "redNumThreshold":10,
-      "blueNumThre":10
+       "blueNumThre":10
 
 
 }
