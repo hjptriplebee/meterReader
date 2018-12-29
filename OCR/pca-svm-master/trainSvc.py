@@ -22,7 +22,6 @@ if __name__ == "__main__":
     test_num = 2000
     data = pd.read_csv('train_v1.csv').values
     print(data.shape)
-    # train_data = data[0:train_num, 2:]
     train_data = data[0:train_num, 2:]
     train_label = data[0:train_num:, 1]
     test_data = data[train_num:train_num+test_num, 2:]
