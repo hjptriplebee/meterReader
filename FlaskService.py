@@ -23,6 +23,7 @@ def getMeterNum(imageID):
 
     return num
 
+
 def getMeterIDs(imageID):
     """get id of meters in an image"""
     meterIDs = []
@@ -36,6 +37,7 @@ def getMeterIDs(imageID):
             meterIDs.append(prefix)
 
     return meterIDs
+
 
 @app.route('/', methods=['POST'])
 def meterReaderAPI():
@@ -55,6 +57,7 @@ def meterReaderAPI():
 
     return sendData
 
+
 @app.route('/store', methods=['POST'])
 def storeAPI():
     data = request.get_data().decode("utf-8")
@@ -63,7 +66,6 @@ def storeAPI():
     imageID = data["imageID"]
     meterNum = getMeterNum(imageID)
     meterID = imageID + "_" + str(meterNum + 1)
-
     imageByte = data["template"].encode("ascii")
     imageByte = base64.b64decode(imageByte)
     imageArray = np.asarray(bytearray(imageByte), dtype="uint8")
@@ -78,7 +80,6 @@ def storeAPI():
     file.close()
 
     return "received!"
-
 
 
 if __name__ == '__main__':

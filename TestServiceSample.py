@@ -7,8 +7,10 @@ import cv2
 import multiprocessing
 from Interface import meterReader
 
+
 def startServer():
     os.system("python FlaskService.py")
+
 
 def startClient(results):
     # test reader interface
@@ -91,6 +93,21 @@ def startClient(results):
         results.append(False)
     else:
         results.append(True)
+    # ===========================pressure2 test===========================
+    image = open("image/pressure2_1.jpg", "rb")
+    imageByte = base64.b64encode(image.read())
+    data = json.dumps({
+        "image": imageByte.decode("ascii"),
+        "imageID": "pressure2"
+    })
+    r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+    receive = json.loads(r.text)
+    print(receive)
+
+    if not "pressure2_1" in receive:
+        results.append(False)
+    else:
+        results.append(True)
 
     # ===========================absorb test===========================
     image = open("image/absorb_1.jpg", "rb")
@@ -140,6 +157,7 @@ def startClient(results):
     else:
         results.append(True)
 
+
 def codecov():
     image = cv2.imread("image/bileiqi1_1.jpg")
     receive2 = meterReader(image, ["bileiqi1_1"])
@@ -152,6 +170,9 @@ def codecov():
 
     image = cv2.imread("image/pressure_1.jpg")
     receive2 = meterReader(image, ["pressure_1"])
+
+    image = cv2.imread("image/pressure2_1.jpg")
+    receive2 = meterReader(image, ["pressure2_1"])
 
     image = cv2.imread("image/absorb_1.jpg")
     receive2 = meterReader(image, ["absorb_1"])
@@ -179,11 +200,6 @@ if __name__ == "__main__":
     for result in results:
         if result == False:
             exit(100)
-
-
-
-
-
 
 # test store interface
 # image = open("template/1_1.jpg", "rb")

@@ -8,6 +8,9 @@ from pressure import pressure
 from absorb import absorb
 from switch import switch
 from bileiqi1 import bileiqi1
+from pressure2 import readPressureValueFromImage as readPressure
+
+
 # from bileiqi2 import bileiqi2
 
 
@@ -58,6 +61,8 @@ def getInfo(ID):
         info["type"] = youwen
     elif info["type"] == "pressure":
         info["type"] = pressure
+    elif info["type"] == "pressure2":
+        info["type"] = readPressure
     elif info["type"] == "bileiqi1":
         info["type"] = bileiqi1
     # elif info["type"] == "bileiqi2":
