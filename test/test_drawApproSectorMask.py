@@ -1,6 +1,6 @@
 from unittest import TestCase
 # from DrawSector import drawApproSectorMask
-from uitl import PlotUtil as plot, DrawSector as ds
+from util import PlotUtil as plot, DrawSector as ds
 
 
 class TestDrawApproSectorMask(TestCase):

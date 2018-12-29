@@ -12,12 +12,12 @@
     "h": 680
   },
   "startPoint": {
-    "x": 124,
-    "y": 340
+    "x": 121,
+    "y": 334
   },
   "endPoint": {
-    "x": 329,
-    "y": 344
+    "x": 334,
+    "y": 347
   },
   "centerPoint": {
     "x": 229,
@@ -26,7 +26,7 @@
   "startValue": 0.0,
   "totalValue": 2.5,
   "unit": "Mpa",
-  "enableFit": false,
+  "enableFit":false,
   "enableEqualizeHistogram": false,
   "enableCleanNoisedRegion": true ,
   "ptr_resolution": 10,

@@ -2,7 +2,7 @@ from unittest import TestCase
 import tabulate as table
 import numpy as np
 import cv2
-from uitl import PlotUtil as plot, RasancFitCircle as rasanc
+from util import PlotUtil as plot, RasancFitCircle as rasanc
 
 plot_index = 0
 

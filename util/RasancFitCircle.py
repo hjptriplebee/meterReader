@@ -143,7 +143,7 @@ def getCircle(pointer1, pointer2, pointer3):
     :param pointer3:
     :return:
     """
-    circle = np.zeros(3, dtype=np.float16)
+    circle = np.array([0.0, 0.0, 0.0], dtype=np.float64)
     x1 = float(pointer1[0])
     x2 = float(pointer2[0])
     x3 = float(pointer3[0])

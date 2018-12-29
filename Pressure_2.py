@@ -1,106 +1,42 @@
 import json
 from Common import *
-from uitl import PlotUtil as plot, RasancFitCircle as rasan, DrawSector as ds, ROIUtil as roiutil
+from util import RasancFitCircle as rasan, DrawSector as ds
 import math
 
-plot_img_index = 0
-ed_src = None
 
-
-def inc():
-    global plot_img_index
-    plot_img_index += 1
-    return plot_img_index
-
-
-def recognizePointerInstrument(image, info):
+def readPressureValueFromImage(image, info):
     doEqualizeHist = False
-    if image is None:
-        print("Open Error.Image is empty.")
-        return
     pyramid = 0.2
     if info['pyramid'] is not None:
         pyramid = info['pyramid']
     src = cv2.resize(image, (0, 0), fx=pyramid, fy=pyramid)
-    rgb_src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
-    # plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), index=inc(), title="Src")
-    # A. The Template Image Processing
     src = cv2.GaussianBlur(src, (3, 3), sigmaX=0, sigmaY=0, borderType=cv2.BORDER_DEFAULT)
-    # src = cv2.medianBlur(src, ksize=9)
-
-    # to make image more contrast and obvious by equalizing histogram
-    # if doEqualizeHist:
-    #     src = cv2.cvtColor(src, cv2.COLOR_BGR2YUV)
-    #     src[:, :, 0] = cv2.equalizeHist(src[:, :, 0])
-    #     src = cv2.cvtColor(src, cv2.COLOR_YUV2RGB)
-    # # plot.subImage(src=src, index=++plot_img_index, title="Src")
-
-    # plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), index=inc(), title="Blurred")
     canny = cv2.Canny(src, 75, 75 * 2, edges=None)
-    # calculate edge by Sobel operator
     gray = cv2.cvtColor(src=src, code=cv2.COLOR_RGB2GRAY)
     if doEqualizeHist:
         gray = cv2.equalizeHist(gray)
-    # plot.subImage(src=gray, index=inc(), title='Gray', cmap='gray')
-    # usa a large structure element to fix high light in case otust image segmentation error.
-    structuring_element = cv2.getStructuringElement(shape=cv2.MORPH_ELLIPSE, ksize=(101, 101))
-    gray = cv2.morphologyEx(src=gray, op=cv2.MORPH_BLACKHAT, kernel=structuring_element)
-    # plot.subImage(src=gray, index=inc(), title='BlackHap', cmap='gray')
-    # B. Edge Detection
-    grad_x = cv2.Sobel(src=gray, dx=1, dy=0, ddepth=cv2.CV_8UC1, borderType=cv2.BORDER_DEFAULT)
-    grad_y = cv2.Sobel(src=gray, dx=0, dy=1, ddepth=cv2.CV_8UC1, borderType=cv2.BORDER_DEFAULT)
-    cv2.convertScaleAbs(grad_x, grad_x)
-    cv2.convertScaleAbs(grad_y, grad_y)
-    grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
-    # plot.subImage(cmap='gray', src=grad, title="grad", index=inc())
-    grad = cv2.GaussianBlur(grad, (3, 3), sigmaX=0, sigmaY=0)
-    # plot.subImage(src=grad, index=inc(), title='BlurredGrad', cmap='gray')
-    # get binarization image by Otsu'algorithm
-    # ret, ostu = cv2.threshold(grad, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    # adaptive = cv1.adaptiveThreshold(grad, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-    # threshold = ostu
     canny = cv2.Canny(src, 75, 75 * 2)
-    # # plot.subImage(cmap='gray', src=gray, title='gray', index=inc())
-    # # plot.subImage(cmap='gray', src=grad_x, title="GradX", index=inc())
-    # # plot.subImage(cmap='gray', src=grad_y, title="grady", index=inc())
-    # # plot.subImage(cmap='gray', src=otsu, title="otsu", index=inc())
-    # # plot.subImage(cmap='gray', src=adaptive, title="adaptive", index=inc())
-    # plot.subImage(cmap='gray', src=canny, title="Canny", index=inc())
     dilate_kernel = cv2.getStructuringElement(ksize=(5, 5), shape=cv2.MORPH_ELLIPSE)
     erode_kernel = cv2.getStructuringElement(ksize=(3, 3), shape=cv2.MORPH_ELLIPSE)
-    # # plot.subImage(src=ed_canny, index=inc(), title='EDCanny', cmap='gray')
-    # threshold = cv2.dilate(threshold, dilate_kernel)
-    # threshold = cv2.erode(threshold, dilate_kernel)
-    # canny = cv2.dilate(canny, dilate_kernel)
-    dilate_canny = canny.copy()
     # plot.subImage(src=canny, index=inc(), title='DilatedCanny', cmap='gray')
+    # fill scale line with white pixels
     canny = cv2.dilate(canny, dilate_kernel)
     canny = cv2.erode(canny, erode_kernel)
-    zhang_thinning = cv2.ximgproc.thinning(canny, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
-    # guo_thinning = cv2.ximgproc.thinning(canny, thinningType=cv2.ximgproc.THINNING_GUOHALL)
-    # plot.subImage(cmap='gray', src=zhang_thinning, title='ZhangeThinning', index=inc())
-    # # plot.subImage(cmap='gray', src=guo_thinning, title='GuoThinning', index=inc())
-    # cv2.createTrackbar("Kernel:", window_name, 1, 20, dilate_erode)
-    # cv2.imshow(window_name, otsu)
-    # # plot.subImage(cmap='gray', src=threshold, title='DilateAndErodeThresh', index=inc())
-    # plot.subImage(cmap='gray', src=canny, title='DilateAndErodeCanny', index=inc())
-    # find contours ,at least included all lines
+    # find contours
     img, contours, hierarchy = cv2.findContours(canny, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE)
-    # filter some large contours, the pixel number of scale line should be small enough.
+    # filter the large contours, the pixel number of scale line should be small enough.
     # and the algorithm will find the pixel belong to the scale line as we need.
     contours = [c for c in contours if len(c) < 40]
-    ## Draw Contours
+    # draw contours
     src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
     cv2.drawContours(src, contours, -1, (0, 255, 0), thickness=cv2.FILLED)
-    prasan_iteration = rasan.getIteration(0.7, 0.3)
-    avg_circle = np.zeros(3, dtype=np.float64)
-    avg_fit_num = 0
+    # prasan_iteration = rasan.getIteration(0.7, 0.3)
     dst_threshold = 35
     period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
     iter_time = 5  # 启动rasanc拟合算法的固定次数
     hit_time = 0  # 成功拟合到圆的次数lot.subImage(src=src, title='Contours', index=inc())
-    # C. Figuring out Centroids of the Scale Lines
     theta = 0
+    # load meter calibration form configuration
     start_value = info['startValue']
     total = info['totalValue']
     start_ptr = info['startPoint']
@@ -108,16 +44,14 @@ def recognizePointerInstrument(image, info):
     ptr_resolution = info['ptrResolution']
     if ptr_resolution is None:
         ptr_resolution = 15
-    assert start_value is not None
-    assert start_ptr is not None
-    assert end_ptr is not None
-    assert total is not None
+    validateConfig(end_ptr, start_ptr, start_value, total)
     start_ptr = cvtPtrDic2D(start_ptr)
     end_ptr = cvtPtrDic2D(end_ptr)
-    center = 0
-    radius = 0
+    center = 0  # 表盘的中心
+    radius = 0  # 表盘的半径
     # 使用拟合方式求表盘的圆,进而求出圆心
     if info['enableFit']:
+        # figuring out centroids of the scale lines
         center, radius = figureOutDialCircleByScaleLine(contours, dst_threshold,
                                                         iter_time, period_rasanc_time)
     # 使用标定信息
@@ -132,52 +66,40 @@ def recognizePointerInstrument(image, info):
 
     # 清楚可被清除的噪声区域，噪声区域(文字、刻度数字、商标等)的area 可能与指针区域的area形似,应该被清除，
     # 防止在识别指针时出现干扰。值得注意，如果当前指针覆盖了该干扰区域，指针的一部分可能也会被清除
-    # dilate_canny = cleanNoisedRegions(dilate_canny, info, src)
-    zhang_thinning = cleanNoisedRegions(zhang_thinning, info, src.shape)
-    dilate_canny = cleanNoisedRegions(dilate_canny, info, src.shape)
+    canny = cleanNoisedRegions(canny, info, src.shape)
     # 用直线Mask求指针区域
     hlt = np.array([center[0] + radius, center[1]])  # 通过圆心的水平线与圆的右交点
     # start_degree = math.degrees(AngleFactory.calAngleClockwise(hlt, start_ptr, center))
     # end_degree = math.degrees(AngleFactory.calAngleClockwise(end_ptr, hlt, center))
-    # 计算夹角
+    # 计算夹角的弧度角
     start_radians = AngleFactory.calAngleClockwise(hlt, start_ptr, center)
     end_radians = AngleFactory.calAngleClockwise(end_ptr, hlt, center)
     # print("Start degree:", start_degree)
     # print("End degree:", end_degree)
-    pointer_mask, theta, line_ptr = pointerMaskByLine(dilate_canny, center, radius, start_radians, end_radians,
-                                                      patch_degree=0.5,
-                                                      ptr_resolution=ptr_resolution)
-
-    # 求始点与水平线
+    # 从特定范围搜索指针
+    pointer_mask, theta, line_ptr = findPointerFromBinarySpace(canny, center, radius, start_radians, end_radians,
+                                                               patch_degree=0.5,
+                                                               ptr_resolution=ptr_resolution)
     res = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr,
                                               centerPoint=center,
                                               point=cv2PtrTuple2D(line_ptr), startValue=start_value,
                                               totalValue=total)
     print(res)
-    # plot.subImage(src=pointer_mask, index=inc(), title='PointerMask', cmap='gray')
-    plot.subImage(src=cv2.bitwise_or(dilate_canny, pointer_mask), index=inc(), title='Pointer', cmap='gray')
-    # drawDialFeature(center, end_ptr, radius, rgb_src, start_ptr)
-    plot.show()
 
 
-def drawDialFeature(center, end_ptr, radius, rgb_src, start_ptr):
+def validateConfig(end_ptr, start_ptr, start_value, total):
     """
-    绘图功能函数，绘出表盘的大致区域
-    :param center:
+    validate the meter's configuration,the specialized param should exist for algorithm effectiveness.
     :param end_ptr:
-    :param radius:
-    :param rgb_src:
     :param start_ptr:
+    :param start_value:
+    :param total:
     :return:
     """
-    fitted_circle_img = drawDial((center[0], center[1]), radius, rgb_src)
-    cv2.circle(img=fitted_circle_img, center=(start_ptr[0], start_ptr[1]),
-               color=(np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)),
-               radius=4, thickness=2)
-    cv2.circle(img=fitted_circle_img, center=(end_ptr[0], end_ptr[1]),
-               color=(np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)),
-               radius=4, thickness=2)
-    # plot.subImage(src=fitted_circle_img, index=inc(), title='FittedCircle')
+    assert start_value is not None
+    assert start_ptr is not None
+    assert end_ptr is not None
+    assert total is not None
 
 
 def cvtPtrDic2D(dic_ptr):
@@ -214,7 +136,7 @@ def cleanNoisedRegions(src, info, shape):
     :param shape:
     :return:
     """
-    if info['noisedRegion'] is not None:
+    if 'noisedRegion' in info and info['noisedRegion'] is not None:
         region_roi = info['noisedRegion']
         for roi in region_roi:
             mask = cv2.bitwise_not(np.zeros(shape=(shape[0], shape[1]), dtype=np.uint8))
@@ -222,30 +144,6 @@ def cleanNoisedRegions(src, info, shape):
             src = cv2.bitwise_and(src, mask)
         # plot.subImage(src=src, index=inc(), title='CleanNoisedRegion', cmap='gray')
     return src
-
-
-def drawDial(center, radius, rgb_src):
-    fitted_circle_img = rgb_src.copy()
-    cv2.circle(fitted_circle_img, center, radius,
-               color=(0, 0, 255),
-               thickness=2,
-               lineType=cv2.LINE_AA)
-    cv2.circle(fitted_circle_img, center, radius=6, color=(0, 0, 255), thickness=2)
-    # # plot.subImage(src=fitted_circle_img, index=inc(), title='Circle')
-    return fitted_circle_img
-
-
-# patch_degree = 5
-# mask_res = []
-# areas = []
-# patch_index = 0
-# pointerMaskBySector(areas, canny, center, patch_degree, patch_index, radius)
-# mask_res = sorted(mask_res, key=lambda r: r[1], reverse=True)
-# print("Max Area: ", mask_res[0][1])
-# print("Degree: ", patch_degree * mask_res[0][0])
-# for res in mask_res[0:5]:
-#    index = inc()
-#    # plot.subImage(src=areas[res[0]], index=index, title='Mask Res :' + str(index), cmap='gray')
 
 
 def figureOutDialCircleByScaleLine(contours, dst_threshold, iter_time,
@@ -258,7 +156,7 @@ def figureOutDialCircleByScaleLine(contours, dst_threshold, iter_time,
     :param period_rasanc_time: 每趟rasanc 的迭代次数
     :return: 拟合得到的圆心、半径
     """
-    avg_circle = np.array([0, 0])
+    avg_circle = np.array([0.0, 0.0, 0.0], dtype=np.float64)
     avg_fit_num = 0
     hit_time = 0
     centroids = []
@@ -298,41 +196,6 @@ def figureOutDialCircleByScaleLine(contours, dst_threshold, iter_time,
         return (0, 0), 0
 
 
-def extractLines(gray):
-    """
-    HoughLine的随机方法、全参数空间方法找直线方程
-    :param gray:输入的灰度图
-    :return:
-    """
-    p_lines = cv2.HoughLinesP(gray, 1, np.pi / 180, threshold=5, minLineLength=1, maxLineGap=10)
-    lines = cv2.HoughLines(gray, 1, np.pi / 180, threshold=5)
-    p_src_lines = np.zeros(shape=(gray.shape[0], gray[1], 3), dtype=np.uint8)
-    src_lines = np.zeros(shape=(gray.shape[0], gray[1], 3), dtype=np.uint8)
-    for line in p_lines[0]:
-        r = np.random.randint(0, 256)
-        g = np.random.randint(0, 256)
-        b = np.random.randint(0, 256)
-        cv2.line(p_src_lines, (line[0], line[1]), (line[2], line[3]), color=(r, g, b), thickness=1)
-        cv2.circle(p_src_lines, (line[0], line[1]), radius=4, color=(r, g, b), thickness=1)
-        cv2.circle(p_src_lines, (line[2], line[3]), radius=4, color=(r, g, b), thickness=1)
-    for line in lines[0]:
-        r = np.random.randint(0, 256)
-        g = np.random.randint(0, 256)
-        cb = np.random.randint(0, 256)
-        rho = line[0]
-        theta = line[1]
-        a = np.cos(theta)
-        b = np.sin(theta)
-        x0 = a * rho
-        y0 = b * rho
-        ptr1 = (np.int(x0 + 1000 * (-b)), np.int(y0 + 1000 * a))
-        ptr2 = (np.int(x0 - 1000 * (-b)), np.int(y0 - 1000 * a))
-        cv2.line(src_lines, ptr1, ptr2, color=(r, g, cb), thickness=1)
-        cv2.circle(src_lines, ptr1, radius=4, color=(r, g, cb), thickness=1)
-        cv2.circle(src_lines, ptr2, radius=4, color=(r, g, cb), thickness=1)
-    return lines[0], p_lines[0], src_lines, p_src_lines
-
-
 def pointerMaskBySector(areas, gray, center, patch_degree, radius):
     """
     用扇形遮罩的方法求直线位置。函数接受一个已经被灰度/二值化的图，图中默认保留了比较清晰的指针轮廓，
@@ -361,55 +224,25 @@ def pointerMaskBySector(areas, gray, center, patch_degree, radius):
     return mask_res, mask_res[0][1] * patch_degree
 
 
-def on_touch(val):
-    return None
+def findPointerFromHSVSpace(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5,
+                            low_ptr_color=np.array([0, 0, 221]), up_ptr_color=np.array([180, 30, 255])):
+    """
+    从固定颜色的区域找指针,未完成
+    :param low_ptr_color: 指针的hsv颜色空间的下界
+    :param up_ptr_color:  指针的hsv颜色空间的上界
+    :param radians_low:圆的搜索范围(弧度制表示)
+    :param radians_high:圆的搜索范围(弧度制表示)
+    :param src: 二值图
+    :param center: 刻度盘的圆心
+    :param radius: 圆的半径
+    :param patch_degree:搜索梯度，默认每次一度
+    :param ptr_resolution: 指针的粗细程度
+    :return: 指针遮罩、直线与圆相交的点
+    """
+    pass
 
 
-def dilate_erode(kernel_size):
-    kernel = cv2.getStructuringElement(ksize=(kernel_size * 2 + 1, kernel_size * 2 + 1), shape=cv2.MORPH_ELLIPSE)
-    src = cv2.dilate(ed_src, kernel)
-    src = cv2.erode(src, kernel)
-    # cv2.imshow(window_name, src)
-    return src
-
-
-def compareEqualizeHistBetweenDiffEnvironment():
-    src1 = cv2.imread('image/SF6/IMG_7638.JPG', cv2.IMREAD_GRAYSCALE)
-    src2 = cv2.imread('image/SF6/IMG_7640.JPG', cv2.IMREAD_GRAYSCALE)
-    src1 = cv2.resize(src1, (0, 0), fx=0.2, fy=0.2)
-    src2 = cv2.resize(src2, (0, 0), fx=0.2, fy=0.2)
-    if src1 is None or src2 is None:
-        return
-    print(src1.shape)
-    print(src2.shape)
-    hist1 = cv2.calcHist(images=[src1], channels=[0], histSize=[256], ranges=[0, 256], mask=None)
-    hist2 = cv2.calcHist(images=[src2], channels=[0], histSize=[256], ranges=[0, 256], mask=None)
-    equalizedSrc1 = cv2.equalizeHist(src1)
-    equalizedSrc2 = cv2.equalizeHist(src2)
-    equalizedHist1 = cv2.calcHist(images=[equalizedSrc1], channels=[0], histSize=[256], ranges=[0, 256], mask=None)
-    equalizedHist2 = cv2.calcHist(images=[equalizedSrc2], channels=[0], histSize=[256], ranges=[0, 256], mask=None)
-    # hist_np1 = np.histogram(src1.ravel(), 256, [0, 256])
-    # hist_np2 = np.histogram(src2.ravel(), 256, [0, 256])
-    # # plot.subImage(cmap='gray', src=src1, title='Src1', index=inc())
-    # plot.subImage(cmap='gray', src=src2, title='Src2', index=inc())
-    plot.plot(hist1, index=inc(), title="Hist1")
-    plot.plot(hist2, index=inc(), title="Hist2")
-    # plot.subImage(cmap='gray', src=equalizedSrc1, title="EqualizedSrc1", index=inc())
-    # plot.subImage(cmap='gray', src=equalizedSrc2, title="EqualizedSrc2", index=inc())
-    plot.plot(equalizedHist1, index=inc(), title='EqualizedHist1')
-    plot.plot(equalizedHist2, index=inc(), title='EqualizedHist2')
-    kernel = cv2.getStructuringElement(shape=cv2.MORPH_ELLIPSE, ksize=(41, 41))
-    black_hat = cv2.morphologyEx(src1, kernel=kernel, op=cv2.MORPH_BLACKHAT)
-    # plot.subImage(cmap='gray', src=black_hat, title='TopTrans', index=inc())
-    # cv2.imshow("hist1",hist1)
-    # cv2.imshow("hist2", src2)
-    # cv2.waitkey(0)
-    # # plot.subImage(cmap='gray', src=hist_np1, title="histnp1", index=inc())
-    # # plot.subImage(cmap='gray', src=hist_np2, title="histnp2", index=inc())
-
-
-def pointerMaskByLine(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5,
-                      low_ptr_color=np.array([0, 0, 221]), up_ptr_color=np.array([180, 30, 255])):
+def findPointerFromBinarySpace(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5):
     """
     接收一张预处理过的二值图（默认较完整保留了指针信息），从通过圆心水平线右边的点开始，连接圆心顺时针建立直线遮罩，取出遮罩范围下的区域,
     计算对应区域灰度和，灰度和最大的区域即为指针所在的位置。直线遮罩的粗细程度、搜索的梯度决定了算法侦测指针的细粒度。该算法适合搜索指针形状
@@ -438,14 +271,16 @@ def pointerMaskByLine(src, center, radius, radians_low, radians_high, patch_degr
     best_theta = 0
     iteration = np.abs(int((high - low) / patch_degree))
     for i in range(iteration):
-        pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
+        # 建立一个大小跟输入一致的全黑图像
+        # pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
         # theta = float(i) * 0.01
+        # 每次旋转patch_degree度，取圆上一点
         theta = float(i * patch_degree / 180 * np.pi)
-        y1 = int(center[1] - np.sin(theta) * radius)
-        x1 = int(center[0] + np.cos(theta) * radius)
+        pointer_mask, point = drawLineMask(_shape, theta, center, ptr_resolution, radius)
         # cv2.circle(black_img, (x1, y1), 2, 255, 3)
         # cv2.circle(black_img, (item[0], item[1]), 2, 255, 3)
-        cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, ptr_resolution)
+        # cv2.line(pointer_mask, (center[0], center[1]), point, 255, ptr_resolution)
+        # 去除遮罩对应的小区域
         and_img = cv2.bitwise_and(pointer_mask, img)
         not_zero_intensity = cv2.countNonZero(and_img)
         mask_info.append((not_zero_intensity, theta))
@@ -453,6 +288,7 @@ def pointerMaskByLine(src, center, radius, radians_low, radians_high, patch_degr
         #     mask_intensity = not_zero_intensity
         #     mask_theta = theta
         # imwrite(dir_path+'/2_line1.jpg', black_img)
+    # 按灰度和从大到小排列
     mask_info = sorted(mask_info, key=lambda m: m[0], reverse=True)
     # thresh = mask_info[0][0] / 30
     # over_index = 1
@@ -462,10 +298,8 @@ def pointerMaskByLine(src, center, radius, radians_low, radians_high, patch_degr
     #         break
     #     over_index += 1
     best_theta = mask_info[0][1]
-    pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
-    y1 = int(center[1] - np.sin(best_theta) * radius)
-    x1 = int(center[0] + np.cos(best_theta) * radius)
-    cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, ptr_resolution)
+    # 得到灰度和最大的那个直线遮罩,和直线与圆相交的点
+    pointer_mask, point = drawLineMask(_shape, best_theta, center, ptr_resolution, radius)
     #
     # black_img1 = np.zeros([_shape[0], _shape[1]], np.uint8)
     # r = item[2]-20 if item[2]==_heart[1][2] else _heart[1][2]+ _heart[0][1]-_heart[1][1]-20
@@ -477,25 +311,41 @@ def pointerMaskByLine(src, center, radius, radians_low, radians_high, patch_degr
     best_theta = 180 - best_theta * 180 / np.pi
     if best_theta < 0:
         best_theta = 360 - best_theta
-    return pointer_mask, best_theta, (x1, y1)
+    return pointer_mask, best_theta, point
 
 
-def demarcate_roi(img_dir):
-    # ROI 选择\
-    src = cv2.resize(cv2.imread(img_dir), (0, 0), fx=0.2, fy=0.2)
-    regions = roiutil.selectROI(src)
-    print(regions)
+def drawLineMask(_shape, best_theta, center, ptr_resolution, radius):
+    """
+    画一个长为radius，白色的直线，产生一个背景全黑的白色直线遮罩
+    :param _shape:
+    :param best_theta:
+    :param center:
+    :param ptr_resolution:
+    :param radius:
+    :return:
+    """
+    pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
+    y1 = int(center[1] - np.sin(best_theta) * radius)
+    x1 = int(center[0] + np.cos(best_theta) * radius)
+    cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, ptr_resolution)
+    return pointer_mask, (x1, y1)
 
 
-def reg_ptr(img_dir, config):
+def readPressureValueFromDir(img_dir, config):
     img = cv2.imread(img_dir)
     file = open(config)
     info = json.load(file)
     assert info is not None
-    recognizePointerInstrument(img, info)
+    readPressureValueFromImage(img, info)
+
+
+def readPressureValueFromImg(img, info):
+    if img is None:
+        raise Exception("Failed to resolve the empty image.")
+    return readPressureValueFromImage(img, info)
 
 
 if __name__ == '__main__':
-    # reg_ptr('image/SF6/IMG_7640.JPG', 'config/pressure_1.json')
-    reg_ptr('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
+    # readPressureValueFromDir('image/SF6/IMG_7640.JPG', 'config/pressure_1.json')
+    readPressureValueFromDir('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
     # demarcate_roi('image/SF6/IMG_7666.JPG')
