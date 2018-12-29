@@ -143,21 +143,21 @@ def cleanNoisedRegions(src, info, shape):
     return src
 
 
-def readPressureValueFromDir(img_dir, config):
-    img = cv2.imread(img_dir)
-    file = open(config)
-    info = json.load(file)
-    assert info is not None
-    readPressureValueFromImage(img, info)
-
-
-def readPressureValueFromImg(img, info):
-    if img is None:
-        raise Exception("Failed to resolve the empty image.")
-    return readPressureValueFromImage(img, info)
-
-
-if __name__ == '__main__':
-    # readPressureValueFromDir('image/SF6/IMG_7640.JPG', 'config/pressure_1.json')
-    readPressureValueFromDir('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
-    # demarcate_roi('image/SF6/IMG_7666.JPG')
+# def readPressureValueFromDir(img_dir, config):
+#     img = cv2.imread(img_dir)
+#     file = open(config)
+#     info = json.load(file)
+#     assert info is not None
+#     readPressureValueFromImage(img, info)
+#
+#
+# def readPressureValueFromImg(img, info):
+#     if img is None:
+#         raise Exception("Failed to resolve the empty image.")
+#     return readPressureValueFromImage(img, info)
+#
+#
+# if __name__ == '__main__':
+#     # readPressureValueFromDir('image/SF6/IMG_7640.JPG', 'config/pressure_1.json')
+#     readPressureValueFromDir('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
+#     # demarcate_roi('image/SF6/IMG_7666.JPG')
