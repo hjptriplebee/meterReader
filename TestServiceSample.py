@@ -5,7 +5,9 @@ import os
 import time
 import cv2
 import multiprocessing
+
 from Interface import meterReader
+from util.JsonModifier import JsonModifier
 
 
 def startServer():
@@ -171,8 +173,11 @@ def codecov():
     image = cv2.imread("image/pressure_1.jpg")
     receive2 = meterReader(image, ["pressure_1"])
 
+    # 基于遮罩算法的pressure表读数测试`1
+    meter_id = "pressure2_1"
+    config_base_path = "config/"
     image = cv2.imread("image/pressure2_1.jpg")
-    receive2 = meterReader(image, ["pressure2_1"])
+    test_pressure_recognition(config_base_path, image, meter_id)
 
     image = cv2.imread("image/absorb_1.jpg")
     receive2 = meterReader(image, ["absorb_1"])
@@ -184,8 +189,39 @@ def codecov():
     receive2 = meterReader(image, ["blenometer_1"])
 
 
-if __name__ == "__main__":
+def test_pressure_recognition(config_base_path, image, meter_id):
+    json_modifier = JsonModifier(meter_id, config_base_path, revert_before_del=True)
+    # case 1:不使用圆拟合算法,使用标定信息定位圆
+    receive2 = meterReader(image, [meter_id])
+    print("Case 1: ", receive2)
+    # case 2:使用圆拟合算法
+    json_modifier.modifyDic({
+        "enableFit": True
+    })
+    receive2 = meterReader(image, [meter_id])
+    print("Case 2: ", receive2)
+    # case 3:不使用圆拟合算法,指针分辨率为30
+    json_modifier.revert()  # 回退
+    json_modifier.modifyKv("ptrResolution", 30)
+    receive2 = meterReader(image, [meter_id])
+    print("Case 3: ", receive2)
+    # case 4:使用圆拟合算法,指针分辨率为50
+    json_modifier.revert()
+    json_modifier.modifyDic({
+        "enableFit": True,
+        "ptrResolution": 50
+    }
+    )
+    print("Case 4: ", receive2)
+    # case 5:使用直方图均衡化,不使用圆拟合算法,使用标定信息
+    json_modifier.revertToOriginal()  # 回滚到原配置
+    json_modifier.modifyKv("enableEqualizeHistogram", True)
+    json_modifier.modifyKv("ptrResolution", 40)
+    receive2 = meterReader(image, [meter_id])
+    print("Case 5: ", receive2)
 
+
+if __name__ == "__main__":
     serverProcess = multiprocessing.Process(target=startServer)
     results = multiprocessing.Manager().list()
     clientProcess = multiprocessing.Process(target=startClient, args=(results,))
