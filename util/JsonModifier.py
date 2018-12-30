@@ -33,7 +33,7 @@ class JsonModifier:
             os.remove(self.dump_target_path)
 
     def __loadWritableJsonConfig(self):
-        self.__src_file = open(self.src_config_path, "rb")
+        self.__src_file = open(self.src_config_path, "r")
         self.json_info = json.load(self.__src_file)
 
     def dumpConfig(self, meter_id, config_base_dir="/config"):
