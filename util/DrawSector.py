@@ -17,6 +17,8 @@ def drawApproSectorMask(dst, begin_point, end_point, center, color, thickness, l
     x = (begin_point[0] + end_point[0] + center[0]) / 3
     y = (begin_point[1] + end_point[1] + center[1]) / 3
     sector_center = (np.int64(x), np.int64(y))
+    if sector_center[0] >= dst.shape[0] or sector_center[1] >= dst.shape[1]:
+        return 0, 0
     mask = np.zeros((dst.shape[0] + 2, dst.shape[1] + 2, 1), dtype=np.uint8)
     begin_point = (np.int64(begin_point[0]), np.int64(begin_point[1]))
     end_point = (np.int64(end_point[0]), np.int64(end_point[1]))
@@ -46,9 +48,21 @@ def buildCounterClockWiseSectorMasks(center, radius, shape, patch_degree, color,
         y1 = y_theta1 * radius + center[1]
         x2 = x_theta2 * radius + center[0]
         y2 = y_theta2 * radius + center[1]
+        # x1 = normalize(shape[0], x1)
+        # x2 = normalize(shape[0], x1)
+        # y1 = normalize(shape[1], y1)
+        # y2 = normalize(shape[1], y2)
         centroid_x, centroid_y = drawApproSectorMask(mask, (x1, y1), (x2, y2), center, color, thickness=2,
                                                      lineType=cv2.FILLED)
         masks.append(mask)
         centorids.append((np.uint64(centroid_x), np.uint64(centroid_y)))
 
     return masks, centorids
+
+
+def normalize(shape, val):
+    if val > shape:
+        val = shape
+    if val < 0:
+        val = 0
+    return val

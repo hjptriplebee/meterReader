@@ -12,7 +12,7 @@ def getIteration(inliers_probability, outliers_ratio):
 def adaptiveRandomSampleConsensus(data, best_circle=None, max_iterations=None, dst_threshold=None, inliers_threshold=0,
                                   optimal_consensus_num=None):
     """
-
+    具有自适应的圆拟合随机共识一致算法,未完成
     :param data: 一组观测数据,这里指拟合的点数据
     :param best_circle: 适应于数据的模型,这里指拟合得到的最优圆
     :param max_iterations: 算法的迭代次数
@@ -21,42 +21,7 @@ def adaptiveRandomSampleConsensus(data, best_circle=None, max_iterations=None, d
     :param optimal_consensus_num: 期望的最优结果
     :return:
     """
-    assert len(data) > 0, 'Input observable data is empty.'
-    assert max_iterations is not None, 'Iteration should be specified.'
-    assert dst_threshold is not None, 'Threshold should be specified.'
-
-    max_fit_num = 0
-    best_consensus_pointers = []
-    data_size = len(data)
-    if optimal_consensus_num is None:
-        optimal_consensus_num = np.round(data_size * 0.8)
-    for i in range(max_iterations):
-        idx1 = np.random.randint(low=0, high=data_size)
-        idx2 = np.random.randint(low=0, high=data_size)
-        idx3 = np.random.randint(low=0, high=data_size)
-        # 假设样本遵循均匀分布，圆的三个点是独立选择的;maxIteration是选取不重复点的上限
-        if idx1 == idx2:
-            continue
-        if idx1 == idx3:
-            continue
-        if idx3 == idx2:
-            continue
-        consensus_pointers = [data[idx1], data[idx2], data[idx3]]
-        # 三点确定一个圆
-        circle = getCircle(data[idx1], data[idx2], data[idx3])
-        # 求剩余点的拟合程度
-        current_fit_num = fitNum(data, circle, dst_threshold, [idx1, idx2, idx3], consensus_pointers)
-        # 如果当前得到的inliers数目超过了拟合的阈值，且拟合到的点数量超过了inliers threshold，则认为找到了一个更好的模型
-        if current_fit_num > max_fit_num and current_fit_num > inliers_threshold:
-            max_fit_num = current_fit_num
-            best_circle = circle
-            best_consensus_pointers = consensus_pointers
-        # 如果达到了最优值，结束迭代
-        if current_fit_num >= optimal_consensus_num:
-            break
-    if max_fit_num == 0:
-        print("Could not fit a circle from data.")
-    return best_circle, max_fit_num, best_consensus_pointers
+    pass
 
 
 def randomSampleConsensus(data, best_circle=None, max_iterations=None, dst_threshold=None, inliers_threshold=0,
