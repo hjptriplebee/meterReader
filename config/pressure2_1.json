@@ -4,98 +4,38 @@
   "vertical": 20.0,
   "name": "pressure2_1",
   "type": "pressure2",
-  "pyramid": 0.2,
   "ROI": {
     "x": 0,
     "y": 0,
     "w": 1920,
-    "h": 1080
+    "h": 1280
   },
   "startPoint": {
-    "x": 121,
-    "y": 334
+    "x": 211,
+    "y": 620
   },
   "endPoint": {
-    "x": 334,
-    "y": 347
+    "x": 584,
+    "y": 618
   },
   "centerPoint": {
-    "x": 229,
-    "y": 246
+    "x": 406,
+    "y": 446
   },
   "startValue": 0.0,
   "totalValue": 2.5,
   "unit": "Mpa",
-  "enableFit":false,
+  "enableFit": false,
   "enableEqualizeHistogram": false,
-  "enableCleanNoisedRegion": true ,
-  "ptrResolution": 25,
+  "enableCleanNoisedRegion": true,
+  "ptrResolution": 50,
   "noisedRegion": [
     [
-      109,
-      217,
-      35,
-      136
-    ],
-    [
-      181,
-      177,
-      61,
-      25
-    ],
-    [
-      262,
-      233,
-      40,
-      6
-    ],
-    [
-      143,
-      334,
-      173,
-      242
-    ],
-    [
-      151,
-      230,
-      51,
-      112
-    ],
-    [
-      260,
-      228,
-      44,
-      31
-    ],
-    [
-      325,
-      210,
-      24,
-      34
-    ],
-    [
-      296,
-      300,
-      38,
-      31
-    ],
-    [
-      164,
-      142,
-      20,
-      24
-    ],
-    [
-      107,
-      213,
-      40,
-      33
-    ],
-    [
-      128,
-      300,
-      31,
-      29
+      247,
+      417,
+      117,
+      62
     ]
-  ]
+  ],
+  "contoursThreshold":100
 }

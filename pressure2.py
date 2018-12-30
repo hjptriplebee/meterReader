@@ -3,14 +3,15 @@ from Common import *
 
 
 def readPressureValueFromImage(image, info):
-    doEqualizeHist = False
+    src = meterFinderByTemplate(image, info["template"])
     pyramid = 0.2
-    if info['pyramid'] is not None:
+    if 'pyramid' in info and info['pyramid'] is not None:
         pyramid = info['pyramid']
-    src = cv2.resize(image, (0, 0), fx=pyramid, fy=pyramid)
+        src = cv2.resize(src, (0, 0), fx=pyramid, fy=pyramid)
     src = cv2.GaussianBlur(src, (3, 3), sigmaX=0, sigmaY=0, borderType=cv2.BORDER_DEFAULT)
     gray = cv2.cvtColor(src=src, code=cv2.COLOR_RGB2GRAY)
-    if doEqualizeHist:
+    do_hist = info["enableEqualizeHistogram"]
+    if do_hist:
         gray = cv2.equalizeHist(gray)
     canny = cv2.Canny(src, 75, 75 * 2)
     dilate_kernel = cv2.getStructuringElement(ksize=(5, 5), shape=cv2.MORPH_ELLIPSE)
@@ -23,12 +24,13 @@ def readPressureValueFromImage(image, info):
     img, contours, hierarchy = cv2.findContours(canny, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE)
     # filter the large contours, the pixel number of scale line should be small enough.
     # and the algorithm will find the pixel belong to the scale line as we need.
-    contours = [c for c in contours if len(c) < 40]
+    contours_thresh = info["contoursThreshold"]
+    contours = [c for c in contours if len(c) < contours_thresh]
     # draw contours
     src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
     cv2.drawContours(src, contours, -1, (0, 255, 0), thickness=cv2.FILLED)
     # prasan_iteration = rasan.getIteration(0.7, 0.3)
-    dst_threshold = 35
+    dst_threshold = 70
     period_rasanc_time = 100  # 每趟rasanc 的迭代次数,rasanc内置提前终止的算法
     iter_time = 5  # 启动rasanc拟合算法的固定次数
     hit_time = 0  # 成功拟合到圆的次数lot.subImage(src=src, title='Contours', index=inc())
@@ -51,6 +53,8 @@ def readPressureValueFromImage(image, info):
         # figuring out centroids of the scale lines
         center, radius = figureOutDialCircleByScaleLine(contours, dst_threshold,
                                                         iter_time, period_rasanc_time)
+        if radius == 0:
+            return json.dumps({"value": "Unknown"})
     # 使用标定信息
     else:
         center = info['centerPoint']
@@ -77,6 +81,7 @@ def readPressureValueFromImage(image, info):
     pointer_mask, theta, line_ptr = findPointerFromBinarySpace(canny, center, radius, start_radians, end_radians,
                                                                patch_degree=0.5,
                                                                ptr_resolution=ptr_resolution)
+    mask_res, stheta = pointerMaskBySector([], canny, center, 1, radius)
     value = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr,
                                                 centerPoint=center,
                                                 point=cv2PtrTuple2D(line_ptr), startValue=start_value,
@@ -143,11 +148,12 @@ def cleanNoisedRegions(src, info, shape):
     return src
 
 
-def readPressureValueFromDir(img_dir, config):
+def readPressureValueFromDir(meter_id, img_dir, config):
     img = cv2.imread(img_dir)
     file = open(config)
     info = json.load(file)
     assert info is not None
+    info["template"] = cv2.imread("template/" + meter_id + ".jpg")
     readPressureValueFromImage(img, info)
 
 
@@ -158,6 +164,6 @@ def readPressureValueFromImg(img, info):
 
 
 if __name__ == '__main__':
-    readPressureValueFromDir('image/pressure2_1.jpg', 'config/pressure2_1.json')
+    readPressureValueFromDir('pressure2_1', 'image/pressure2_1.jpg', 'config/pressure2_1.json')
     # readPressureValueFromDir('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
     # demarcate_roi('image/SF6/IMG_7666.JPG')
