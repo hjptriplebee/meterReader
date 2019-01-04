@@ -2,8 +2,8 @@
       "distance": 10.0,
       "horizontal": 10.0,
       "vertical": 20.0,
-      "name": "youwen_5",
-      "type": "youwen",
+      "name": "szk1",
+      "type": "",
       "ROI": {
           "x": 5,
           "y":5,
@@ -24,4 +24,19 @@
       },
       "startValue": 0.0,
       "totalValue": 150.0
-}
+
+    "startPointUp": {
+            "x": 73,
+            "y": 324
+        },
+      "endPointUp": {
+          "x": 315,
+          "y": 336
+      },
+      "centerPointUp": {
+          "x": 209,
+          "y": 228
+      },
+      "startValueUp": 0.0,
+      "totalValueUp": 150.0
+  }

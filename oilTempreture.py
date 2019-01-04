@@ -80,7 +80,7 @@ def contours_check(image, center):
     return target
 
 
-def youwen(image, info):
+def oilTempreture(image, info):
     """
     :param image: ROI image
     :param info: information for this meter
