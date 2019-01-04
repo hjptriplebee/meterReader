@@ -8,7 +8,7 @@ from pressure import pressure
 from absorb import absorb
 from switch import switch
 from bileiqi1 import bileiqi1
-from pressure2 import readPressureValueFromImage as readPressure
+from normalPressure import readPressure
 
 
 # from bileiqi2 import bileiqi2
