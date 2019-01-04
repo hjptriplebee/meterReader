@@ -62,7 +62,7 @@ def getInfo(ID):
     if info["type"] == "absorb":
         info["type"] = absorb
     elif info["type"] == "digitPressure":
-        info["type"] =digitPressure
+        info["type"] = digitPressure
     elif info["type"] == "normalPressure":
         info["type"] = normalPressure
     elif info["type"] == "colorPressure":
@@ -73,6 +73,8 @@ def getInfo(ID):
         info["type"] = digitArrester
     elif info["type"] == "countArrester":
         info["type"] = countArrester
+    elif info["type"] == "doubleArrester":
+        info["type"] = doubleArrester
     elif info["type"] == "oilTempreture":
         info["type"] = oilTempreture
     elif info["type"] == "blenometer":
