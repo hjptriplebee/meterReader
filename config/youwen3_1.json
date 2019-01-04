@@ -2,8 +2,8 @@
       "distance": 10.0,
       "horizontal": 10.0,
       "vertical": 20.0,
-      "name": "youwen_6",
-      "type": "youwen",
+      "name": "youwen3",
+      "type": "oilTempreture",
       "ROI": {
           "x": 345,
           "y":467,
