@@ -1,8 +1,6 @@
 import cv2
 import json
 
-
-
 from absorb import absorb
 
 from digitPressure import digitPressure
@@ -10,12 +8,13 @@ from normalPressure import normalPressure
 from colorPressure import colorPressure
 from SF6 import SF6Reader
 from doubleArrester import doubleArrester
-from digitArrester import  digitArrester
+from digitArrester import digitArrester
 from countArrester import countArrester
 from oilTempreture import oilTempreture
 from Blenometer import checkBleno
 from onoffIndoor import onoffIndoor
-from onoffOutdoor import  onoffOutdoor
+from onoffOutdoor import onoffOutdoor
+
 
 
 def meterReaderCallBack(image, info):
@@ -57,8 +56,7 @@ def getInfo(ID):
             },
             "startValue": 0,
             "totalValue": 2
-
-        } 
+        }
     """
     file = open("config/" + ID + ".json")
     info = json.load(file)
@@ -100,7 +98,7 @@ def meterReader(image, meterIDs):
     global interface
     :param image: camera image
     :param meterIDs: list of meter ID
-    :return: 
+    :return:
     """
     results = {}
     for ID in meterIDs:
