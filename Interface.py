@@ -17,9 +17,13 @@ from Blenometer import checkBleno
 from onoffIndoor import onoffIndoor
 from onoffOutdoor import  onoffOutdoor
 
+
 def meterReaderCallBack(image, info):
     """call back function"""
-    return info["type"](image, info)
+    if not info["type"]:
+        return None
+    else:
+        return info["type"](image, info)
 
 
 def getInfo(ID):
@@ -84,6 +88,7 @@ def getInfo(ID):
     elif info["type"] == "onoffOutdoor":
         info["type"] = onoffOutdoor
     else:
+        info["type"] = None
         print("meter type not support!")
 
     info["template"] = cv2.imread("template/" + ID + ".jpg")
