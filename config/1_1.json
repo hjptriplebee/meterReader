@@ -23,5 +23,6 @@
           "y": -1
       },
       "startValue": 0.0,
-      "totalValue": 2.0
+      "totalValue": 2.0,
+      "result": 0.0
 }

@@ -65,9 +65,9 @@ def meterFinderBySIFT(image, template):
 
     # distance matrix
     templatePointMatrix = np.array([list(templateKeyPoint[p[0].queryIdx].pt) for p in good])
-    imagePointMatrux = np.array([list(imageKeyPoint[p[0].trainIdx].pt) for p in good])
+    imagePointMatrix = np.array([list(imageKeyPoint[p[0].trainIdx].pt) for p in good])
     templatePointDistanceMatrix = pairwise_distances(templatePointMatrix, metric="euclidean")
-    imagePointDistanceMatrix = pairwise_distances(imagePointMatrux, metric="euclidean")
+    imagePointDistanceMatrix = pairwise_distances(imagePointMatrix, metric="euclidean")
 
     # del bad match
     good2 = []

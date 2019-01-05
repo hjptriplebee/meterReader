@@ -1,0 +1,25 @@
+{
+  "distance": 10.0,
+  "horizontal": 10.0,
+  "vertical": 20.0,
+  "name": "blenometer_1",
+  "type": "blenometer",
+  "ROI": {
+    "x": 0,
+    "y": 0,
+    "w": 5184,
+    "h": 3456
+  },
+  "centerPoint": {
+    "x": -1,
+    "y": -1
+  },
+  "switcherUpPosition": {
+    "x": -1,
+    "y": -1
+  },
+  "switcherDownPosition": {
+    "x": -1,
+    "y": -1
+  }
+}
