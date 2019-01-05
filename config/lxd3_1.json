@@ -5,10 +5,10 @@
   "name": "lxd3_1",
   "type": "normalPressure",
   "ROI": {
-    "x": 420,
-    "y": 330,
-    "w": 666,
-    "h": 571
+    "x": 96,
+    "y": 308,
+    "w": 489,
+    "h": 530
   },
   "startPoint": {
     "x": 207,

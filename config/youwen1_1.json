@@ -4,23 +4,23 @@
       "vertical": 20.0,
       "name": "youwen1",
       "type": "oilTempreture",
-      "ROI": {
+               "ROI": {
           "x": 5,
           "y":5,
           "w": 700,
           "h": 900
       },
       "startPoint": {
-          "x": 73,
-          "y": 324
+          "x": 85,
+          "y": 273
       },
       "endPoint": {
-          "x": 315,
-          "y": 336
+          "x": 276,
+          "y": 273
       },
       "centerPoint": {
-          "x": 209,
-          "y": 228
+          "x": 160,
+          "y": 183
       },
       "startValue": 0.0,
       "totalValue": 150.0
