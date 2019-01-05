@@ -1,6 +1,5 @@
 from Common import *
 import json
-import util.PlotUtil as plot
 
 plot_index = 0
 
@@ -20,7 +19,6 @@ def inc():
 def readPressure(image, info):
     src = meterFinderByTemplate(image, info["template"])
     pyramid = 0.5
-    plot.subImage(src=src, index=inc(), title='Template Src')
     if 'pyramid' in info and info['pyramid'] is not None:
         pyramid = info['pyramid']
         src = cv2.resize(src, (0, 0), fx=pyramid, fy=pyramid)
@@ -29,7 +27,6 @@ def readPressure(image, info):
     thresh = gray.copy()
     cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV, thresh)
     thresh = cv2.ximgproc.thinning(thresh, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
-    plot.subImage(src=thresh, index=inc(), title='thresh', cmap='gray')
     do_hist = info["enableEqualizeHistogram"]
     if do_hist:
         gray = cv2.equalizeHist(gray)
@@ -78,14 +75,11 @@ def readPressure(image, info):
                                                                ptr_resolution=ptr_resolution)
     print("Best theta:", theta)
     line_ptr = cv2PtrTuple2D(line_ptr)
-    plot.subImage(src=canny, index=inc(), title='canny', cmap='gray')
-    plot.subImage(src=cv2.bitwise_or(thresh, pointer_mask), index=inc(), title='poiter', cmap='gray')
     cv2.line(src, (start_ptr[0], start_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
     cv2.line(src, (end_ptr[0], end_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
     cv2.circle(src, (start_ptr[0], start_ptr[1]), 5, (0, 0, 255), -1)
     cv2.circle(src, (end_ptr[0], end_ptr[1]), 5, (0, 0, 255), -1)
     cv2.circle(src, (center[0], center[1]), 2, (0, 0, 255), -1)
-    plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), index=inc(), title='calibration')
     if double_range:
         start_value_in = info['startValueIn']
         total_value_in = info['totalValueIn']
