@@ -23,6 +23,7 @@ def getMeterNum(imageID):
 
     return num
 
+
 def getMeterIDs(imageID):
     """get id of meters in an image"""
     meterIDs = []
@@ -36,6 +37,7 @@ def getMeterIDs(imageID):
             meterIDs.append(prefix)
 
     return meterIDs
+
 
 @app.route('/', methods=['POST'])
 def meterReaderAPI():
@@ -54,6 +56,7 @@ def meterReaderAPI():
     sendData = json.dumps(result).encode("utf-8")
 
     return sendData
+
 
 @app.route('/store', methods=['POST'])
 def storeAPI():
@@ -78,7 +81,6 @@ def storeAPI():
     file.close()
 
     return "received!"
-
 
 
 if __name__ == '__main__':
