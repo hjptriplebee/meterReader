@@ -8,7 +8,7 @@ plot_index = 0
 def normalPressure(image, info):
     import showLabel as sl
     # sl.showLabel(image, info)
-    return readPressure(image, info)
+    return {}
 
 
 def inc():
@@ -161,25 +161,3 @@ def cleanNoisedRegions(src, info, shape):
     return src
 
 
-def readPressureValueFromDir(meter_id, img_dir, config):
-    img = cv2.imread(img_dir)
-    file = open(config)
-    info = json.load(file)
-    assert info is not None
-    info["template"] = cv2.imread("template/" + meter_id + ".jpg")
-    return readPressureValueFromImg(img, info)
-
-
-def readPressureValueFromImg(img, info):
-    if img is None:
-        raise Exception("Failed to resolve the empty image.")
-    return normalPressure(img, info)
-
-
-if __name__ == '__main__':
-    res = readPressureValueFromDir('lxd1_4', 'image/lxd1.jpg', 'config/lxd1_4.json')
-    # res = readPressureValueFromDir('pressure2_1', 'image/pressure2.jpg', 'config/pressure2_1.json')
-    plot.show()
-    print(res)
-    # readPressureValueFromDir('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
-    # demarcate_roi('image/SF6/IMG_7666.JPG')
