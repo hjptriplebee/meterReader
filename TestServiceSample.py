@@ -34,7 +34,7 @@ def startClient(results):
 #     # test reader interface
 #
 #     # ===========================bileiqi1 test===========================
-#     image = open("image/bileiqi1_1.jpg", "rb")
+#     image = open("image/bileiqi1.jpg", "rb")
 #     imageByte = base64.b64encode(image.read())
 #     data = json.dumps({
 #         "image": imageByte.decode("ascii"),
