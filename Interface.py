@@ -1,17 +1,19 @@
 import cv2
 import json
-from Blenometer import checkBleno
-from SF6 import SF6Reader
-from Remember import remember
-from youwen import youwen
-from pressure import pressure
+
 from absorb import absorb
-from switch import switch
-from bileiqi1 import bileiqi1
-from normalPressure import readPressure
 
-
-# from bileiqi2 import bileiqi2
+from digitPressure import digitPressure
+from normalPressure import normalPressure
+from colorPressure import colorPressure
+from SF6 import SF6Reader
+from doubleArrester import doubleArrester
+from digitArrester import digitArrester
+from countArrester import countArrester
+from oilTempreture import oilTempreture
+from Blenometer import checkBleno
+from onoffIndoor import onoffIndoor
+from onoffOutdoor import onoffOutdoor
 
 
 def meterReaderCallBack(image, info):
@@ -50,31 +52,35 @@ def getInfo(ID):
             },
             "startValue": 0,
             "totalValue": 2
-        } 
+        }
     """
     file = open("config/" + ID + ".json")
     info = json.load(file)
     # string to pointer
-    if info["type"] == "SF6":
+    if info["type"] == "absorb":
+        info["type"] = absorb
+    elif info["type"] == "digitPressure":
+        info["type"] = digitPressure
+    elif info["type"] == "normalPressure":
+        info["type"] = normalPressure
+    elif info["type"] == "colorPressure":
+        info["type"] = colorPressure
+    elif info["type"] == "SF6":
         info["type"] = SF6Reader
-    elif info["type"] == "youwen":
-        info["type"] = youwen
-    elif info["type"] == "pressure":
-        info["type"] = pressure
-    elif info["type"] == "pressure2":
-        info["type"] = readPressure
-    elif info["type"] == "bileiqi1":
-        info["type"] = bileiqi1
-    # elif info["type"] == "bileiqi2":
-    #     info["type"] = bileiqi2
+    elif info["type"] == "digitArrester":
+        info["type"] = digitArrester
+    elif info["type"] == "countArrester":
+        info["type"] = countArrester
+    elif info["type"] == "doubleArrester":
+        info["type"] = doubleArrester
+    elif info["type"] == "oilTempreture":
+        info["type"] = oilTempreture
     elif info["type"] == "blenometer":
         info["type"] = checkBleno
-    elif info["type"] == "absorb":
-        info["type"] = absorb
-    elif info["type"] == "switch":
-        info["type"] = switch
-    elif info["type"] == "remember":
-        info["type"] = remember
+    elif info["type"] == "onoffIndoor":
+        info["type"] = onoffIndoor
+    elif info["type"] == "onoffOutdoor":
+        info["type"] = onoffOutdoor
     else:
         print("meter type not support!")
 
@@ -87,7 +93,7 @@ def meterReader(image, meterIDs):
     global interface
     :param image: camera image
     :param meterIDs: list of meter ID
-    :return: 
+    :return:
     """
     results = {}
     for ID in meterIDs:

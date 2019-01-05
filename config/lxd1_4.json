@@ -22,8 +22,22 @@
     "x": 99,
     "y": 100
   },
+  "doubleRange": true,
   "startValueIn": 0.0,
   "startValueOut": 0.0,
   "totalValueIn": 16.0,
-  "totalValueOut": 1600.0
+  "totalValueOut": 1600.0,
+  "enableFit": false,
+  "enableEqualizeHistogram": false,
+  "enableCleanNoisedRegion": true,
+  "ptrResolution": 5,
+  "noisedRegion": [
+    [
+      247,
+      417,
+      117,
+      62
+    ]
+  ],
+  "contoursThreshold": 100
 }

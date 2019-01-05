@@ -299,18 +299,18 @@ def findPointerFromBinarySpace(src, center, radius, radians_low, radians_high, p
     return pointer_mask, best_theta, point
 
 
-def drawLineMask(_shape, best_theta, center, ptr_resolution, radius):
+def drawLineMask(_shape, theta, center, ptr_resolution, radius):
     """
     画一个长为radius，白色的直线，产生一个背景全黑的白色直线遮罩
     :param _shape:
-    :param best_theta:
+    :param theta:
     :param center:
     :param ptr_resolution:
     :param radius:
     :return:
     """
     pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
-    y1 = int(center[1] - np.sin(best_theta) * radius)
-    x1 = int(center[0] + np.cos(best_theta) * radius)
+    y1 = int(center[1] - np.sin(theta) * radius)
+    x1 = int(center[0] + np.cos(theta) * radius)
     cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, ptr_resolution)
     return pointer_mask, (x1, y1)
