@@ -21,145 +21,15 @@ def startClient(results):
             "image": imageByte.decode("ascii"),
             "imageID": im.split('.')[0]
         })
-        r = requests.post("http://127.0.0.1.png:5000/", data=data.encode("utf-8"))
+        r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+        print(im)
         receive = json.loads(r.text)
-        print(im, receive)
+        print(receive)
 
-        if None in receive:
+        if len(receive) == 0:
             results.append(False)
         else:
             results.append(True)
-
-# def startClient(results):
-#     # test reader interface
-#
-#     # ===========================bileiqi1 test===========================
-#     image = open("image/bileiqi1.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "bileiqi1"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "bileiqi1_1" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-#
-#     # ===========================bileiqi2 test===========================
-#     # image = open("image/bileiqi2_1.jpg", "rb")
-#     # imageByte = base64.b64encode(image.read())
-#     # data = json.dumps({
-#     #     "image": imageByte.decode("ascii"),
-#     #     "imageID": "bileiqi2"
-#     # })
-#     # r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     # receive = json.loads(r.text)
-#     # print(receive)
-#     # if not "bileiqi2_1" in receive:
-#     #     results.append(False)
-#     # else:
-#     #     results.append(True)
-#
-#     # ===========================SF6 test===========================
-#     image = open("image/SF6_1.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "SF6"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "SF6_1" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-#
-#     # ===========================youwen test===========================
-#     image = open("image/youwen_4.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "youwen"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "youwen_4" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-#
-#     # ===========================pressure test===========================
-#     image = open("image/pressure_1.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "pressure"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "pressure_1" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-#
-#     # ===========================absorb test===========================
-#     image = open("image/absorb_1.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "absorb"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "absorb_1" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-#
-#     # ===========================switch test===========================
-#     image = open("image/switch_1.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "switch"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "switch_1" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-#
-#     # ===========================bleno test===================================
-#     image = open("image/blenometer_1.jpg", "rb")
-#     imageByte = base64.b64encode(image.read())
-#     data = json.dumps({
-#         "image": imageByte.decode("ascii"),
-#         "imageID": "blenometer"
-#     })
-#     r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-#     receive = json.loads(r.text)
-#     print(receive)
-#
-#     if not "blenometer_1" in receive:
-#         results.append(False)
-#     else:
-#         results.append(True)
-
 
 def codecov():
     images = os.listdir("image")
@@ -195,7 +65,7 @@ if __name__ == "__main__":
 # imageByte = base64.b64encode(image.read())
 # data = json.dumps({
 #     "template": imageByte.decode("ascii"),
-#     "imageID": "1.png",
+#     "imageID": "1",
 #     "config": {
 #       "distance": 10.0,
 #       "horizontal": 10.0,
@@ -209,16 +79,16 @@ if __name__ == "__main__":
 #           "h": 680
 #       },
 #       "startPoint": {
-#           "x": -1.png,
-#           "y": -1.png
+#           "x": -1,
+#           "y": -1
 #       },
 #       "endPoint": {
-#           "x": -1.png,
-#           "y": -1.png
+#           "x": -1,
+#           "y": -1
 #       },
 #       "centerPoint": {
-#           "x": -1.png,
-#           "y": -1.png
+#           "x": -1,
+#           "y": -1
 #       },
 #       "startValue": 0.0,
 #       "totalValue": 2.0

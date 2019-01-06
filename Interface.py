@@ -109,6 +109,7 @@ def meterReader(image, meterIDs):
         y = info["ROI"]["y"]
         w = info["ROI"]["w"]
         h = info["ROI"]["h"]
+
         ROI = image[y:y + h, x:x + w]
         # call back
         results[ID] = meterReaderCallBack(ROI, info)
