@@ -66,7 +66,6 @@ def storeAPI():
     imageID = data["imageID"]
     meterNum = getMeterNum(imageID)
     meterID = imageID + "_" + str(meterNum + 1)
-
     imageByte = data["template"].encode("ascii")
     imageByte = base64.b64decode(imageByte)
     imageArray = np.asarray(bytearray(imageByte), dtype="uint8")

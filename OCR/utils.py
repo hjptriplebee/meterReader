@@ -2,14 +2,13 @@ import numpy as np
 from sklearn.externals import joblib
 import torch
 import sys
-
-
+sys.path.append(".")
 
 
 class svmOCR:
     def __init__(self):
-        self.svm = joblib.load("pca-svm-master/model.m")
-        self.pca = joblib.load("pca-svm-master/pca.m")
+        self.svm = joblib.load("OCR/pca-svm-master/model.m")
+        self.pca = joblib.load("OCR/pca-svm-master/pca.m")
 
     def recognizeSvm(self, image):
         """
@@ -36,7 +35,7 @@ class leNetOCR:
         :return:
         """
         sys.path.append("LeNet")
-        self.net = torch.load("LeNet/model/net.pkl")
+        self.net = torch.load("OCR/LeNet/model/net.pkl")
 
     def recognizeNet(self, image):
         """
