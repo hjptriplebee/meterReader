@@ -9,6 +9,11 @@ black_range = [np.array([0, 0, 0]), np.array([180, 255, 220])]
 
 
 def fillAndResize(image):
+    """
+    将输入图像填充为正方形且变换为（28，28）
+    :param image:
+    :return:
+    """
     h, w = image.shape
     l = max(2*w, h+10)
     ret = np.zeros((l, l), np.uint8)
@@ -27,12 +32,15 @@ def digitPressure(image, info):
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = ([info["endPoint"]["x"], info["endPoint"]["y"]])
     center = ([info["centerPoint"]["x"], info["centerPoint"]["y"]])
+
+    # 计算数字表的矩形外框，并且拉直矫正
     fourth = (start[0] + end[0] - center[0], start[1] + end[1] - center[1])
     pts1 = np.float32([start, center, end, fourth])
     pts2 = np.float32([[0, 0], [200, 0], [200, 100], [0, 100]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
     dst = cv2.warpPerspective(template, M, (200, 100))
 
+    # 边缘检测
     gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
     edge = cv2.Canny(gray, 30, 70)
 
@@ -40,11 +48,13 @@ def digitPressure(image, info):
         cv2.imshow("edge", edge)
         cv2.waitKey(0)
 
+    # 各个数字位的横纵坐标
     split = [2, 34, 69, 102, 132, 163]
     height = [23, 88]
     res = 0
 
-    # print("开始测试")
+    # 分别从途中截取每个数字，经过膨胀腐蚀尽量使其达到实心
+    # 输入网络中进行识别
     for i in range(5):
         num = edge[height[0]:height[1], split[i]:split[i+1]]
         num = cv2.resize(num, (0, 0), fx=2, fy=2)
@@ -68,7 +78,6 @@ def digitPressure(image, info):
             cv2.waitKey(0)
 
         res = 10*res + numNet
-    # print("读数", res)
 
     if ifShow:
         cv2.circle(template, (start[0], start[1]), 5, (0, 0, 255), -1)
