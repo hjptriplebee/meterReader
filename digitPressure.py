@@ -3,7 +3,7 @@ from OCR.utils import *
 
 import sys
 sys.path.append("OCR/LeNet")
-ifShow = True
+ifShow = False
 
 black_range = [np.array([0, 0, 0]), np.array([180, 255, 220])]
 
@@ -21,7 +21,7 @@ def fillAndResize(image):
 def digitPressure(image, info):
     net = leNetOCR()
     svm = svmOCR()
-    print("模型加载完毕,,,")
+    # print("模型加载完毕,,,")
     template = meterFinderByTemplate(image, info["template"])
 
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
@@ -44,7 +44,7 @@ def digitPressure(image, info):
     height = [23, 88]
     res = 0
 
-    print("开始测试")
+    # print("开始测试")
     for i in range(5):
         num = edge[height[0]:height[1], split[i]:split[i+1]]
         num = cv2.resize(num, (0, 0), fx=2, fy=2)
@@ -68,7 +68,7 @@ def digitPressure(image, info):
             cv2.waitKey(0)
 
         res = 10*res + numNet
-    print("读数", res)
+    # print("读数", res)
 
     if ifShow:
         cv2.circle(template, (start[0], start[1]), 5, (0, 0, 255), -1)

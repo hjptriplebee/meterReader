@@ -18,6 +18,7 @@ def checkBleno(image, info):
     :param info: image description
     :return:  dumps string by json format ,such as {"meterId": "VALUE"}.
     """
+    return 0
     src = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_LINEAR)
     blurred = cv2.GaussianBlur(src, (3, 3), 0, None, 0)
     gray = cv2.cvtColor(blurred, cv2.COLOR_RGB2GRAY, None)
@@ -58,7 +59,7 @@ def checkBleno(image, info):
 
     if is_find_circles == False:
         print("Can not located the element of Blenometer.\n")
-        return
+        return 1
     # print(circles_in_roi)
     # get the circle center Y aix of min circle
     min_center = min(circles_in_roi, key=lambda c: c[2])
@@ -68,12 +69,15 @@ def checkBleno(image, info):
     res = {}
     if info is not None:
         if y_roi + h_roi / 2 > center_y:
-            res[info["name"]] = {"value": "Up"}
+            # res[info["name"]] = {"value": "Up"}
+            res = 1
         else:
-            res[info["name"]] = {"value": "Down"}
+            # res[info["name"]] = {"value": "Down"}
+            res = 0
     else:
         print("Meter info is not provided.Return error message.")
-        res['error'] = 'Lost Meter Id.'
+        # res['error'] = 'Lost Meter Id.'
+        res = -1
     rgb_roi = src[y_roi: y_roi + h_roi, x_roi: x_roi + w_roi]
     # cv2.circle(rgb_roi, (min_center[0], min_center[1]), min_center[2], (255, 0, 0), cv2.LINE_4)
     # cv2.imshow("ROI", rgb_roi)
