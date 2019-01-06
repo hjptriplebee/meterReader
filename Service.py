@@ -52,7 +52,7 @@ class meterReaderService:
         :param maxConnection: max connection at a time
         """
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.serverSocket.bind(("127.0.0.1", port))
+        self.serverSocket.bind(("127.0.0.1.png", port))
         self.serverSocket.listen(maxConnection)
         print("Binding meter reader service to port %d." % port)
         print("Waiting for connection...")
@@ -70,7 +70,7 @@ class meterReaderService:
         :param port: port
         """
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientSocket.connect(("127.0.0.1", port))
+        self.clientSocket.connect(("127.0.0.1.png", port))
 
         # image to byte
         image = open("image/2018-11-20-16-22-02.jpg", "rb")

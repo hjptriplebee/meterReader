@@ -21,7 +21,7 @@ def startClient(results):
             "image": imageByte.decode("ascii"),
             "imageID": im.split('.')[0]
         })
-        r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+        r = requests.post("http://127.0.0.1.png:5000/", data=data.encode("utf-8"))
         receive = json.loads(r.text)
         print(im, receive)
 
@@ -195,7 +195,7 @@ if __name__ == "__main__":
 # imageByte = base64.b64encode(image.read())
 # data = json.dumps({
 #     "template": imageByte.decode("ascii"),
-#     "imageID": "1",
+#     "imageID": "1.png",
 #     "config": {
 #       "distance": 10.0,
 #       "horizontal": 10.0,
@@ -209,16 +209,16 @@ if __name__ == "__main__":
 #           "h": 680
 #       },
 #       "startPoint": {
-#           "x": -1,
-#           "y": -1
+#           "x": -1.png,
+#           "y": -1.png
 #       },
 #       "endPoint": {
-#           "x": -1,
-#           "y": -1
+#           "x": -1.png,
+#           "y": -1.png
 #       },
 #       "centerPoint": {
-#           "x": -1,
-#           "y": -1
+#           "x": -1.png,
+#           "y": -1.png
 #       },
 #       "startValue": 0.0,
 #       "totalValue": 2.0

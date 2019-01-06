@@ -4,7 +4,7 @@ import torch.nn as nn
 class LeNet(nn.Module):
     def __init__(self):
         super(LeNet, self).__init__()
-        self.conv1 = nn.Sequential(     # input_size=(1*28*28)
+        self.conv1 = nn.Sequential(     # input_size=(1.png*28*28)
             nn.Conv2d(1, 6, 5, 1, 2),   # padding=2保证输入输出尺寸相同
             nn.ReLU(),      # input_size=(6*28*28)
             nn.MaxPool2d(kernel_size=2, stride=2)  # output_size=(6*14*14)

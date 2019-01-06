@@ -28,7 +28,7 @@
   "enableFit": false,
   "enableEqualizeHistogram": false,
   "enableCleanNoisedRegion": true,
-  "ptrResolution": 50,
+  "ptrResolution": 10,
   "noisedRegion": [
     [
       247,
@@ -37,5 +37,6 @@
       62
     ]
   ],
+  "doubleRange": false,
   "contoursThreshold":100
 }

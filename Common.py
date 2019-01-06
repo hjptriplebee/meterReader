@@ -229,74 +229,54 @@ class AngleFactory:
     pass
 
 
-def findPointerFromBinarySpace(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5):
+def findPointerFromBinarySpace(src, center, radius, radians_low=0, radians_high=2 * np.pi, patch_degree=1.0,
+                               ptr_resolution=5,
+                               ):
     """
-    接收一张预处理过的二值图（默认较完整保留了指针信息），从通过圆心水平线右边的点开始，连接圆心顺时针建立直线遮罩，取出遮罩范围下的区域,
+    接收一张预处理过的二值图（默认较完整保留了指针信息），指针的轮廓应为白色，
+    从通过圆心水平线与圆的左交点开始，连接圆心顺时针建立直线遮罩，取出遮罩范围下的区域,
     计算对应区域灰度和，灰度和最大的区域即为指针所在的位置。直线遮罩的粗细程度、搜索的梯度决定了算法侦测指针的细粒度。该算法适合搜索指针形状
-    为直线的仪表盘，原理与@pointerMaskBySector类似。
-    :param radians_low:圆的搜索范围(弧度制表示)
-    :param radians_high:圆的搜索范围(弧度制表示)
+    为直线的仪表盘。
+    :param radians_low:圆的搜索起点(弧度制表示),默认从0 处开始
+    :param radians_high:圆的搜索终点(弧度制表示),默认从在2 * np.pi 处结束
     :param src: 二值图
     :param center: 刻度盘的圆心
     :param radius: 圆的半径
     :param patch_degree:搜索梯度，默认每次一度
-    :param ptr_resolution: 指针的粗细程度
-    :return: 指针遮罩、直线与圆相交的点
+    :param ptr_resolution: 指针的粗细程度(分辨率)
+    :return: 被认为是指针区域的白色遮罩(黑色背景)、指针轮廓直线与圆相交的点
     """
     _shape = src.shape
     img = src.copy()
     # 弧度转化为角度值
     low = math.degrees(radians_low)
     high = math.degrees(radians_high)
-    # _img1 = cv2.erode(_img1, kernel3, iterations=1)
-    # _img1 = cv2.dilate(_img1, kernel3, iterations=1)
-    # 157=pi/2*100
     mask_info = []
-    max_area = 0
-    best_theta = 0
     iteration = np.abs(int((high - low) / patch_degree))
     for i in range(iteration):
         # 建立一个大小跟输入一致的全黑图像
-        # pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
-        # theta = float(i) * 0.01
         # 每次旋转patch_degree度，取圆上一点
-        theta = float(i * patch_degree / 180 * np.pi)
+        if radians_low < 0:
+            # 为了适应人读表的感观,将扫描方向转换为顺时针,起点初始为传入的弧度角
+            theta = np.pi - np.radians(i * patch_degree) - radians_low
+        else:
+            theta = np.pi - np.radians(i * patch_degree) + radians_low
+
         pointer_mask, point = drawLineMask(_shape, theta, center, ptr_resolution, radius)
-        # cv2.circle(black_img, (x1, y1), 2, 255, 3)
-        # cv2.circle(black_img, (item[0], item[1]), 2, 255, 3)
-        # cv2.line(pointer_mask, (center[0], center[1]), point, 255, ptr_resolution)
         # 去除遮罩对应的小区域
         and_img = cv2.bitwise_and(pointer_mask, img)
         not_zero_intensity = cv2.countNonZero(and_img)
         mask_info.append((not_zero_intensity, theta))
-        # if not_zero_intensity > mask_intensity:
-        #     mask_intensity = not_zero_intensity
-        #     mask_theta = theta
-        # imwrite(dir_path+'/2_line1.jpg', black_img)
     # 按灰度和从大到小排列
     mask_info = sorted(mask_info, key=lambda m: m[0], reverse=True)
-    # thresh = mask_info[0][0] / 30
-    # over_index = 1
-    # sum = thresh
-    # for info in mask_info[1:]:
-    #     if mask_info[0][0] - info[0] > thresh:
-    #         break
-    #     over_index += 1
-    best_theta = mask_info[0][1]
+    best_theta = mask_info[0][1] % 360
     # 得到灰度和最大的那个直线遮罩,和直线与圆相交的点
     pointer_mask, point = drawLineMask(_shape, best_theta, center, ptr_resolution, radius)
-    #
-    # black_img1 = np.zeros([_shape[0], _shape[1]], np.uint8)
-    # r = item[2]-20 if item[2]==_heart[1][2] else _heart[1][2]+ _heart[0][1]-_heart[1][1]-20
-    # y1 = int(item[1] - math.sin(mask_theta) * (r))
-    # x1 = int(item[0] + math.cos(mask_theta) * (r))
-    # cv2.line(black_img1, (item[0], item[1]), (x1, y1), 255, 7)
-    # src = cv2.subtract(src, line_mask)
-    # img = cv2.subtract(img, line_mask)
+    second_pm, point = drawLineMask(_shape, mask_info[1][1], center, ptr_resolution, radius)
     best_theta = 180 - best_theta * 180 / np.pi
     if best_theta < 0:
         best_theta = 360 - best_theta
-    return pointer_mask, best_theta, point
+    return pointer_mask, best_theta, point, second_pm
 
 
 def drawLineMask(_shape, theta, center, ptr_resolution, radius):
@@ -310,7 +290,7 @@ def drawLineMask(_shape, theta, center, ptr_resolution, radius):
     :return:
     """
     pointer_mask = np.zeros([_shape[0], _shape[1]], np.uint8)
-    y1 = int(center[1] - np.sin(theta) * radius)
+    y1 = int(center[0] - np.sin(theta) * radius)
     x1 = int(center[0] + np.cos(theta) * radius)
     cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, ptr_resolution)
     return pointer_mask, (x1, y1)

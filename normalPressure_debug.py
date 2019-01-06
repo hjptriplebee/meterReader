@@ -1,5 +1,6 @@
 from Common import *
 import json
+import util.PlotUtil as plot
 
 plot_index = 0
 
@@ -24,6 +25,7 @@ def reset():
 def readPressure(image, info):
     src = meterFinderByTemplate(image, info["template"])
     pyramid = 0.5
+    plot.subImage(src=src, index=inc(), title='Template Src')
     if 'pyramid' in info and info['pyramid'] is not None:
         pyramid = info['pyramid']
         src = cv2.resize(src, (0, 0), fx=pyramid, fy=pyramid)
@@ -32,6 +34,7 @@ def readPressure(image, info):
     thresh = gray.copy()
     cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV, thresh)
     thresh = cv2.ximgproc.thinning(thresh, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
+    # plot.subImage(src=thresh, index=inc(), title='thresh', cmap='gray')
     do_hist = info["enableEqualizeHistogram"]
     if do_hist:
         gray = cv2.equalizeHist(gray)
@@ -46,10 +49,13 @@ def readPressure(image, info):
     # filter the large contours, the pixel number of scale line should be small enough.
     # and the algorithm will find the pixel belong to the scale line as we need.
     contours_thresh = info["contoursThreshold"]
-    contours = [c for c in contours if len(c) < contours_thresh]
+    contours = [c for c in contours if len(c) > contours_thresh]
     # draw contours
     src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
-    cv2.drawContours(src, contours, -1, (0, 255, 0), thickness=cv2.FILLED)
+    filtered_thresh = np.zeros(thresh.shape, dtype=np.uint8)
+    cv2.drawContours(filtered_thresh, contours, -1, (255, 0, 0), thickness=cv2.FILLED)
+    thresh = filtered_thresh
+    plot.subImage(src=filtered_thresh, index=inc(), title='Filtered Threshold', cmap='gray')
     # prasan_iteration = rasan.getIteration(0.7, 0.3)
     # load meter calibration form configuration
     double_range = info['doubleRange']
@@ -66,6 +72,8 @@ def readPressure(image, info):
     center = cvtPtrDic2D(center)
     # 起点和始点连接，分别求一次半径,并得到平均值
     radius = calAvgRadius(center, end_ptr, radius, start_ptr)
+    # 清楚可被清除的噪声区域，噪声区域(文字、刻度数字、商标等)的area 可能与指针区域的area形似,应该被清除，
+    # 防止在识别指针时出现干扰。值得注意，如果当前指针覆盖了该干扰区域，指针的一部分可能也会被清除
     # 用直线Mask求指针区域
     hlt = np.array([center[0] - radius, center[1]])  # 通过圆心的水平线与圆的左交点
     # 计算起点向量、终点向量与过圆心的左水平线的夹角
@@ -76,16 +84,20 @@ def readPressure(image, info):
         start_radians = -start_radians
     end_radians = AngleFactory.calAngleClockwise(hlt, end_ptr, center)
     # 从特定范围搜索指针
-    pointer_mask, theta, line_ptr = findPointerFromBinarySpace(thresh, center, radius, start_radians,
-                                                               end_radians,
-                                                               patch_degree=0.5,
-                                                               ptr_resolution=ptr_resolution)
+    pointer_mask, theta, line_ptr, sp = findPointerFromBinarySpace(thresh, center, radius, start_radians,
+                                                                   end_radians,
+                                                                   patch_degree=0.5,
+                                                                   ptr_resolution=ptr_resolution)
     line_ptr = cv2PtrTuple2D(line_ptr)
+    # plot.subImage(src=canny, index=inc(), title='canny', cmap='gray')
+    plot.subImage(src=cv2.bitwise_or(thresh, pointer_mask), index=inc(), title='pointer', cmap='gray')
+    plot.subImage(src=cv2.bitwise_or(thresh, sp), index=inc(), title='pointer', cmap='gray')
     cv2.line(src, (start_ptr[0], start_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
     cv2.line(src, (end_ptr[0], end_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
     cv2.circle(src, (start_ptr[0], start_ptr[1]), 5, (0, 0, 255), -1)
     cv2.circle(src, (end_ptr[0], end_ptr[1]), 5, (0, 0, 255), -1)
     cv2.circle(src, (center[0], center[1]), 2, (0, 0, 255), -1)
+    plot.subImage(src=cv2.cvtColor(src, cv2.COLOR_BGR2RGB), index=inc(), title='calibration')
     if double_range:
         start_value_in = info['startValueIn']
         total_value_in = info['totalValueIn']
@@ -101,7 +113,6 @@ def readPressure(image, info):
             "valueIn": valueIn,
             "valueOut": valueOut
         })
-    # 单量程
     else:
         start_value = info['startValue']
         total = info['totalValue']
@@ -171,15 +182,15 @@ if __name__ == '__main__':
     # res3 = readPressureValueFromDir('szk1_5', 'image/szk1.jpg', 'config/szk1_5.json')
     # plot.show(save=True)
     # reset()
-    # res4 = readPressureValueFromDir('wn1_5', 'image/wn1.jpg', 'config/wn1_5.json')
-    # plot.show(save=True)
-    # reset()
-    res5 = readPressureValueFromDir('xyy3_1', 'image/xyy3.jpg', 'config/xyy3_1.json')
+    res4 = readPressureValueFromDir('wn1_5', 'image/wn1.jpg', 'config/wn1_5.json')
     plot.show(save=True)
     reset()
+    # res5 = readPressureValueFromDir('xyy3_1', 'image/xyy3.jpg', 'config/xyy3_1.json')
+    # plot.show(save=True)
+    # reset()
     # res6 = readPressureValueFromDir('pressure2_1', 'image/pressure2.jpg', 'config/pressure2_1.json')
     # plot.show(save=True)
-    reset()
+    # reset()
     print(res1)
     print(res2)
     print(res3)

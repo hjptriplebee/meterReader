@@ -75,7 +75,7 @@ def checkBleno(image, info):
         print("Meter info is not provided.Return error message.")
         res['error'] = 'Lost Meter Id.'
     rgb_roi = src[y_roi: y_roi + h_roi, x_roi: x_roi + w_roi]
-    # cv2.circle(rgb_roi, (min_center[0], min_center[1]), min_center[2], (255, 0, 0), cv2.LINE_4)
+    # cv2.circle(rgb_roi, (min_center[0], min_center[1.png]), min_center[2], (255, 0, 0), cv2.LINE_4)
     # cv2.imshow("ROI", rgb_roi)
     # cv2.waitKey(0)
 
