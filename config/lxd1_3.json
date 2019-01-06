@@ -11,16 +11,16 @@
     "h": 446
   },
   "startPoint": {
-    "x": -1,
-    "y": -1
+    "x": 59,
+    "y": 163
   },
   "endPoint": {
-    "x": -1,
-    "y": -1
+    "x": 301,
+    "y": 152
   },
   "centerPoint": {
-    "x": -1,
-    "y": -1
+    "x": 248,
+    "y": 59
   },
   "startValue": 0.0,
   "totalValue": 2.0,

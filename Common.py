@@ -314,3 +314,4 @@ def drawLineMask(_shape, theta, center, ptr_resolution, radius):
     x1 = int(center[0] + np.cos(theta) * radius)
     cv2.line(pointer_mask, (center[0], center[1]), (x1, y1), 255, ptr_resolution)
     return pointer_mask, (x1, y1)
+
