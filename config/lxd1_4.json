@@ -23,9 +23,11 @@
     "y": 100
   },
   "doubleRange": true,
+  "startValue": 0.0,
   "startValueIn": 0.0,
   "startValueOut": 0.0,
-  "totalValueIn": 16.0,
+  "totalValue": 16.0,
+  "totalValueIn": 0.0,
   "totalValueOut": 1600.0,
   "enableFit": false,
   "enableEqualizeHistogram": false,
