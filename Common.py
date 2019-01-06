@@ -230,8 +230,7 @@ class AngleFactory:
 
 
 def findPointerFromBinarySpace(src, center, radius, radians_low=0, radians_high=2 * np.pi, patch_degree=1.0,
-                               ptr_resolution=5,
-                               ):
+                               ptr_resolution=5, clean_ration=0.16):
     """
     接收一张预处理过的二值图（默认较完整保留了指针信息），指针的轮廓应为白色，
     从通过圆心水平线与圆的左交点开始，连接圆心顺时针建立直线遮罩，取出遮罩范围下的区域,
@@ -244,10 +243,12 @@ def findPointerFromBinarySpace(src, center, radius, radians_low=0, radians_high=
     :param radius: 圆的半径
     :param patch_degree:搜索梯度，默认每次一度
     :param ptr_resolution: 指针的粗细程度(分辨率)
+    :param clean_ration: 用圆遮罩清除圆心区域的元素,半径为 shape[0] * clean_ration
     :return: 被认为是指针区域的白色遮罩(黑色背景)、指针轮廓直线与圆相交的点
     """
     _shape = src.shape
     img = src.copy()
+    img = cleanShortPart(img, center, _shape, clean_ration)
     # 弧度转化为角度值
     low = math.degrees(radians_low)
     high = math.degrees(radians_high)
@@ -265,6 +266,7 @@ def findPointerFromBinarySpace(src, center, radius, radians_low=0, radians_high=
         pointer_mask, point = drawLineMask(_shape, theta, center, ptr_resolution, radius)
         # 去除遮罩对应的小区域
         and_img = cv2.bitwise_and(pointer_mask, img)
+        img, white_contours, h = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
         not_zero_intensity = cv2.countNonZero(and_img)
         mask_info.append((not_zero_intensity, theta))
     # 按灰度和从大到小排列
@@ -272,11 +274,25 @@ def findPointerFromBinarySpace(src, center, radius, radians_low=0, radians_high=
     best_theta = mask_info[0][1] % 360
     # 得到灰度和最大的那个直线遮罩,和直线与圆相交的点
     pointer_mask, point = drawLineMask(_shape, best_theta, center, ptr_resolution, radius)
-    second_pm, point = drawLineMask(_shape, mask_info[1][1], center, ptr_resolution, radius)
     best_theta = 180 - best_theta * 180 / np.pi
     if best_theta < 0:
         best_theta = 360 - best_theta
-    return pointer_mask, best_theta, point, second_pm
+    return pointer_mask, best_theta, point
+
+
+def cleanShortPart(src, center, shape, clean_ration):
+    """
+    根据标定信息清楚一些有干扰性的区域
+    :param src:
+    :param info:
+    :param shape:
+    :return:
+    """
+    circle_mask = cv2.bitwise_not(np.zeros(shape, dtype=np.uint8))
+    cv2.circle(circle_mask, (np.int64(center[0]), np.int64(center[1])), np.int64(shape[0] * clean_ration),
+               color=(0, 0, 255),
+               thickness=cv2.FILLED)
+    return cv2.bitwise_and(src, circle_mask)
 
 
 def drawLineMask(_shape, theta, center, ptr_resolution, radius):

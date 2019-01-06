@@ -3,7 +3,7 @@
   "horizontal": 10.0,
   "vertical": 20.0,
   "name": "pressure2_1",
-  "type": "pressure2",
+  "type": "normalPressure",
   "ROI": {
     "x": 0,
     "y": 0,
@@ -24,19 +24,8 @@
   },
   "startValue": 0.0,
   "totalValue": 2.5,
-  "unit": "Mpa",
-  "enableFit": false,
-  "enableEqualizeHistogram": false,
-  "enableCleanNoisedRegion": true,
   "ptrResolution": 10,
-  "noisedRegion": [
-    [
-      247,
-      417,
-      117,
-      62
-    ]
-  ],
   "doubleRange": false,
-  "contoursThreshold":100
+  "cleanRation": 0.17,
+  "contoursThreshold": 100
 }

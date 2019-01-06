@@ -11,8 +11,8 @@
     "h": 800
   },
   "startPoint": {
-    "x": 314,
-    "y": 347
+    "x": 327,
+    "y": 358
   },
   "endPoint": {
     "x": 405,
@@ -27,17 +27,7 @@
   "startValueOut": 0.0,
   "totalValueIn": 16.0,
   "totalValueOut": 1600.0,
-  "enableFit": false,
-  "enableEqualizeHistogram": false,
-  "enableCleanNoisedRegion": true,
-  "ptrResolution": 5,
-  "noisedRegion": [
-    [
-      247,
-      417,
-      117,
-      62
-    ]
-  ],
-  "contoursThreshold": 50
+  "ptrResolution": 2,
+  "contoursThreshold": 50,
+  "cleanRation": 0.17
 }

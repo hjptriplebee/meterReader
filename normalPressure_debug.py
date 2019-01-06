@@ -62,8 +62,7 @@ def readPressure(image, info):
     start_ptr = info['startPoint']
     end_ptr = info['endPoint']
     ptr_resolution = info['ptrResolution']
-    if ptr_resolution is None:
-        ptr_resolution = 15
+    clean_ration = info['cleanRation']
     start_ptr = cvtPtrDic2D(start_ptr)
     end_ptr = cvtPtrDic2D(end_ptr)
     center = 0  # 表盘的中心
@@ -84,14 +83,14 @@ def readPressure(image, info):
         start_radians = -start_radians
     end_radians = AngleFactory.calAngleClockwise(hlt, end_ptr, center)
     # 从特定范围搜索指针
-    pointer_mask, theta, line_ptr, sp = findPointerFromBinarySpace(thresh, center, radius, start_radians,
+    pointer_mask, theta, line_ptr, cm = findPointerFromBinarySpace(thresh, center, radius, start_radians,
                                                                    end_radians,
                                                                    patch_degree=0.5,
                                                                    ptr_resolution=ptr_resolution)
     line_ptr = cv2PtrTuple2D(line_ptr)
     # plot.subImage(src=canny, index=inc(), title='canny', cmap='gray')
     plot.subImage(src=cv2.bitwise_or(thresh, pointer_mask), index=inc(), title='pointer', cmap='gray')
-    plot.subImage(src=cv2.bitwise_or(thresh, sp), index=inc(), title='pointer', cmap='gray')
+    plot.subImage(src=cm, index=inc(), title='cleaned', cmap='gray')
     cv2.line(src, (start_ptr[0], start_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
     cv2.line(src, (end_ptr[0], end_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
     cv2.circle(src, (start_ptr[0], start_ptr[1]), 5, (0, 0, 255), -1)
@@ -173,18 +172,18 @@ def readPressureValueFromImg(img, info):
 
 if __name__ == '__main__':
     res1 = res2 = res3 = res4 = res5 = res6 = 0
-    # res1 = readPressureValueFromDir('lxd1_4', 'image/lxd1.jpg', 'config/lxd1_4.json')
-    # plot.show(save=True)
-    # reset()
+    res1 = readPressureValueFromDir('lxd1_4', 'image/lxd1.jpg', 'config/lxd1_4.json')
+    plot.show(save=True)
+    reset()
     # res2 = readPressureValueFromDir('szk2_1', 'image/szk2.jpg', 'config/szk2_1.json')
     # plot.show(save=True)
     # reset()
     # res3 = readPressureValueFromDir('szk1_5', 'image/szk1.jpg', 'config/szk1_5.json')
     # plot.show(save=True)
     # reset()
-    res4 = readPressureValueFromDir('wn1_5', 'image/wn1.jpg', 'config/wn1_5.json')
-    plot.show(save=True)
-    reset()
+    # res4 = readPressureValueFromDir('wn1_5', 'image/wn1.jpg', 'config/wn1_5.json')
+    # plot.show(save=True)
+    # reset()
     # res5 = readPressureValueFromDir('xyy3_1', 'image/xyy3.jpg', 'config/xyy3_1.json')
     # plot.show(save=True)
     # reset()
