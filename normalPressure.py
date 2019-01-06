@@ -1,11 +1,12 @@
 from Common import *
 import json
+from szkPressure import myPressure
 
 plot_index = 0
 
 
 def normalPressure(image, info):
-    return {}
+    return myPressure(image, info)
 
 
 def inc():

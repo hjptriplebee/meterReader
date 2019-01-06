@@ -3,7 +3,7 @@
       "horizontal": 10.0,
       "vertical": 20.0,
       "name": "wn1_5",
-      "type": "digitPressure",
+      "type": "normalPressure",
       "ROI": {
           "x": 953,
           "y":910,
