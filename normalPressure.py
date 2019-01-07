@@ -1,19 +1,27 @@
 from Common import *
 import json
-from szkPressure import myPressure
+import cv2
+import numpy as np
 
 plot_index = 0
 
-
 def normalPressure(image, info):
-    return myPressure(image, info)
-
+    '''
+    :param image: ROI image
+    :param info: information for this meter
+    :return: value
+    '''
+    center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
+    start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
+    end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
+    meter = meterFinderByTemplate(image, info["template"])
+    result = scanPointer(meter, [start, end, center], info["startValue"], info["totalValue"])
+    return result
 
 def inc():
     global plot_index
     plot_index += 1
     return plot_index
-
 
 def readPressure(image, info):
     src = meterFinderByTemplate(image, info["template"])
@@ -103,13 +111,11 @@ def readPressure(image, info):
                                                     totalValue=total)
         return json.dumps({"value": value})
 
-
 def calAvgRadius(center, end_ptr, radius, start_ptr):
     radius_1 = np.sqrt(np.power(start_ptr[0] - center[0], 2) + np.power(start_ptr[1] - center[1], 2))
     radius_2 = np.sqrt(np.power(end_ptr[0] - center[0], 2) + np.power(end_ptr[1] - center[1], 2))
     radius = np.int64((radius_1 + radius_2) / 2)
     return radius
-
 
 def cvtPtrDic2D(dic_ptr):
     """
@@ -123,7 +129,6 @@ def cvtPtrDic2D(dic_ptr):
         return np.array([0, 0])
     return dic_ptr
 
-
 def cv2PtrTuple2D(tuple):
     """
     tuple 转numpy 数组
@@ -135,7 +140,6 @@ def cv2PtrTuple2D(tuple):
     else:
         return np.array([0, 0])
     return tuple
-
 
 def cleanNoisedRegions(src, info, shape):
     """
@@ -152,5 +156,3 @@ def cleanNoisedRegions(src, info, shape):
             mask[roi[1]:roi[1] + roi[3], roi[0]:roi[0] + roi[2]] = 0
             src = cv2.bitwise_and(src, mask)
     return src
-
-
