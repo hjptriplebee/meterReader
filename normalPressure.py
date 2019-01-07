@@ -1,11 +1,9 @@
 from Common import meterFinderByTemplate, meterFinderBySIFT, scanPointer
 import json
 import cv2
-from Common import *
 import numpy as np
 
 plot_index = 0
-
 
 def normalPressure(image, info):
 	center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
