@@ -21,6 +21,7 @@ def startClient(results):
             "image": imageByte.decode("ascii"),
             "imageID": im.split('.')[0]
         })
+
         r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
         print(im)
         receive = json.loads(r.text)
@@ -30,6 +31,7 @@ def startClient(results):
             results.append(False)
         else:
             results.append(True)
+
 
 def codecov():
     images = os.listdir("image")
