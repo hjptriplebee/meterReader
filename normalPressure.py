@@ -39,7 +39,6 @@ def readPressure(image, info):
     # load meter calibration form configuration
     if 'ptrResolution' not in info:
         return json.dumps({"value": "Not support configuration."})
-    double_range = info['doubleRange']
     start_ptr = info['startPoint']
     end_ptr = info['endPoint']
     ptr_resolution = info['ptrResolution']
@@ -67,29 +66,13 @@ def readPressure(image, info):
                                                                patch_degree=0.5,
                                                                ptr_resolution=ptr_resolution, clean_ration=clean_ration)
     line_ptr = cv2PtrTuple2D(line_ptr)
-    if double_range:
-        start_value_in = info['startValueIn']
-        total_value_in = info['totalValueIn']
-        start_value_out = info['startValueOut']
-        total_value_out = info['totalValueOut']
-        valueIn = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr, centerPoint=center,
-                                                      point=line_ptr, startValue=start_value_in,
-                                                      totalValue=total_value_in)
-        valueOut = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr, centerPoint=center,
-                                                       point=line_ptr, startValue=start_value_out,
-                                                       totalValue=total_value_out)
-        return json.dumps({
-            "valueIn": valueIn,
-            "valueOut": valueOut
-        })
-    else:
-        start_value = info['startValue']
-        total = info['totalValue']
-        value = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr,
-                                                    centerPoint=center,
-                                                    point=line_ptr, startValue=start_value,
-                                                    totalValue=total)
-        return json.dumps({"value": value})
+    start_value = info['startValue']
+    total = info['totalValue']
+    value = AngleFactory.calPointerValueByPoint(startPoint=start_ptr, endPoint=end_ptr,
+                                                centerPoint=center,
+                                                point=line_ptr, startValue=start_value,
+                                                totalValue=total)
+    return json.dumps({"value": value})
 
 
 def calAvgRadius(center, end_ptr, start_ptr):

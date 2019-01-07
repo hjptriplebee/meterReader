@@ -22,11 +22,8 @@
     "x": 63,
     "y": 62
   },
-  "doubleRange": true,
-  "startValueIn": 0.0,
-  "startValueOut": 0.0,
-  "totalValueIn": 16.0,
-  "totalValueOut": 1600.0,
+  "startValue": 0.0,
+  "totalValue": 16.0,
   "ptrResolution": 3,
   "contoursThreshold": 100,
   "cleanRation": 0.17

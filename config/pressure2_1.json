@@ -25,7 +25,6 @@
   "startValue": 0.0,
   "totalValue": 2.5,
   "ptrResolution": 10,
-  "doubleRange": false,
   "cleanRation": 0.17,
   "contoursThreshold": 100
 }
