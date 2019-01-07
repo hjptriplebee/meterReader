@@ -1,2 +1,4 @@
+from normalPressure import normalPressure
+
 def countArrester(image, info):
-    return 0
+    return normalPressure(image, info)
