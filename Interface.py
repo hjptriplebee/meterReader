@@ -112,5 +112,7 @@ def meterReader(image, meterIDs):
 
         ROI = image[y:y + h, x:x + w]
         # call back
+        if info["type"] in [digitArrester, digitPressure]:
+            continue
         results[ID] = meterReaderCallBack(ROI, info)
     return results
