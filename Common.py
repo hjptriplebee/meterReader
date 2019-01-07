@@ -332,7 +332,6 @@ def getPoints(center, radious, angle):
     return res, [farthestPointX, farthestPointY]
 
 
-def findPointerFromBinarySpace(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5):
 def findPointerFromBinarySpace(src, center, radius, radians_low=0, radians_high=2 * np.pi, patch_degree=1.0,
                                ptr_resolution=5, clean_ration=0.16):
     """
