@@ -41,14 +41,15 @@ def doubleArrester(image, info):
     result["ovalMeter"] = scanPointer(ovalMeter, [ovalStart, ovalEnd, ovalCenter], info["startValueUp"],
                                       info["totalValueUp"])
     # crop rectangle meter
-    minx = max(0, rectStart[0] - 30)
-    miny = max(0, min(rectStart[1], rectEnd[1]) - 30)
-    maxx = min(w, rectEnd[0] + 30)
-    maxy = min(h, rectCenter[1] + 30)
-    rectStart = np.array([rectStart[0] - minx, rectStart[1] - miny])
-    rectEnd = np.array([rectEnd[0] - minx, rectEnd[1] - miny])
-    rectCenter = np.array([rectCenter[0] - minx, rectCenter[1] - miny])
-    rectMeter = meter[miny:maxy, minx:maxx]
+    r = int(np.sqrt(np.sum(np.square(rectCenter - rectStart))) * 1.6)
+    y = max(0, int(rectCenter[1] - r))
+    x = max(0, int(rectCenter[0] - r))
+    width = min(w, x + 2 * r)
+    height = min(h, y + 2 * r)
+    rectCenter = np.array([rectCenter[0] - x, rectCenter[1] - y])
+    rectStart = np.array([rectStart[0] - x, rectStart[1] - y])
+    rectEnd = np.array([rectEnd[0] - x, rectEnd[1] - y])
+    rectMeter = meter[y:height, x:width]
     '''
     cv2.circle(rectMeter, (rectStart[0], rectStart[1]), 5, (0, 0, 255), -1)
     cv2.circle(rectMeter, (rectCenter[0], rectCenter[1]), 5, (0, 0, 255), -1)
