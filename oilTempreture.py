@@ -2,8 +2,8 @@ from Common import *
 
 ifshow = False
 
-red_range = [ np.array([156, 120, 80]), np.array([179, 240, 220])]
-white_range = [ np.array([0, 0, 200]), np.array([180, 30, 255])]
+red_range = [np.array([156, 120, 80]), np.array([179, 240, 220])]
+white_range = [np.array([0, 0, 200]), np.array([180, 30, 255])]
 
 
 def color_detection(image, color):
@@ -14,7 +14,7 @@ def color_detection(image, color):
     """
     HSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     Lower = color[0]
-    Upper =  color[1]
+    Upper = color[1]
     mask = cv2.inRange(HSV, Lower, Upper)
     if ifshow:
         cv2.imshow("inRange", mask)
@@ -23,7 +23,7 @@ def color_detection(image, color):
     mask = cv2.resize(mask, (0, 0), fx=0.5, fy=0.5)
     kernel = np.ones((3, 3), np.uint8)
 
-    mask = cv2.dilate(mask, kernel,)
+    mask = cv2.dilate(mask, kernel, )
     if ifshow:
         cv2.imshow("dilate", mask)
         cv2.waitKey(0)
@@ -62,12 +62,12 @@ def contours_check(image, center):
     for i in range(len(contours)):
         rec = cv2.minAreaRect(contours[i])
         area = cv2.contourArea(contours[i])
-        if area/(rec[1][0]*rec[1][1]+1) < 0.7 or area > 1400 or area < 500:
+        if area / (rec[1][0] * rec[1][1] + 1) < 0.7 or area > 1400 or area < 500:
             continue
         else:
             for point in contours[i]:
                 point = np.squeeze(point)
-                dis = np.sqrt((point[0]-center[0])**2 + (point[1]-center[1])**2)
+                dis = np.sqrt((point[0] - center[0]) ** 2 + (point[1] - center[1]) ** 2)
                 if dis > reach:
                     reach = dis
                     target = point
@@ -109,16 +109,17 @@ def oilTempreture(image, info):
     end = (end * resizeCoffX).astype(np.int16)
     center = (center * resizeCoffX).astype(np.int16)
 
-    meter[int(0.6*meter.shape[0]):] *= 0
+    meter[int(0.6 * meter.shape[0]):] *= 0
 
     mask_meter_red = color_detection(meter, red_range)
     point_red = contours_check(mask_meter_red, center)
-    degree_red = AngleFactory.calPointerValueByOuterPoint(start, end, center, point_red, info["startValue"], info["totalValue"])
+    degree_red = AngleFactory.calPointerValueByOuterPoint(start, end, center, point_red, info["startValue"],
+                                                          info["totalValue"])
     cv2.destroyAllWindows()
     mask_meter_white = color_detection(meter, white_range)
     point_white = contours_check(mask_meter_white, center)
-    degree_white = AngleFactory.calPointerValueByOuterPoint(start, end, center, point_white, info["startValue"], info["totalValue"])
-
+    degree_white = AngleFactory.calPointerValueByOuterPoint(start, end, center, point_white, info["startValue"],
+                                                            info["totalValue"])
 
     if ifshow:
         print("white degree {:.2f}".format(degree_white))
@@ -131,4 +132,4 @@ def oilTempreture(image, info):
         cv2.imshow("meter", meter)
         cv2.waitKey(0)
 
-    return int(degree_red*100)/100, int(degree_white*100)/100
+    return int(degree_red * 100) / 100, int(degree_white * 100) / 100
