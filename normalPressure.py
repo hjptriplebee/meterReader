@@ -12,9 +12,9 @@ def normalPressure(image, info):
     start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
     meter = meterFinderByTemplate(image, info["template"])
-    result = scanPointer(meter, [start, end, center], info["startValue"], info["totalValue"])
-    readPressure(image, info)
-    return result
+    result1 = scanPointer(meter, [start, end, center], info["startValue"], info["totalValue"])
+    result2 = readPressure(image, info)
+    return [result1, result2]
 
 
 def readPressure(image, info):
@@ -29,7 +29,7 @@ def readPressure(image, info):
     img, contours, hierarchy = cv2.findContours(thresh, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_NONE)
     # filter small contours.
     if 'contoursThreshold' not in info:
-        return json.dumps({"value": "Not support configuration."})
+        return -1
     contours_thresh = info["contoursThreshold"]
     contours = [c for c in contours if len(c) > contours_thresh]
     # draw contours
@@ -38,7 +38,7 @@ def readPressure(image, info):
     thresh = filtered_thresh
     # load meter calibration form configuration
     if 'ptrResolution' not in info:
-        return json.dumps({"value": "Not support configuration."})
+        return -1
     start_ptr = info['startPoint']
     end_ptr = info['endPoint']
     ptr_resolution = info['ptrResolution']
@@ -49,9 +49,6 @@ def readPressure(image, info):
     center = cvtPtrDic2D(center)
     # 起点和始点连接，分别求一次半径,并得到平均值
     radius = calAvgRadius(center, end_ptr, start_ptr)
-    # 清楚可被清除的噪声区域，噪声区域(文字、刻度数字、商标等)的area 可能与指针区域的area形似,应该被清除，
-    # 防止在识别指针时出现干扰。值得注意，如果当前指针覆盖了该干扰区域，指针的一部分可能也会被清除
-    # 用直线Mask求指针区域
     hlt = np.array([center[0] - radius, center[1]])  # 通过圆心的水平线与圆的左交点
     # 计算起点向量、终点向量与过圆心的左水平线的夹角
     start_radians = AngleFactory.calAngleClockwise(start_ptr, hlt, center)
@@ -72,7 +69,7 @@ def readPressure(image, info):
                                                 centerPoint=center,
                                                 point=line_ptr, startValue=start_value,
                                                 totalValue=total)
-    return json.dumps({"value": value})
+    return value
 
 
 def calAvgRadius(center, end_ptr, start_ptr):

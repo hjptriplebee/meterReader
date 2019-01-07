@@ -53,7 +53,7 @@ def checkBleno(image, info):
         try_time = try_time - 1
     res = {}
     if not is_find_circles:
-        res = {"value": "Unknown status"}
+        res = {"value": -1}
     min_center = min(circles_in_roi, key=lambda c: c[2])
     center_y = min_center[2]
     if info is not None:
