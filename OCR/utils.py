@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.externals import joblib
+import torch
 import sys
 sys.path.append(".")
 
@@ -34,10 +35,9 @@ class leNetOCR:
         :return:
         """
         sys.path.append("LeNet")
-        # self.net = torch.load("OCR/LeNet/model/net.pkl")
+        self.net = torch.load("OCR/LeNet/model/net.pkl")
 
     def recognizeNet(self, image):
-        return 0
         """
         LeNet识别图像中的数字
         :param image: 输入图像
@@ -47,9 +47,9 @@ class leNetOCR:
         if image.size != 784:
             print("检查输入图片大小！不为28*28")
             return None
-        # image = torch.Tensor(image).view((1, 1, 28, 28))
+        image = torch.Tensor(image).view((1, 1, 28, 28))
         image = image.to("cpu")
         result = self.net.forward(image)
-        # _, predicted = torch.max(result.data, 1)
+        _, predicted = torch.max(result.data, 1)
         num = int(np.array(predicted[0]).astype(np.uint32))
         return num
