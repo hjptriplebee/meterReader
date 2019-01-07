@@ -116,15 +116,10 @@ class AngleFactory:
         :param vectorB: vector B
         :return: angle
         """
-        print("??? ", vectorA, vectorB)
         lenA = np.sqrt(vectorA.dot(vectorA))
         lenB = np.sqrt(vectorB.dot(vectorB))
         cosAngle = vectorA.dot(vectorB) / (lenA * lenB)
-        print("lenA*lenB", lenA, lenB, lenA*lenB)
-        print("dot ", vectorA.dot(vectorB))
-        print("cosAngle ", cosAngle)
         angle = np.arccos(cosAngle)
-        print("angle ", angle)
         return angle
 
     @classmethod
@@ -138,7 +133,6 @@ class AngleFactory:
         """
         vectorA = startPoint - centerPoint
         vectorB = endPoint - centerPoint
-        print("vector ", vectorA, vectorB)
         angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
 
         # if counter-clockwise
@@ -431,7 +425,7 @@ def detectHoughLine(meter, cannyThresholds, houghParam):
 	'''
 	img = cv2.GaussianBlur(meter, (3, 3), 0)  # cv2.imshow("GaussianBlur ", img)
 	edges = cv2.Canny(img, cannyThresholds[0], cannyThresholds[1], apertureSize=3)
-	cv2.imshow("canny", edges)
+	# cv2.imshow("canny", edges)
 	lines = cv2.HoughLines(edges, 1, np.pi / 180, houghParam)  # 这里对最后一个参数使用了经验型的值
 	if lines is None:
 		return None
@@ -442,8 +436,8 @@ def detectHoughLine(meter, cannyThresholds, houghParam):
 	b = np.sin(theta)
 	x0 = a * rho
 	y0 = b * rho
-	print("x0, y0:", x0, y0)
-	print("width, height ", width, height)
+	# print("x0, y0:", x0, y0)
+	# print("width, height ", width, height)
 	xcenter = int(width / 2)
 	ycenter = int(height / 2)
 	if xcenter < x0 or (xcenter == x0 and ycenter > y0):
@@ -457,7 +451,7 @@ def detectHoughLine(meter, cannyThresholds, houghParam):
 		y1 = y0
 		y2 = ycenter
 	cv2.line(meter, (x1, y1), (x2, y2), (0, 0, 255), 2)
-	cv2.imshow("HoughLine", meter)
+	# cv2.imshow("HoughLine", meter)
 	cv2.waitKey(0)
 	pointer.append([x2 - x1, y2 - y1])
 	pointer = np.array(pointer[0])
