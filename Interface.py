@@ -43,16 +43,16 @@ def getInfo(ID):
                 "h": 680
             },
             "startPoint": {
-                "x": -1.png,
-                "y": -1.png
+                "x": -1,
+                "y": -1
             },
             "endPoint": {
-                "x": -1.png,
-                "y": -1.png
+                "x": -1,
+                "y": -1
             },
             "centerPoint": {
-                "x": -1.png,
-                "y": -1.png
+                "x": -1,
+                "y": -1
             },
             "startValue": 0,
             "totalValue": 2

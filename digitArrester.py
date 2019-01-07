@@ -103,12 +103,12 @@ def digitArrester(src, info):
                     src_gray.shape[1] / 1.5) and x > (src_gray.shape[1] / 2.5)):
                 Aline.append(line)
         if (len(Aline) == 1 or low_thres == 100):
-            # print("%f度" % levelAngle(Aline[0][0], Aline[0][1.png], Aline[0][2], Aline[0][3]))
+            # print("%f度" % levelAngle(Aline[0][0], Aline[0][1], Aline[0][2], Aline[0][3]))
             if (len(Aline) == 0):
                 break
             else:
                 angle = levelAngle(Aline[0][0], Aline[0][1], Aline[0][2], Aline[0][3])
-                # cv.line(src_gray, (Aline[0][0], Aline[0][1.png]), (Aline[0][2], Aline[0][3]), 0, 2)
+                # cv.line(src_gray, (Aline[0][0], Aline[0][1]), (Aline[0][2], Aline[0][3]), 0, 2)
                 break
         else:
             low_thres += 1

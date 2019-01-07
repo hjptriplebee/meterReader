@@ -125,7 +125,7 @@ def getCircle(img):
         r = int(circle[2])
         # print("r========" + str(r))
 
-        # img = cv2.circle(img, (x, y), r, (0, 0, 255), 1.png, 8, 0)
+        # img = cv2.circle(img, (x, y), r, (0, 0, 255), 1, 8, 0)
 
         cp_img = img[y - 10:y + 30, x - 10:x + 30]
 

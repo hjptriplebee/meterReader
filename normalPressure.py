@@ -3,8 +3,6 @@ import json
 
 
 def normalPressure(image, info):
-    import showLabel as sl
-    # sl.showLabel(image, info)
     return readPressure(image, info)
 
 
@@ -24,7 +22,6 @@ def readPressure(image, info):
     contours_thresh = info["contoursThreshold"]
     contours = [c for c in contours if len(c) > contours_thresh]
     # draw contours
-    src = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
     filtered_thresh = np.zeros(thresh.shape, dtype=np.uint8)
     cv2.drawContours(filtered_thresh, contours, -1, (255, 0, 0), thickness=cv2.FILLED)
     thresh = filtered_thresh
@@ -38,8 +35,6 @@ def readPressure(image, info):
     clean_ration = info['cleanRation']
     start_ptr = cvtPtrDic2D(start_ptr)
     end_ptr = cvtPtrDic2D(end_ptr)
-    center = 0  # 表盘的中心
-    radius = 0  # 表盘的半径
     center = info['centerPoint']
     center = cvtPtrDic2D(center)
     # 起点和始点连接，分别求一次半径,并得到平均值
@@ -59,14 +54,8 @@ def readPressure(image, info):
     pointer_mask, theta, line_ptr = findPointerFromBinarySpace(thresh, center, radius, start_radians,
                                                                end_radians,
                                                                patch_degree=0.5,
-                                                               ptr_resolution=ptr_resolution)
+                                                               ptr_resolution=ptr_resolution, clean_ration=clean_ration)
     line_ptr = cv2PtrTuple2D(line_ptr)
-    # plot.subImage(src=canny, index=inc(), title='canny', cmap='gray')
-    cv2.line(src, (start_ptr[0], start_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
-    cv2.line(src, (end_ptr[0], end_ptr[1]), (center[0], center[1]), color=(0, 0, 255), thickness=1)
-    cv2.circle(src, (start_ptr[0], start_ptr[1]), 5, (0, 0, 255), -1)
-    cv2.circle(src, (end_ptr[0], end_ptr[1]), 5, (0, 0, 255), -1)
-    cv2.circle(src, (center[0], center[1]), 2, (0, 0, 255), -1)
     if double_range:
         start_value_in = info['startValueIn']
         total_value_in = info['totalValueIn']
