@@ -13,6 +13,7 @@ before_install:
   - pip install flask
   - pip install tensorflow==1.7.1
   - pip install keras
+  - pip install torch torchvision
   - pip install opencv-python==3.4.2.16
   - pip install opencv-contrib-python==3.4.2.16
   - pip install codecov
