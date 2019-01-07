@@ -155,6 +155,21 @@ def cv2PtrTuple2D(tuple):
     return tuple
 
 
+
+
+def cv2PtrTuple2D(tuple):
+    """
+    tuple 转numpy 数组
+    :param tuple:
+    :return:
+    """
+    if tuple[0] and tuple[1] is not None:
+        tuple = np.array([tuple[0], tuple[1]])
+    else:
+        return np.array([0, 0])
+    return tuple
+
+
 def readPressureValueFromDir(meter_id, img_dir, config):
     img = cv2.imread(img_dir)
     file = open(config)
@@ -171,30 +186,15 @@ def readPressureValueFromImg(img, info):
 
 
 if __name__ == '__main__':
-    res1 = res2 = res3 = res4 = res5 = res6 = 0
     res1 = readPressureValueFromDir('lxd1_4', 'image/lxd1.jpg', 'config/lxd1_4.json')
-    plot.show(save=True)
-    reset()
-    # res2 = readPressureValueFromDir('szk2_1', 'image/szk2.jpg', 'config/szk2_1.json')
-    # plot.show(save=True)
-    # reset()
-    # res3 = readPressureValueFromDir('szk1_5', 'image/szk1.jpg', 'config/szk1_5.json')
-    # plot.show(save=True)
-    # reset()
-    # res4 = readPressureValueFromDir('wn1_5', 'image/wn1.jpg', 'config/wn1_5.json')
-    # plot.show(save=True)
-    # reset()
-    # res5 = readPressureValueFromDir('xyy3_1', 'image/xyy3.jpg', 'config/xyy3_1.json')
-    # plot.show(save=True)
-    # reset()
-    # res6 = readPressureValueFromDir('pressure2_1', 'image/pressure2.jpg', 'config/pressure2_1.json')
-    # plot.show(save=True)
-    # reset()
+    res2 = readPressureValueFromDir('szk2_1', 'image/szk2.jpg', 'config/szk2_1.json')
+    res3 = readPressureValueFromDir('szk1_5', 'image/szk1.jpg', 'config/szk1_5.json')
+    res4 = readPressureValueFromDir('wn1_5', 'image/wn1.jpg', 'config/wn1_5.json')
+    res5 = readPressureValueFromDir('xyy3_1', 'image/xyy3.jpg', 'config/xyy3_1.json')
+    res6 = readPressureValueFromDir('pressure2_1', 'image/pressure2.jpg', 'config/pressure2_1.json')
     print(res1)
     print(res2)
     print(res3)
     print(res4)
     print(res5)
     print(res6)
-    # readPressureValueFromDir('image/SF6/IMG_7666.JPG', 'config/otg_1.json')
-    # demarcate_roi('image/SF6/IMG_7666.JPG')
