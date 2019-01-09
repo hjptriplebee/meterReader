@@ -29,7 +29,17 @@
   "totalValue": 16.0,
   "totalValueIn": 0.0,
   "totalValueOut": 1600.0,
+  "enableFit": false,
+  "enableEqualizeHistogram": false,
+  "enableCleanNoisedRegion": true,
   "ptrResolution": 5,
-  "cleanRation": 0.17,
+  "noisedRegion": [
+    [
+      247,
+      417,
+      117,
+      62
+    ]
+  ],
   "contoursThreshold": 100
 }

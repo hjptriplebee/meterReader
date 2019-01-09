@@ -24,7 +24,18 @@
   },
   "startValue": 0.0,
   "totalValue": 2.5,
-  "ptrResolution": 10,
-  "cleanRation": 0.17,
-  "contoursThreshold": 100
+  "unit": "Mpa",
+  "enableFit": false,
+  "enableEqualizeHistogram": false,
+  "enableCleanNoisedRegion": true,
+  "ptrResolution": 50,
+  "noisedRegion": [
+    [
+      247,
+      417,
+      117,
+      62
+    ]
+  ],
+  "contoursThreshold":100
 }

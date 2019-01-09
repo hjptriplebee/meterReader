@@ -1,20 +1,22 @@
-import cv2
 import json
 
-from absorb import absorb
+import cv2
+from algorithm.absorb import absorb
+from algorithm.Blenometer import checkBleno
+from algorithm.SF6 import SF6Reader
+from algorithm.oilTempreture import oilTempreture
 
-from digitPressure import digitPressure
-from normalPressure import normalPressure
-from colorPressure import colorPressure
-from SF6 import SF6Reader
-from doubleArrester import doubleArrester
-from digitArrester import digitArrester
-from countArrester import countArrester
-from oilTempreture import oilTempreture
-from Blenometer import checkBleno
-from onoffIndoor import onoffIndoor
-from onoffOutdoor import onoffOutdoor
 
+from algorithm.arrest.countArrester import countArrester
+from algorithm.arrest.digitArrester import digitArrester
+from algorithm.arrest.doubleArrester import doubleArrester
+
+from algorithm.pressure.digitPressure import digitPressure
+from algorithm.pressure.normalPressure import normalPressure
+from algorithm.pressure.colorPressure import colorPressure
+
+from algorithm.onoff.onoffIndoor import onoffIndoor
+from algorithm.onoff.onoffOutdoor import onoffOutdoor
 
 
 def meterReaderCallBack(image, info):
@@ -112,7 +114,7 @@ def meterReader(image, meterIDs):
 
         ROI = image[y:y + h, x:x + w]
         # call back
-        if info["type"] in [digitArrester, digitPressure]:
+        if info["type"] in [digitArrester]:#, digitPressure]:
             continue
         results[ID] = meterReaderCallBack(ROI, info)
     return results
