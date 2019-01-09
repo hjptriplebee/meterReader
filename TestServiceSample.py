@@ -42,7 +42,7 @@ def codecov():
         print(im)
         for i in range(1, 6):
             cfg = im.split(".jpg")[0]+"_"+str(i)
-            print(cfg)
+            # print(cfg)
             if cfg+".json" in config:
                 receive2 = meterReader(image, [cfg])
     print("codecov done")

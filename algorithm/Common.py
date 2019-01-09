@@ -35,15 +35,13 @@ def meterFinderByTemplate(image, template):
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
 
-
-def meterFinderBySIFT(image, template):
+def meterLocationFinderBySIFT(image, template):
     """
     locate meter's bbox
     :param image: image
     :param template: template
-    :return: bbox image
+    :return: bbox
     """
-
     templateBlurred = cv2.GaussianBlur(template, (3, 3), 0)
     imageBlurred = cv2.GaussianBlur(image, (3, 3), 0)
 
@@ -103,6 +101,17 @@ def meterFinderBySIFT(image, template):
     maxX = int(np.max(matchPointMatrix[:, 0]))
     minY = int(np.min(matchPointMatrix[:, 1]))
     maxY = int(np.max(matchPointMatrix[:, 1]))
+    return minX, minY, maxX, maxY
+
+
+def meterFinderBySIFT(image, template):
+    """
+    locate meter's bbox
+    :param image: image
+    :param template: template
+    :return: bbox image
+    """
+    minX, minY, maxX, maxY = meterLocationFinderBySIFT(image, template)
 
     return image[minY:maxY, minX:maxX]
 
