@@ -4,6 +4,8 @@ python: "3.5"
 notifications:      # 邮箱通知
   email: false
 
+env: VERBOSE=0
+
 sudo: false #有定制化开发环境需要，默认false，不开启容器，编译效率高
 
 before_install:

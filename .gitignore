@@ -1,6 +1,7 @@
 # pycharm
 .idea/
 test.py
+szkPressure.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -106,6 +107,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-util/.*
-normalPressure_debug.py
-output/.*
