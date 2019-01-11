@@ -3,13 +3,13 @@
       "horizontal": 10.0,
       "vertical": 20.0,
       "name": "bileiqi2_1",
-      "type": "bileiqi2",
+      "type": "insideArrest",
       "template": "bileiqi2_1.jpg",
       "ROI": {
-          "x": 200,
-          "y": 200,
-          "w": 1520,
-          "h": 680
+          "x": 0,
+          "y": 0,
+          "w": 5100,
+          "h": 3400
       },
       "startPoint": {
           "x": 0,

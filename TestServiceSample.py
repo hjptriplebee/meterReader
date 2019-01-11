@@ -49,16 +49,29 @@ def codecov():
 
 
 if __name__ == "__main__":
-    serverProcess = multiprocessing.Process(target=startServer)
-    results = multiprocessing.Manager().list()
-    clientProcess = multiprocessing.Process(target=startClient, args=(results,))
-    serverProcess.start()
-    time.sleep(30)
-    clientProcess.start()
-    clientProcess.join()
-    serverProcess.terminate()
 
-    codecov()
+    # serverProcess = multiprocessing.Process(target=startServer)
+    # results = multiprocessing.Manager().list()
+    # clientProcess = multiprocessing.Process(target=startClient, args=(results,))
+    # serverProcess.start()
+    # time.sleep(30)
+    # clientProcess.start()
+    # clientProcess.join()
+    # serverProcess.terminate()
+    #
+    # codecov()
+
+    for i in range(20):
+        serverProcess = multiprocessing.Process(target=startServer)
+        results = multiprocessing.Manager().list()
+        clientProcess = multiprocessing.Process(target=startClient, args=(results,))
+        serverProcess.start()
+        time.sleep(30)
+        clientProcess.start()
+        clientProcess.join()
+        serverProcess.terminate()
+
+        codecov()
 
     # for result in results:
     #     print(result)
