@@ -8,10 +8,6 @@ import multiprocessing
 
 from Interface import meterReader
 
-import warnings
-warnings.filterwarnings("ignore")
-
-
 def startServer():
     os.system("python FlaskService.py")
 
@@ -27,7 +23,6 @@ def startClient(results):
         })
 
         r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
-
         receive = json.loads(r.text)
         print(im, receive)
 
@@ -50,28 +45,28 @@ def codecov():
 
 if __name__ == "__main__":
 
-    # serverProcess = multiprocessing.Process(target=startServer)
-    # results = multiprocessing.Manager().list()
-    # clientProcess = multiprocessing.Process(target=startClient, args=(results,))
-    # serverProcess.start()
-    # time.sleep(30)
-    # clientProcess.start()
-    # clientProcess.join()
-    # serverProcess.terminate()
+    serverProcess = multiprocessing.Process(target=startServer)
+    results = multiprocessing.Manager().list()
+    clientProcess = multiprocessing.Process(target=startClient, args=(results,))
+    serverProcess.start()
+    time.sleep(30)
+    clientProcess.start()
+    clientProcess.join()
+    serverProcess.terminate()
+
+    codecov()
     #
-    # codecov()
-
-    for i in range(20):
-        serverProcess = multiprocessing.Process(target=startServer)
-        results = multiprocessing.Manager().list()
-        clientProcess = multiprocessing.Process(target=startClient, args=(results,))
-        serverProcess.start()
-        time.sleep(30)
-        clientProcess.start()
-        clientProcess.join()
-        serverProcess.terminate()
-
-        codecov()
+    # for i in range(20):
+    #     serverProcess = multiprocessing.Process(target=startServer)
+    #     results = multiprocessing.Manager().list()
+    #     clientProcess = multiprocessing.Process(target=startClient, args=(results,))
+    #     serverProcess.start()
+    #     time.sleep(30)
+    #     clientProcess.start()
+    #     clientProcess.join()
+    #     serverProcess.terminate()
+    #
+    #     codecov()
 
     # for result in results:
     #     print(result)
