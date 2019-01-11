@@ -141,6 +141,45 @@ def gamma(image,thre):
     out = getMatInt(out * 255)
     return out
 
+def calDis(img,t):
+    t = int(t)
+    # print(t)
+    s1=0
+    s2=0
+    h,w = img.shape
+
+    for i in  range(w):
+        if img[t][i]==255:
+            if s1==0:
+                s1=i
+            elif s2==0:
+                s2=i
+    return abs(s2-s1)
+
+def judgeStatus(img):
+    h,w = img.shape
+    mid = h/2
+
+    #画三条线
+    t1 = mid
+    t2 = mid+3
+    t3=t2+6
+    #计算距离
+    n=0
+    ts = []
+    ts.append(t1)
+    ts.append(t2)
+    ts.append(t3)
+
+    for t in ts:
+        if calDis(img,t)<4:
+         n=n+1
+
+    # print(n)
+    return n
+
+
+
 def onoffIndoor(image, info):
     """
     :param image:whole image
@@ -160,31 +199,34 @@ def onoffIndoor(image, info):
     if info['name']=="onoffIndoor1_1":
         x1, y1, x2, y2 = searchUpBlack(image, binary, Y, X)
         img = cutTarget(image, x1, y1, x2, y2,"left")
+        H, _, _, h, _, _ = HSV(img)
+        n,per = countTarPer(h, "black")
+        status="p"
+        if per > 0.5:
+            status = "close"
+        res = {
+            'status': status,
+            'num': n,
+            'per': per
+        }
 
     elif info['name']=="onoffIndoor3_1":
         x1, y1, x2, y2 = searchRightRed(image, binary, Y, X)
         img = cutTarget(image, x1, y1, x2, y2, "right")
         #获取目标区域
         img = gamma(img, 0.2)
-        cv2.imwrite("res.jpg", img)
+        # cv2.imwrite("res.jpg", img)
         img = getBinary(img)
-        cv2.imwrite("ress.jpg",img)
+        n = judgeStatus(img)
+        status = "p"
+        if n > 2:
+            status = "close"
+        res = {
+            'status': status
+        }
 
-    #H, _, _, h, _, _ = HSV(img)
 
-    #n,per = countTarPer(h, "black")
+    res = json.dumps(res)
 
-    # status="p"
-    #
-    # if per > 0.5:
-    #     status = "close"
-
-    # res = {
-    #     'status': status,
-    #     'num': n,
-    #     'per': per
-    # }
-    # res = json.dumps(res)
-    #
-    # return res
+    return res
     # cv2.imwrite("tar.jpg",img)
