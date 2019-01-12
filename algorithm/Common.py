@@ -390,6 +390,7 @@ def scanPointer(meter, pts, startVal, endVal):
                                        endPoint=start) * 180 / np.pi)
     endAngle = int(AngleFactory.calAngleClockwise(startPoint=np.array([center[0] + 100, center[1]]), centerPoint=center,
                                                   endPoint=end) * 180 / np.pi)
+    # print(startAngle, endAngle)
     if endAngle <= startAngle:
         endAngle += 360
     maxSum = 0
