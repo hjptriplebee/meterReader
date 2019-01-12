@@ -1,6 +1,7 @@
 # pycharm
 .idea/
 test.py
+szkPressure.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,26 +1,29 @@
-import cv2
 import json
 
-from absorb import absorb
+import cv2
+from algorithm.absorb import absorb
+from algorithm.Blenometer import checkBleno
+from algorithm.SF6 import SF6Reader
+from algorithm.oilTempreture import oilTempreture
 
-from digitPressure import digitPressure
-from normalPressure import normalPressure
-from colorPressure import colorPressure
-from SF6 import SF6Reader
-from doubleArrester import doubleArrester
-from digitArrester import digitArrester
-from countArrester import countArrester
-from oilTempreture import oilTempreture
-from Blenometer import checkBleno
-from onoffIndoor import onoffIndoor
-from onoffOutdoor import onoffOutdoor
 
+from algorithm.arrest.countArrester import countArrester
+from algorithm.arrest.digitArrester import digitArrester
+from algorithm.arrest.doubleArrester import doubleArrester
+from algorithm.arrest.insideArrest import insideArrest
+
+from algorithm.pressure.digitPressure import digitPressure
+from algorithm.pressure.normalPressure import normalPressure
+from algorithm.pressure.colorPressure import colorPressure
+
+from algorithm.onoff.onoffIndoor import onoffIndoor
+from algorithm.onoff.onoffOutdoor import onoffOutdoor
 
 
 def meterReaderCallBack(image, info):
     """call back function"""
-    if not info["type"]:
-        return None
+    if info["type"] == None:
+        return "meter type not support!"
     else:
         return info["type"](image, info)
 
@@ -77,6 +80,8 @@ def getInfo(ID):
         info["type"] = countArrester
     elif info["type"] == "doubleArrester":
         info["type"] = doubleArrester
+    elif info["type"] == "insideArrest":
+        info["type"] = insideArrest
     elif info["type"] == "oilTempreture":
         info["type"] = oilTempreture
     elif info["type"] == "blenometer":
@@ -87,7 +92,6 @@ def getInfo(ID):
         info["type"] = onoffOutdoor
     else:
         info["type"] = None
-        print("meter type not support!")
 
     info["template"] = cv2.imread("template/" + ID + ".jpg")
     return info

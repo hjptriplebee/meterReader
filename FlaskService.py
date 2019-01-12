@@ -73,7 +73,7 @@ def storeAPI():
     cv2.imwrite("template/" + meterID + ".jpg", image)
 
     config = data["config"]
-    print(config)
+    # print(config)
 
     file = open("config/" + meterID + ".json", "w")
     file.write(json.dumps(config))
