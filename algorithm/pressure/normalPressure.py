@@ -16,7 +16,8 @@ def normalPressure(image, info):
     center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
     start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
-    meter = meterFinderByTemplate(image, info["template"])
+    # meter = meterFinderByTemplate(image, info["template"])
+    meter = meterFinderBySIFT(image, info)
     result = scanPointer(meter, [start, end, center], info["startValue"], info["totalValue"])
     return result
 

@@ -85,7 +85,6 @@ def digitPressure(image, info):
         cv2.circle(template, (fourth[0], fourth[1]), 5, (255, 255, 0), -1)
         cv2.imshow("tem", template)
         cv2.imshow("rec", dst)
-        cv2.imwrite("digit.jpg", dst)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
     return res

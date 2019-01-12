@@ -10,6 +10,7 @@ from algorithm.oilTempreture import oilTempreture
 from algorithm.arrest.countArrester import countArrester
 from algorithm.arrest.digitArrester import digitArrester
 from algorithm.arrest.doubleArrester import doubleArrester
+from algorithm.arrest.insideArrest import insideArrest
 
 from algorithm.pressure.digitPressure import digitPressure
 from algorithm.pressure.normalPressure import normalPressure
@@ -21,8 +22,8 @@ from algorithm.onoff.onoffOutdoor import onoffOutdoor
 
 def meterReaderCallBack(image, info):
     """call back function"""
-    if not info["type"]:
-        return None
+    if info["type"] == None:
+        return "meter type not support!"
     else:
         return info["type"](image, info)
 
@@ -79,6 +80,8 @@ def getInfo(ID):
         info["type"] = countArrester
     elif info["type"] == "doubleArrester":
         info["type"] = doubleArrester
+    elif info["type"] == "insideArrest":
+        info["type"] = insideArrest
     elif info["type"] == "oilTempreture":
         info["type"] = oilTempreture
     elif info["type"] == "blenometer":
@@ -89,7 +92,6 @@ def getInfo(ID):
         info["type"] = onoffOutdoor
     else:
         info["type"] = None
-        print("meter type not support!")
 
     info["template"] = cv2.imread("template/" + ID + ".jpg")
     return info
@@ -114,7 +116,5 @@ def meterReader(image, meterIDs):
 
         ROI = image[y:y + h, x:x + w]
         # call back
-        if info["type"] in [digitArrester]:#, digitPressure]:
-            continue
         results[ID] = meterReaderCallBack(ROI, info)
     return results
