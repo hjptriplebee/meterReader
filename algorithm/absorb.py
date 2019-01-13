@@ -93,7 +93,7 @@ def RedReader(image, info):
     cv2.imwrite("gamma.jpg", image)
     image = cv2.imread("gamma.jpg")
 
-    meter = meterFinderByTemplate(image, info["template"])
+    meter = (image, info["template"])
 
     h, s, v = HSV(meter)
     h_ave, s_ave, v_ave, h_var, s_var, v_var = GetHsvProperty(h, s, v)
