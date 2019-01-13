@@ -9,6 +9,19 @@ import tensorflow as tf
 
 sys.path.append(".")
 
+def fillAndResize(image):
+    """
+    将输入图像填充为正方形且变换为（28，28）
+    :param image:
+    :return:
+    """
+    h, w = image.shape
+    l = max(2*w, h+10)
+    ret = np.zeros((l, l), np.uint8)
+    leftTop = np.array([l/2-w/2, l/2-h/2], np.uint8)
+    ret[leftTop[1]:leftTop[1]+h, leftTop[0]:leftTop[0]+w] = image
+    ret = cv2.resize(ret, (28, 28), interpolation=cv2.INTER_CUBIC)
+    return ret
 
 class svmOCR:
     def __init__(self):
@@ -22,6 +35,7 @@ class svmOCR:
         :param svc: SVM模型
         :return: 识别的数字值
         """
+        image = fillAndResize(image)
         if image.size != 784:
             print("检查输入图片大小！不为28*28")
             return None
@@ -49,6 +63,7 @@ class leNetOCR:
         :param net: LeNet模型
         :return: 识别的数字值
         """
+        image = fillAndResize(image)
         if image.size != 784:
             print("检查输入图片大小！不为28*28")
             return None
@@ -60,6 +75,9 @@ class leNetOCR:
         return num
 
 class Cnn(object):
+    def __init__(self):
+        sys.path.append("tfNet")
+        self.model = load_model('algorithm/OCR/tfNet/CNN.h5')
     #将图像等比例变为28*28
     def resize_28(self,number):
         mask = np.zeros((28, 28))
@@ -73,7 +91,7 @@ class Cnn(object):
         number = mask
         return number
     #数字识别
-    def cnn_num_detect(self,image):
+    def recognizeNet(self,image):
         """
         :param image:  确保是“黑底白字”的二值图，（因为二值化后图可能是“白底黑字”）
         :return: 返回字符型的数字  其中n代表不是数字
@@ -93,11 +111,10 @@ class Cnn(object):
             image =self. resize_28(image)
         # 确保是0和255
         image = np.array([[0 if y < 150 else 255 for y in x] for x in image])
-        # 加载模型
-        model = load_model('./CNN.h5')
+
         image = np.expand_dims(image, axis=0)
         image = np.expand_dims(image, axis=3)
-        result = model.predict(image)
+        result = self.model.predict(image)
         max = -float('inf')
         num = ""
         for i in range(len(result[0])):
@@ -122,9 +139,7 @@ class tfNet(object):
         self.graph = tf.get_default_graph()
 
     def recognizeNet(self, test):
-        print(test.shape)
-        cv2.imshow("test", test)
-        cv2.waitKey(0)
+        image = fillAndResize(test)
         new_img = cv2.resize(test, (28, 28))
         new_img = new_img.reshape(-1, 784)
         new_img = np.minimum(new_img, 1)
