@@ -68,7 +68,7 @@ def oilTempreture(image, info):
     end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
     center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
 
-    meter = meterFinderByTemplate(image, info["template"])
+    meter = (image, info["template"])
     h, w, _ = meter.shape
 
     fixHeight = 300
