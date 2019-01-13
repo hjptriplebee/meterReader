@@ -1,9 +1,11 @@
 import sys
-import cv2 as cv
+import cv2
 import numpy as np
 from sklearn.externals import joblib
 import torch
 from keras.models import load_model
+import tensorflow as tf
+
 
 sys.path.append(".")
 
@@ -81,11 +83,11 @@ class Cnn(object):
         if (h > 28 or w > 28):
             if (h >= w):
                 scale = round(26 / h, 2)
-                image = cv.resize(image, (0, 0), fx=scale, fy=scale)
+                image = cv2.resize(image, (0, 0), fx=scale, fy=scale)
                 image = self.resize_28(image)
             else:
                 scale = round(26 / w, 2)
-                image = cv.resize(image, (0, 0), fx=scale, fy=scale)
+                image = cv2.resize(image, (0, 0), fx=scale, fy=scale)
                 image = self.resize_28(image)
         else:
             image =self. resize_28(image)
@@ -106,3 +108,28 @@ class Cnn(object):
                 else:
                     num = str(i)
         return num
+
+
+class tfNet(object):
+    def __init__(self):
+        """
+        初始化模型
+        """
+        sys.path.append("tfNet")
+        self.sess = tf.Session()
+        self.saver = tf.train.import_meta_graph('algorithm/OCR/tfNet/model.meta')
+        self.saver.restore(self.sess, tf.train.latest_checkpoint('algorithm/OCR/tfNet'))
+        self.graph = tf.get_default_graph()
+
+    def recognizeNet(self, test):
+        print(test.shape)
+        cv2.imshow("test", test)
+        cv2.waitKey(0)
+        new_img = cv2.resize(test, (28, 28))
+        new_img = new_img.reshape(-1, 784)
+        new_img = np.minimum(new_img, 1)
+        image = self.graph.get_tensor_by_name("img:0")
+        predict = self.graph.get_tensor_by_name("predict:0")
+        prediction = self.sess.run(predict, feed_dict={image: new_img})
+        print("predict number:", prediction[0])
+        return prediction[0]
