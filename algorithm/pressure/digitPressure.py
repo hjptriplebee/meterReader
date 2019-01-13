@@ -2,7 +2,7 @@ import sys
 
 from algorithm.Common import *
 from algorithm.OCR.utils import *
-from algorithm.debug import  *
+from algorithm.debug import *
 sys.path.append("algorithm/OCR/LeNet")
 
 black_range = [np.array([0, 0, 0]), np.array([180, 255, 220])]
@@ -26,6 +26,7 @@ def fillAndResize(image):
 def digitPressure(image, info):
     net = leNetOCR()
     svm = svmOCR()
+    tfNet_ = tfNet()
     template = meterFinderByTemplate(image, info["template"])
 
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
@@ -43,9 +44,9 @@ def digitPressure(image, info):
     gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
     edge = cv2.Canny(gray, 30, 70)
 
-    # if ifShow:
-    #     cv2.imshow("edge", edge)
-    #     cv2.waitKey(0)
+    if ifShow:
+        cv2.imshow("edge", edge)
+        cv2.waitKey(0)
 
     # 各个数字位的横纵坐标
     split = [2, 34, 69, 102, 132, 163]
@@ -70,11 +71,14 @@ def digitPressure(image, info):
         inputNum = fillAndResize(num)
         numNet = net.recognizeNet(inputNum)
         numSvm = svm.recognizeSvm(inputNum)
+        numTf = tfNet_.recognizeNet(inputNum)
 
-        # if ifShow:
-        #     cv2.imshow("fill", inputNum)
-        #     print(numNet, numSvm )
-        #     cv2.waitKey(0)
+        print(numTf)
+
+        if ifShow:
+            cv2.imshow("fill", inputNum)
+            print(numNet, numSvm )
+            cv2.waitKey(0)
 
         res = 10*res + numNet
 
