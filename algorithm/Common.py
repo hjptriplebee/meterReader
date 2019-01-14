@@ -421,6 +421,10 @@ def scanPointer(meter, pts, startVal, endVal):
             end[1] -= 3
         degree = AngleFactory.calPointerValueByOuterPoint(start, end, center, outerPoint, startVal, endVal)
 
+    # small value to zero
+    if degree < 0.02 * endVal:
+        degree = startVal
+
     if ifShow:
         # print(degree, start, center, outerPoint)
         cv2.circle(meter, (outerPoint[0], outerPoint[1]), 10, (0, 0, 255), -1)

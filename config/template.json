@@ -1,0 +1,47 @@
+{
+  "distance": 0.0,
+  "horizontal": 0.0,
+  "vertical": 0.0,
+  "name": "name",
+  "type": "digitPressure",
+  "ROI": {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+  },
+
+  "startPoint": {
+    "x": 0,
+    "y": 0
+  },
+  "endPoint": {
+    "x": 0,
+    "y": 0
+  },
+  "centerPoint": {
+    "x": 0,
+    "y": 0
+  },
+
+  "rectangle":{
+    "width": 0,
+    "height": 0
+  },
+  "widthSplit":[
+    []
+  ],
+  "heightSplit":[],
+
+  "nRows":1,
+  "row1": {
+    "nCols": 1,
+    "col1": {
+      "nDigitsMax": 4,
+      "nDigitsMin": 3,
+      "nDecimals": 1
+    }
+  },
+
+  "result": "0.0"
+}

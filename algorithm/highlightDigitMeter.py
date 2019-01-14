@@ -41,9 +41,10 @@ def highlightDigit(image, info):
                 total = 0
     row_points = np.array(row_points, dtype="int").reshape((-1, 3))
     args = np.argsort(-row_points[:, 2])
+    args = args[:info["nRows"]]
+    args = args[np.argsort(args)]
     row_points = row_points[args]
-    row_points = row_points[:info["nRows"]]
-    # print(row_points)
+
     blobs = []
 
     # 根据找到的高亮块，进行逐块的数字识别
@@ -109,18 +110,23 @@ def highlightDigit(image, info):
             for j in range(len(index) - 1):
                 nDecimals = info["row" + str(i + 1)]["col" + str(j + 1)]["nDecimals"]
                 t_b = blob[index[j]:index[j + 1]]
-                val = 0.00
+                tmp = ""
                 for k in range(t_b.shape[0] - 1, -1, -1):
-                    val = val + t_b[t_b.shape[0] - k - 1][2] * math.pow(10, k - nDecimals)
-                val = round(val, nDecimals)
-                vals.append(val)
+                    tmp = tmp + str(blob[blob.shape[0] - k - 1][2])
+                    if k == nDecimals:
+                        tmp = tmp + "."
+                # val = float(tmp)
+                # val = round(val, nDecimals)
+                vals.append(tmp)
         else:
-            val = 0.00
+            tmp = ""
             nDecimals = info["row" + str(i + 1)]["col1"]["nDecimals"]
             for j in range(blob.shape[0] - 1, -1, -1):
-                w = blob[blob.shape[0] - j - 1][2] * math.pow(10, j - nDecimals)
-                val = val + w
-            val = round(val, nDecimals)
-            vals.append(val)
+                tmp = tmp + str(blob[blob.shape[0] - j - 1][2])
+                if j == nDecimals:
+                    tmp = tmp + "."
+            # val = float(tmp)
+            # val = round(val, nDecimals)
+            vals.append(tmp)
         values.append(vals)
     return values
