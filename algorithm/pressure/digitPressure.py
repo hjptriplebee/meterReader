@@ -3,15 +3,15 @@ import sys
 from algorithm.Common import *
 from algorithm.OCR.utils import *
 from algorithm.debug import *
-sys.path.append("algorithm/OCR/LeNet")
 
+sys.path.append("algorithm/OCR/LeNet")
 
 
 def digitPressure(image, info):
     # net = leNetOCR()
     # svm = svmOCR()
     # tfNet_ = tfNet()
-    cnn_ = Cnn()
+    net_ = Cnn()
     template = meterFinderBySIFT(image, info)
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     template = cv2.equalizeHist(template)
@@ -32,13 +32,13 @@ def digitPressure(image, info):
     dst = cv2.warpPerspective(template, M, (width, height))
     result = []
 
-
     for i in range(len(widthSplit)):
         split = widthSplit[i]
         Num = ""
         for j in range(len(split) - 1):
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
-            _, img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
+            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
+            # _, img = cv2.threshold(img, 0, 255,cv2.THRESH_OTSU )
             sum = 0
             for row in range(img.shape[0]):
                 if (img[row][0] == 0):
@@ -54,12 +54,11 @@ def digitPressure(image, info):
                 img = cv2.bitwise_not(img)
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-
-            num = cnn_.recognizeNet(img)
+            # cv2.imshow('%d%d' % (i, j), img)
+            num = net_.recognizeNet(img)
             Num += str(num)
         result.append(Num)
         print(Num)
-
 
     # inputNum = fillAndResize(num)
     #     numNet = net.recognizeNet(num)
@@ -69,12 +68,12 @@ def digitPressure(image, info):
 
     # print(numTf)
 
-        # if ifShow:
-        #     cv2.imshow("fill", num)
-        #     print(numNet, numSvm, numTf, numCNN)
-        #     cv2.waitKey(0)
+    # if ifShow:
+    #     cv2.imshow("fill", num)
+    #     print(numNet, numSvm, numTf, numCNN)
+    #     cv2.waitKey(0)
 
-        # res = 10*res + numCNN
+    # res = 10*res + numCNN
 
     if ifShow:
         cv2.circle(template, (start[0], start[1]), 5, (0, 0, 255), -1)
