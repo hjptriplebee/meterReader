@@ -4,7 +4,7 @@ import math
 from algorithm.OCR.utils import *
 
 
-def highlightDigitMeter(image, info):
+def highlightDigit(image, info):
     """
     识别含有红色高亮数字区域的模块
     :param image: 输入图片
@@ -16,7 +16,7 @@ def highlightDigitMeter(image, info):
 
     # 图像预处理
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    cv2.imshow("gray", gray)
+    # cv2.imshow("gray", gray)
     ret, thresh = cv2.threshold(gray, gray.max() - 25, gray.max(), cv2.THRESH_BINARY)
 
     # 对高亮区域进行列投影，并且找到高亮区域块，将其分离
@@ -43,7 +43,7 @@ def highlightDigitMeter(image, info):
     args = np.argsort(-row_points[:, 2])
     row_points = row_points[args]
     row_points = row_points[:info["nRows"]]
-    print(row_points)
+    # print(row_points)
     blobs = []
 
     # 根据找到的高亮块，进行逐块的数字识别
@@ -68,7 +68,7 @@ def highlightDigitMeter(image, info):
                     col_points.append(total)
                     total = 0
         col_points = np.array(col_points, dtype="int").reshape((-1, 3))
-        print(col_points)
+        # print(col_points)
         for j, col_point in enumerate(col_points):
             img = thresh[row_point[0] - 2:row_point[1] + 2, col_point[0] - 2:col_point[1] + 2]
             if img.shape[0] > img.shape[1]:
@@ -77,9 +77,12 @@ def highlightDigitMeter(image, info):
                 subs = subs // 2
                 new_img[:, subs:subs + img.shape[1]] = img
                 new_img = cv2.resize(new_img, (28, 28))
+                # cv2.imshow("test", img)
+                # cv2.waitKey(0)
                 new_img = new_img.reshape(-1, 784)
                 new_img = np.minimum(new_img, 1)
-                predict = tfNet_.recognizeNet(new_img)
+                predict = tfNet_.recognizeNet2(new_img)
+                # print(predict)
                 col_points[j][2] = predict
         col_points = col_points.tolist()
         new_col_points = [col_point for col_point in col_points if col_point[2] != 10]
@@ -89,7 +92,7 @@ def highlightDigitMeter(image, info):
     for i, blob in enumerate(blobs):
         vals = []
         nCols = info["row" + str(i + 1)]["nCols"]
-        print(blob)
+        # print(blob)
         if nCols > 1:
             distances = []
             for j in range(1, blob.shape[0]):

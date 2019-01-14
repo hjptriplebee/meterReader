@@ -58,7 +58,7 @@ def digitPressure(image, info):
             num = cnn_.recognizeNet(img)
             Num += str(num)
         result.append(Num)
-        print(Num)
+        # print(Num)
 
 
     # inputNum = fillAndResize(num)
