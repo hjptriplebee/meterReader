@@ -25,14 +25,14 @@
       "startValue": 0.0,
       "totalValue": 0.0,
   "rectangle":{
-    "width": 0,
-    "height": 0
+    "width": 200,
+    "height": 100
   },
   "widthSplit":[
-    [],
-    [],
-    [],
-    []
+    [48,72,103,135,165]
+
   ],
-  "heightSplit":[]
+  "heightSplit":[
+      [20,75]
+  ]
   }

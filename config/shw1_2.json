@@ -11,29 +11,29 @@
         "h": 1200
     },
     "startPoint": {
-        "x": 0,
-        "y": 0
+        "x": 128,
+        "y": 206
     },
     "endPoint": {
-        "x": 0,
-        "y": 0
+        "x": 543,
+        "y": 447
     },
     "centerPoint": {
-        "x": 0,
-        "y": 0
+        "x": 557,
+        "y": 243
     },
     "startValue": 0.0,
     "totalValue": 0.0,
     "rectangle":{
-    "width": 0,
-    "height": 0
+    "width": 200,
+    "height": 100
   },
   "widthSplit":[
-    [],
-    [],
-    [],
-    []
+    [36,71,110,133,164]
+
   ],
-  "heightSplit":[]
+  "heightSplit":[
+      [26,86]
+  ]
 
   }
