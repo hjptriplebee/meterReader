@@ -323,7 +323,7 @@ class AngleFactory:
 
         value = angle / angleRange * totalValue + startValue
         if value > totalValue or value < startValue:
-            return startValue if abs(value-startValue) < abs(value-totalValue) else totalValue
+            return startValue if angle > np.pi + angleRange / 2 else totalValue
         return value
 
     def findPointerFromHSVSpace(src, center, radius, radians_low, radians_high, patch_degree=1.0, ptr_resolution=5,
@@ -420,6 +420,10 @@ def scanPointer(meter, pts, startVal, endVal):
             end[0] -= 1
             end[1] -= 3
         degree = AngleFactory.calPointerValueByOuterPoint(start, end, center, outerPoint, startVal, endVal)
+
+    # small value to zero
+    if degree < 0.02 * endVal:
+        degree = startVal
 
     if ifShow:
         # print(degree, start, center, outerPoint)
