@@ -2,28 +2,26 @@
   "distance": 10.0,
   "horizontal": 10.0,
   "vertical": 20.0,
-  "name": "lxd1_3",
+  "name": "name",
   "type": "digitPressure",
   "ROI": {
-    "x": 146,
-    "y": 758,
-    "w": 523,
-    "h": 446
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
   },
   "startPoint": {
-    "x": 59,
-    "y": 163
+    "x": 0,
+    "y": 0
   },
   "endPoint": {
-    "x": 301,
-    "y": 152
+    "x": 0,
+    "y": 0
   },
   "centerPoint": {
-    "x": 248,
-    "y": 59
+    "x": 0,
+    "y": 0
   },
-  "startValue": 0.0,
-  "totalValue": 2.0,
   "rectangle":{
     "width": 0,
     "height": 0

@@ -24,5 +24,16 @@
   },
   "startValue": 0.0,
   "totalValue": 2.0,
+     "rectangle":{
+    "width": 0,
+    "height": 0
+  },
+  "widthSplit":[
+    [],
+    [],
+    [],
+    []
+  ],
+  "heightSplit":[],
   "result": 0.0
 }
