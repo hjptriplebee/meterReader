@@ -2,7 +2,7 @@
       "distance": 10.0,
       "horizontal": 10.0,
       "vertical": 20.0,
-      "name": "xyy9_2",
+      "name": "test5_2",
       "type": "digitPressure",
       "ROI": {
           "x": 0,
@@ -11,17 +11,28 @@
           "h": 4000
       },
       "startPoint": {
-          "x": 40,
-          "y": 79
+          "x": 39,
+          "y": 75
       },
       "endPoint": {
-          "x": 186,
-          "y": 145
+          "x": 188,
+          "y": 143
       },
       "centerPoint": {
-          "x": 176,
-          "y": 67
+          "x": 179,
+          "y": 66
       },
       "startValue": 0.0,
-      "totalValue": 1.0
+      "totalValue": 1.0,
+  "rectangle":{
+    "width": 200,
+    "height":100
+  },
+  "widthSplit":[
+    [37,67,99,131,164]
+
+  ],
+  "heightSplit":[
+      [20,76]
+  ]
   }

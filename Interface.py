@@ -5,6 +5,7 @@ from algorithm.absorb import absorb
 from algorithm.Blenometer import checkBleno
 from algorithm.SF6 import SF6Reader
 from algorithm.oilTempreture import oilTempreture
+from algorithm.highlightDigitMeter import highlightDigit
 
 
 from algorithm.arrest.countArrester import countArrester
@@ -18,6 +19,8 @@ from algorithm.pressure.colorPressure import colorPressure
 
 from algorithm.onoff.onoffIndoor import onoffIndoor
 from algorithm.onoff.onoffOutdoor import onoffOutdoor
+
+
 
 
 def meterReaderCallBack(image, info):
@@ -90,6 +93,8 @@ def getInfo(ID):
         info["type"] = onoffIndoor
     elif info["type"] == "onoffOutdoor":
         info["type"] = onoffOutdoor
+    elif info["type"] == "highlightDigit":
+        info["type"] = highlightDigit
     else:
         info["type"] = None
 

@@ -8,11 +8,11 @@ from algorithm.Common import *
 plot_index = 0
 
 def normalPressure(image, info):
-    '''
+    """
     :param image: ROI image
     :param info: information for this meter
     :return: value
-    '''
+    """
     center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
     start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
@@ -65,7 +65,7 @@ def readPressure(image, info):
         ptr_resolution = 15
     start_ptr = cvtPtrDic2D(start_ptr)
     end_ptr = cvtPtrDic2D(end_ptr)
-    center = 0  # 表盘的中心
+    # center = 0  # 表盘的中心
     radius = 0  # 表盘的半径
     center = info['centerPoint']
     center = cvtPtrDic2D(center)

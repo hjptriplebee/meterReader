@@ -23,5 +23,16 @@
           "y": 441
       },
       "startValue": 0.0,
-      "totalValue": 0.0
+      "totalValue": 0.0,
+  "rectangle":{
+    "width": 200,
+    "height": 100
+  },
+  "widthSplit":[
+    [37,69,101,133,164]
+
+  ],
+  "heightSplit":[
+      [17,70]
+  ]
   }

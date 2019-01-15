@@ -1,0 +1,28 @@
+{
+      "distance": 10.0,
+      "horizontal": 10.0,
+      "vertical": 20.0,
+      "name": "number5_1",
+      "type": "highlightDigit",
+      "template":"number5_1.jpg",
+      "ROI": {
+          "x": 0,
+          "y": 0,
+          "w": 1080,
+          "h": 1440
+      },
+      "nRows":1,
+      "row1": {
+          "nCols": 2,
+          "col1": {
+              "nDigitsMax":3,
+              "nDigitsMin":3,
+              "nDecimals":0
+          },
+          "col2": {
+              "nDigitsMax":3,
+              "nDigitsMin":3,
+              "nDecimals":0
+          }
+      }
+}
