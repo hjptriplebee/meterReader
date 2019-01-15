@@ -347,14 +347,14 @@ class AngleFactory:
 
 
 def scanPointer(meter, pts, startVal, endVal):
-    '''
+    """
     find pointer of meter
     :param meter: meter matched template
     :param pts: a list including three numpy array, eg: [startPointer, endPointer, centerPointer]
     :param startVal: an integer of meter start value
     :param endVal: an integer of meter ending value
     :return: pointer reading number
-    '''
+    """
     start = pts[0].astype(np.int32)
     end = pts[1].astype(np.int32)
     center = pts[2].astype(np.int32)

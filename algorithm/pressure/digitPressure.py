@@ -59,7 +59,8 @@ def digitPressure(image, info):
             Num += str(num)
         result.append(Num)
         # print(Num)
-
+    
+    K.clear_session()
     # inputNum = fillAndResize(num)
     #     numNet = net.recognizeNet(num)
     #     numSvm = svm.recognizeSvm(num)
