@@ -106,7 +106,7 @@ def highlightDigit(image, info):
             index = index + 1
             index = np.insert(index, 0, 0)
             index = np.append(index, len(blob))
-            print(index)
+            # print(index)
             for j in range(len(index) - 1):
                 nDecimals = info["row" + str(i + 1)]["col" + str(j + 1)]["nDecimals"]
                 t_b = blob[index[j]:index[j + 1]]
