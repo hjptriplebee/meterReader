@@ -267,7 +267,7 @@ class AngleFactory:
         angle = cls.calAngleClockwise(startPoint, pointerPoint, centerPoint)
         value = angle / angleRange * totalValue + startValue
         if value > totalValue or value < startValue:
-            return startValue if abs(value-startValue) < abs(value-totalValue) else totalValue
+            return startValue if angle > np.pi + angleRange / 2 else totalValue
         return value
 
     @classmethod
@@ -296,33 +296,6 @@ class AngleFactory:
 
         value = angle / angleRange * totalValue + startValue
         if value > totalValue or value < startValue:
-            return startValue if abs(value-startValue) < abs(value-totalValue) else totalValue
-        return value
-
-    @classmethod
-    def calPointerValueByPoint(cls, startPoint, endPoint, centerPoint, point, startValue, totalValue):
-        """
-        由三个点返回仪表值,区分@calPointerValueByPointerVector
-        :param startPoint: 起点
-        :param endPoint: 终点
-        :param centerPoint:
-        :param point:
-        :param startValue:
-        :param totalValue:
-        :return:
-        """
-        angleRange = cls.calAngleClockwise(startPoint, endPoint, centerPoint)
-
-        vectorA = startPoint - centerPoint
-        vectorB = point - centerPoint
-
-        angle = cls.__calAngleBetweenTwoVector(vectorA, vectorB)
-
-        if np.cross(vectorA, vectorB) < 0:
-            angle = 2 * np.pi - angle
-
-        value = angle / angleRange * totalValue + startValue
-        if value > totalValue or value < startValue:
             return startValue if angle > np.pi + angleRange / 2 else totalValue
         return value
 
@@ -346,18 +319,20 @@ class AngleFactory:
     pass
 
 
-def scanPointer(meter, pts, startVal, endVal):
-    '''
+def scanPointer(meter, info):
+    """
     find pointer of meter
     :param meter: meter matched template
     :param pts: a list including three numpy array, eg: [startPointer, endPointer, centerPointer]
     :param startVal: an integer of meter start value
     :param endVal: an integer of meter ending value
     :return: pointer reading number
-    '''
-    start = pts[0].astype(np.int32)
-    end = pts[1].astype(np.int32)
-    center = pts[2].astype(np.int32)
+    """
+    center = np.array([info["centerPoint"]["x"], info["centerPoint"]["y"]])
+    start = np.array([info["startPoint"]["x"], info["startPoint"]["y"]])
+    end = np.array([info["endPoint"]["x"], info["endPoint"]["y"]])
+    startVal = info["startValue"]
+    endVal = info["totalValue"]
     if meter.shape[0] > 500:
         fixHeight = 300
         fixWidth = int(meter.shape[1] / meter.shape[0] * fixHeight)
@@ -429,6 +404,8 @@ def scanPointer(meter, pts, startVal, endVal):
         # print(degree, start, center, outerPoint)
         cv2.circle(meter, (outerPoint[0], outerPoint[1]), 10, (0, 0, 255), -1)
         cv2.line(meter, (center[0], center[1]), (outerPoint[0], outerPoint[1]), (0, 0, 255), 5)
+        cv2.line(meter, (center[0], center[1]), (start[0], start[1]), (255, 0, 0), 3)
+        cv2.line(meter, (center[0], center[1]), (end[0], end[1]), (255, 0, 0), 3)
         cv2.imshow("test", meter)
         cv2.waitKey(0)
     return degree
