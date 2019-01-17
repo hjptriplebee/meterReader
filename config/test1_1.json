@@ -3,7 +3,7 @@
       "horizontal": 10.0,
       "vertical": 20.0,
       "name": "test1_1",
-      "type": "normalPressure",
+      "type": "colorPressure",
       "ROI": {
           "x": 1,
           "y": 1,
