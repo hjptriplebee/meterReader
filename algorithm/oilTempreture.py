@@ -1,8 +1,8 @@
 from algorithm.Common import *
 from algorithm.debug import *
 
-red_range = [ np.array([156, 120, 80]), np.array([179, 240, 220])]
-white_range = [ np.array([0, 0, 200]), np.array([180, 30, 255])]
+red_range = [np.array([156, 120, 80]), np.array([179, 240, 220])]
+white_range = [np.array([0, 0, 200]), np.array([180, 30, 255])]
 
 
 def color_detection(image, color):
