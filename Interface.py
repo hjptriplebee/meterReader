@@ -19,6 +19,7 @@ from algorithm.pressure.colorPressure import colorPressure
 
 from algorithm.onoff.onoffIndoor import onoffIndoor
 from algorithm.onoff.onoffOutdoor import onoffOutdoor
+from algorithm.onoff.onoffBatteryScreen import onoffBattery
 
 
 
@@ -95,6 +96,8 @@ def getInfo(ID):
         info["type"] = onoffOutdoor
     elif info["type"] == "highlightDigit":
         info["type"] = highlightDigit
+    elif info["type"] == "onoffBattery":
+        info["type"] = onoffBattery
     else:
         info["type"] = None
 
