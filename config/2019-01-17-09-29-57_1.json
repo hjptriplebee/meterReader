@@ -1,0 +1,50 @@
+{
+    "name": "test",
+    "type": "digitPressure",
+    "ROI": {
+        "x": 216,
+        "y": 108,
+        "w": 520,
+        "h": 428
+    },
+    "startPoint": {
+        "x": 123,
+        "y": 28
+    },
+    "endPoint": {
+        "x": 292,
+        "y": 133
+    },
+    "centerPoint": {
+        "x": 293,
+        "y": 23
+    },
+    "startPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "endPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "centerPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "startValue": 0,
+    "totalValue": 0,
+     "rectangle": {
+        "width": 300,
+        "height": 150
+    },
+    "widthSplit": [
+        [169,190,207,225,241,259,278],
+        [169,190,207,225,241,259,278]
+    ],
+    "heightSplit": [
+        [46,70],
+        [82,106]
+    ],
+
+    "result": 0.0
+}
