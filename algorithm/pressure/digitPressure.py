@@ -28,7 +28,6 @@ def digitPressure(image, info):
     pts1 = np.float32([start, center, end, fourth])
     pts2 = np.float32([[0, 0], [width, 0], [width, height], [0, height]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
-
     dst = cv2.warpPerspective(template, M, (width, height))
     result = []
 
