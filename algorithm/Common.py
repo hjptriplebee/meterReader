@@ -346,14 +346,15 @@ def scanPointer(meter, info):
     radious = int(EuclideanDistance(start, center))
 
     src = cv2.GaussianBlur(meter, (3, 3), sigmaX=0, sigmaY=0, borderType=cv2.BORDER_DEFAULT)
+
     gray = cv2.cvtColor(src=src, code=cv2.COLOR_RGB2GRAY)
-    thresh = gray.copy()
-    cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV, thresh)
+
+    thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 17, 11)
 
     mask = np.zeros((src.shape[0], src.shape[1]), np.uint8)
     cv2.circle(mask, (center[0], center[1]), radious, (255, 255, 255), -1)
     thresh = cv2.bitwise_and(thresh, mask)
-    cv2.circle(thresh, (center[0], center[1]), int(radious / 2), (0, 0, 0), -1)
+    cv2.circle(thresh, (center[0], center[1]), int(radious / 3), (0, 0, 0), -1)
 
     thresh = cv2.erode(thresh, np.ones((3, 3), np.uint8), 3)
     thresh = cv2.dilate(thresh, np.ones((5, 5), np.uint8))
@@ -370,7 +371,7 @@ def scanPointer(meter, info):
         endAngle += 360
     maxSum = 0
     outerPoint = start
-    for angle in range(startAngle, endAngle):
+    for angle in range(startAngle - 10, endAngle + 10):
         pts, outPt = getPoints(center, radious, angle)
         thisSum = 0
         showImg = cv2.cvtColor(thresh.copy(), cv2.COLOR_GRAY2BGR)
@@ -379,6 +380,7 @@ def scanPointer(meter, info):
             cv2.circle(showImg, (pt[0], pt[1]), 2, (0, 0, 255), -1)
             if thresh[pt[1], pt[0]] != 0:
                 thisSum += 1
+
         # cv2.circle(showImg, (outPt[0], outPt[1]), 2, (255, 0, 0), -1)
         # cv2.imshow("img", showImg)
         # cv2.waitKey(1)
@@ -397,7 +399,7 @@ def scanPointer(meter, info):
         degree = AngleFactory.calPointerValueByOuterPoint(start, end, center, outerPoint, startVal, endVal)
 
     # small value to zero
-    if degree < 0.02 * endVal:
+    if degree < 0.05 * endVal:
         degree = startVal
 
     if ifShow:
@@ -406,6 +408,11 @@ def scanPointer(meter, info):
         cv2.line(meter, (center[0], center[1]), (outerPoint[0], outerPoint[1]), (0, 0, 255), 5)
         cv2.line(meter, (center[0], center[1]), (start[0], start[1]), (255, 0, 0), 3)
         cv2.line(meter, (center[0], center[1]), (end[0], end[1]), (255, 0, 0), 3)
+
+        thresh = np.expand_dims(thresh, axis=2)
+        thresh = np.concatenate((thresh, thresh, thresh), 2)
+        meter = np.hstack((meter, thresh))
+
         cv2.imshow("test", meter)
         cv2.waitKey(0)
     return degree
@@ -420,15 +427,19 @@ def getPoints(center, radious, angle):
     farthestPointX = int(center[0] + radious * np.cos(angle / 180 * np.pi))
     farthestPointY = int(center[1] + radious * np.sin(angle / 180 * np.pi))
 
-    delta_y = farthestPointX - center[0]
-    delta_y = delta_y if delta_y != 0 else delta_y + 1
-    k = (farthestPointY - center[1]) / delta_y
-    b = center[1] - k * center[0]
+    for ro in range(radious // 3, radious):
+        for theta in range(angle - 2, angle + 2):
+            angleTemp = theta / 180 * np.pi
+            x, y = int(ro * np.cos(angleTemp)) + center[0], int(ro * np.sin(angleTemp)) + center[1]
+            res.append([x, y])
 
-    for x in range(min(farthestPointX, center[0]), max(farthestPointX, center[0])):
-        for y in range(min(farthestPointY, center[1]), max(farthestPointY, center[1])):
-            if k * x + b - 2 <= y <= k * x + b + 2:
-                res.append([x, y])
+    # width = 2
+    #
+    #
+    # for x in range(min(farthestPointX, center[0]), max(farthestPointX, center[0])):
+    #     for y in range(min(farthestPointY, center[1]), max(farthestPointY, center[1])):
+    #         if k * x + b - 2 <= y <= k * x + b + 2:
+    #             res.append([x, y])
 
     return res, [farthestPointX, farthestPointY]
 

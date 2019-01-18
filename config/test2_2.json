@@ -22,6 +22,6 @@
           "x": 245,
           "y": 293
       },
-      "startValue": 10.0,
-      "totalValue": -10.0
+      "startValue": -10.0,
+      "totalValue": 10.0
   }
