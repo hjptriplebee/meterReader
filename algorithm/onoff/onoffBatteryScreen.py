@@ -13,6 +13,7 @@ def onoffBatteryHardCode(image, info):
     :return:
     """
     meter = meterFinderBySIFT(image, info)
+    # print(meter.shape)
     meter = cv2.cvtColor(meter, cv2.COLOR_BGR2GRAY)
     meter = cv2.resize(meter, (200, 200))
 
