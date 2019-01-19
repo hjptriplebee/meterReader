@@ -1,23 +1,23 @@
 {
-    "name": "meter",
+    "name": "test",
     "type": "onoffBattery",
     "ROI": {
-        "x": 1078,
-        "y": 76,
-        "w": 830,
-        "h": 802
+        "x": 1398,
+        "y": 154,
+        "w": 504,
+        "h": 596
     },
     "startPoint": {
-        "x": 0,
-        "y": 331
+        "x": 102,
+        "y": 75
     },
     "endPoint": {
-        "x": 0,
-        "y": 0
+        "x": 143,
+        "y": 154
     },
     "centerPoint": {
-        "x": 0,
-        "y": 0
+        "x": 141,
+        "y": 75
     },
     "startPointUp": {
         "x": 0,
@@ -30,6 +30,10 @@
     "centerPointUp": {
         "x": 0,
         "y": 0
+    },
+    "rectangle":{
+      "width":40,
+      "height":80
     },
     "startValue": 0,
     "totalValue": 0,

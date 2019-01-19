@@ -35,6 +35,7 @@ def meterFinderByTemplate(image, template):
 
     return image[topLeft[1]:bottomRight[1], topLeft[0]:bottomRight[0]]
 
+
 def meterLocationFinderBySIFT(image, template):
     """
     locate meter's bbox
