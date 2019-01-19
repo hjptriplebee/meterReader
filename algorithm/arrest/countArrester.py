@@ -68,6 +68,8 @@ def countArrester(image, info):
         cv2.waitKey(0)
 
     #value = calAngleBetweenTwoVector(np.array(startPoint)-centerPoint,pointerPoint-centerPoint)
+    if len(pointerPoint) == 0:
+        return "pointer not found!"
     value = calAngleClockwise(np.array(startPoint), pointerPoint, centerPoint)
     value = int((value/(2*math.pi))*info["totalValue"])
     return value
