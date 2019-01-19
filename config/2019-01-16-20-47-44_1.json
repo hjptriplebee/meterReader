@@ -33,5 +33,6 @@
     },
     "startValue": 0,
     "totalValue": 0,
-    "result": 0.0
+    "result": 0.0,
+    "digitType": "False"
 }

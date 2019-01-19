@@ -6,7 +6,7 @@
     "type": "digitPressure",
     "ROI": {
         "x": 1537,
-        "y":789,
+        "y": 789,
         "w": 1000,
         "h": 1200
     },
@@ -24,16 +24,24 @@
     },
     "startValue": 0.0,
     "totalValue": 0.0,
-    "rectangle":{
-    "width": 200,
-    "height": 100
-  },
-  "widthSplit":[
-    [36,71,110,133,164]
-
-  ],
-  "heightSplit":[
-      [26,86]
-  ]
-
-  }
+    "rectangle": {
+        "width": 200,
+        "height": 100
+    },
+    "widthSplit": [
+        [
+            36,
+            71,
+            110,
+            133,
+            164
+        ]
+    ],
+    "heightSplit": [
+        [
+            26,
+            86
+        ]
+    ],
+    "digitType": "False"
+}
