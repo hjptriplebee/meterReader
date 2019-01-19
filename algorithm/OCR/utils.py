@@ -5,6 +5,7 @@ import torch
 import tensorflow as tf
 from keras.models import load_model
 from keras import backend as K
+from algorithm.debug import *
 
 sys.path.append(".")
 
@@ -15,7 +16,7 @@ def fillAndResize(image):
     :return:
     """
     h, w = image.shape
-    l = max(2*w, h+10)
+    l = max(w, h)
     ret = np.zeros((l, l), np.uint8)
     leftTop = np.array([l/2-w/2, l/2-h/2], np.uint8)
     ret[leftTop[1]:leftTop[1]+h, leftTop[0]:leftTop[0]+w] = image
@@ -38,6 +39,9 @@ class leNetOCR:
         :return: 识别的数字值
         """
         image = fillAndResize(image)
+        if ifShow:
+            cv2.imshow("single", image)
+            cv2.waitKey(0)
         if image.size != 784:
             print("检查输入图片大小！不为28*28")
             return None
@@ -100,7 +104,6 @@ class Cnn(object):
                     num = str(i)
         return num
 
-
 class tfNet(object):
     def __init__(self):
         """
@@ -133,3 +136,34 @@ class tfNet(object):
         prediction = self.sess.run(predict, feed_dict={image: test})
         # print("predict number:", prediction[0])
         return prediction[0]
+
+class newNet(object):
+    def __init__(self):
+        """
+        初始化LeNet模型
+        :return:
+        """
+        sys.path.append("newNet")
+        from algorithm.OCR.newNet.LeNet import LeNet
+        self.net = LeNet()
+        self.net.load_state_dict(torch.load("algorithm/OCR/newNet/net.pkl"))
+
+    def recognizeNet(self, image):
+        """
+        LeNet识别图像中的数字
+        :param image: 输入图像
+        :return: 识别的数字值
+        """
+        image = fillAndResize(image)
+        if ifShow:
+            cv2.imshow("single", image)
+            cv2.waitKey(0)
+        if image.size != 784:
+            print("检查输入图片大小！不为28*28")
+            return None
+        image = torch.Tensor(image).view((1, 1, 28, 28))
+        image = image.to("cpu")
+        result = self.net.forward(image)
+        _, predicted = torch.max(result.data, 1)
+        num = int(np.array(predicted[0]).astype(np.uint32))
+        return num

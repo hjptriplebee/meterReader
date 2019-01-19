@@ -2,6 +2,10 @@
 .idea/
 test.py
 szkPressure.py
+algorithm/OCR/newNet/test_data/
+algorithm/OCR/newNet/train_data/
+algorithm/OCR/newNet/number/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

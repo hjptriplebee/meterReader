@@ -8,7 +8,7 @@ sys.path.append("algorithm/OCR/LeNet")
 
 
 def digitPressure(image, info):
-    # net = leNetOCR()
+    net = newNet()
     # svm = svmOCR()
     # tfNet_ = tfNet()
     net_ = Cnn()
@@ -33,7 +33,7 @@ def digitPressure(image, info):
 
     for i in range(len(widthSplit)):
         split = widthSplit[i]
-        Num = ""
+        Num = ["", ""]
         for j in range(len(split) - 1):
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
             img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
@@ -53,27 +53,16 @@ def digitPressure(image, info):
                 img = cv2.bitwise_not(img)
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-            # cv2.imshow('%d%d' % (i, j), img)
-            num = net_.recognizeNet(img)
-            Num += str(num)
+
+            numLenet = net.recognizeNet(img)
+            numCNN = net_.recognizeNet(img)
+            Num[0] += str(numLenet)
+            Num[1] += str(numCNN)
+
         result.append(Num)
         # print(Num)
     
     K.clear_session()
-    # inputNum = fillAndResize(num)
-    #     numNet = net.recognizeNet(num)
-    #     numSvm = svm.recognizeSvm(num)
-    #     numTf = tfNet_.recognizeNet(num)
-    #     numCNN = int(cnn_.recognizeNet(num))
-
-    # print(numTf)
-
-    # if ifShow:
-    #     cv2.imshow("fill", num)
-    #     print(numNet, numSvm, numTf, numCNN)
-    #     cv2.waitKey(0)
-
-    # res = 10*res + numCNN
 
     if ifShow:
         cv2.circle(template, (start[0], start[1]), 5, (0, 0, 255), -1)
