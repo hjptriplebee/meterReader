@@ -1,38 +1,47 @@
 {
-      "distance": 10.0,
-      "horizontal": 10.0,
-      "vertical": 20.0,
-      "name": "szk1_3",
-      "type": "digitPressure",
-      "ROI": {
-          "x": 411,
-          "y":509,
-          "w": 250,
-          "h": 250
-      },
-      "startPoint": {
-          "x": 30,
-          "y": 75
-      },
-      "endPoint": {
-          "x": 151,
-          "y": 114
-      },
-      "centerPoint": {
-          "x": 141,
-          "y": 54
-      },
-      "startValue": 0.0,
-      "totalValue": 0.0,
-  "rectangle":{
-    "width": 200,
-    "height": 100
-  },
-  "widthSplit":[
-    [48,72,103,135,165]
-
-  ],
-  "heightSplit":[
-      [20,75]
-  ]
-  }
+    "distance": 10.0,
+    "horizontal": 10.0,
+    "vertical": 20.0,
+    "name": "szk1_3",
+    "type": "digitPressure",
+    "ROI": {
+        "x": 411,
+        "y": 509,
+        "w": 250,
+        "h": 250
+    },
+    "startPoint": {
+        "x": 30,
+        "y": 75
+    },
+    "endPoint": {
+        "x": 151,
+        "y": 114
+    },
+    "centerPoint": {
+        "x": 141,
+        "y": 54
+    },
+    "startValue": 0.0,
+    "totalValue": 0.0,
+    "rectangle": {
+        "width": 200,
+        "height": 100
+    },
+    "widthSplit": [
+        [
+            48,
+            72,
+            103,
+            135,
+            165
+        ]
+    ],
+    "heightSplit": [
+        [
+            20,
+            75
+        ]
+    ],
+    "digitType": "False"
+}
