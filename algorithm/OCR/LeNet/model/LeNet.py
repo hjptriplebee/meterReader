@@ -50,7 +50,7 @@ class myNet(nn.Module):
         self.conv1 = nn.Sequential(  # input_size=(1*28*28)
             nn.Conv2d(
                 in_channels=1,
-                out_channels=3,
+                out_channels=16,
                 kernel_size=5),  # padding=2保证输入输出尺寸相同
             nn.ReLU(),  # input_size=(6*24*24)
             nn.MaxPool2d(kernel_size=2, stride=2)  # output_size=(6*12*12)
@@ -58,14 +58,14 @@ class myNet(nn.Module):
         self.conv2 = nn.Sequential(
             nn.Conv2d(
                 in_channels=3,
-                out_channels=8,
+                out_channels=32,
                 kernel_size=3),
             nn.ReLU(),  # input_size=(8*10*10)
             nn.MaxPool2d(2, 2)  # output_size=(8*5*5)
         )
         self.fc1 = nn.Sequential(
-            nn.Linear(8 * 5 * 5, 32),
-            # nn.Dropout(0.3),
+            nn.Linear(32 * 5 * 5, 128),
+            nn.Dropout(0.3),
             nn.ReLU()
         )
         # self.fc2 = nn.Sequential(

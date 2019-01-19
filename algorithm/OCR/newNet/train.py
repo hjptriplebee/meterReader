@@ -8,15 +8,17 @@ import torch.optim as optim
 
 torch.manual_seed(10)
 
-bs = 16
-lr = 0.01
-epoch = 15
+bs = 64
+lr = 0.001
+epoch = 10
 
-data = dataLoader("train_data", "test_data", bs)
+data = dataLoader("train", "test", bs)
 
 import sys
 sys.path.append("../LeNet")
-net = torch.load("../LeNet/model/net.pkl")
+# net = torch.load("../LeNet/model/net.pkl")
+net = myNet()
+# net = LeNet()
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(net.parameters(), lr=lr)
 
@@ -49,13 +51,12 @@ for e in range(epoch):
     correct = (predicted == testLabels.long()).sum()
     print('第%d个epoch的识别准确率为：%d%%' % (e + 1, (100 * correct / testLabels.shape[0])))
 
-for i in range(testInputs.shape[0]):
-    test = np.array(testInputs[i].view(28, 28))
-    res = net.forward(testInputs[i].view(1,1,28,28))
-    cv2.imshow("test", test)
-    print(torch.max(res.data, 1))
-    cv2.waitKey(0)
-
+# for i in range(testInputs.shape[0]):
+#     test = np.array(testInputs[i].view(28, 28))
+#     res = net.forward(testInputs[i].view(1,1,28,28))
+#     cv2.imshow("test", test)
+#     print(torch.max(res.data, 1))
+#     cv2.waitKey(0)
 torch.save(net.state_dict(), "net.pkl")
 
 

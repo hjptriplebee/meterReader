@@ -145,7 +145,8 @@ class newNet(object):
         """
         sys.path.append("newNet")
         from algorithm.OCR.newNet.LeNet import LeNet
-        self.net = LeNet()
+        from algorithm.OCR.newNet.LeNet import myNet
+        self.net = myNet()
         self.net.load_state_dict(torch.load("algorithm/OCR/newNet/net.pkl"))
 
     def recognizeNet(self, image):
@@ -154,6 +155,8 @@ class newNet(object):
         :param image: 输入图像
         :return: 识别的数字值
         """
+        if ifShow:
+            cv2.imshow("s", image)
         image = fillAndResize(image)
         if ifShow:
             cv2.imshow("single", image)
