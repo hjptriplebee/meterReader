@@ -38,10 +38,10 @@ class myNet(nn.Module):
         )
         self.fc1 = nn.Sequential(
             nn.Linear(32 * 5 * 5, 128),
-            nn.Dropout(0.2),
+            # nn.Dropout(0.5),
             nn.ReLU()
         )
-        self.fc2 = nn.Linear(128, 10)
+        self.fc2 = nn.Linear(128, 11)
         self.softmax = nn.LogSoftmax()
 
     # 定义前向传播过程，输入为x

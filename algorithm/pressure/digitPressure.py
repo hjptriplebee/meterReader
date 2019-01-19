@@ -8,14 +8,11 @@ sys.path.append("algorithm/OCR/LeNet")
 
 
 def digitPressure(image, info):
-    net = newNet()
-    # svm = svmOCR()
-    # tfNet_ = tfNet()
-    net_ = Cnn()
     template = meterFinderBySIFT(image, info)
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     template = cv2.equalizeHist(template)
 
+    # 读取标定信息
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = ([info["endPoint"]["x"], info["endPoint"]["y"]])
     center = ([info["centerPoint"]["x"], info["centerPoint"]["y"]])
@@ -23,45 +20,56 @@ def digitPressure(image, info):
     height = info["rectangle"]["height"]
     widthSplit = info["widthSplit"]
     heightSplit = info["heightSplit"]
+
     # 计算数字表的矩形外框，并且拉直矫正
     fourth = (start[0] + end[0] - center[0], start[1] + end[1] - center[1])
     pts1 = np.float32([start, center, end, fourth])
     pts2 = np.float32([[0, 0], [width, 0], [width, height], [0, height]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
     dst = cv2.warpPerspective(template, M, (width, height))
-    result = []
+
+    # 网络初始化
+    MyNet = newNet()
+    WnNet = Cnn()
+    myRes, wnRes = [], []
 
     for i in range(len(widthSplit)):
         split = widthSplit[i]
-        Num = ["", ""]
+        myNum, wnNum = "", ""
         for j in range(len(split) - 1):
+            if "decimal" in info.keys() and j == info["decimal"][i]:
+                myNum += "."
+                wnNum += "."
+                continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
             img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
-            # _, img = cv2.threshold(img, 0, 255,cv2.THRESH_OTSU )
+
             sum = 0
             for row in range(img.shape[0]):
-                if (img[row][0] == 0):
+                if img[row][0] == 0:
                     sum += 1
-                if (img[row][img.shape[1] - 1] == 0):
+                if img[row][img.shape[1] - 1] == 0:
                     sum += 1
             for col in range(img.shape[1]):
-                if (img[0][col] == 0):
+                if img[0][col] == 0:
                     sum += 1
-                if (img[img.shape[0] - 1][col] == 0):
+                if img[img.shape[0] - 1][col] == 0:
                     sum += 1
-            if (sum < (img.shape[0] + img.shape[1])):
+            if sum < (img.shape[0] + img.shape[1]):
                 img = cv2.bitwise_not(img)
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
-            numLenet = net.recognizeNet(img)
-            numCNN = net_.recognizeNet(img)
-            Num[0] += str(numLenet)
-            Num[1] += str(numCNN)
+            myNum += str(MyNet.recognizeNet(img))
+            wnNum += str(WnNet.recognizeNet(img))
 
-        result.append(Num)
-        # print(Num)
-    
+        myRes.append(myNum)
+        wnRes.append(wnNum)
+
+    if info["digitType"] == "KWH":
+        myRes[0] = myRes[0][:4]+myRes.pop(1)
+        wnRes[0] = wnRes[0][:4]+wnRes.pop(1)
+
     K.clear_session()
 
     if ifShow:
@@ -73,4 +81,4 @@ def digitPressure(image, info):
         cv2.imshow("rec", dst)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    return result
+    return {"newModel": myRes, "oldModel": wnRes}

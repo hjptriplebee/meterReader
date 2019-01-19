@@ -1,29 +1,44 @@
 from algorithm.OCR.newNet.dataLoader import *
 from algorithm.OCR.newNet.LeNet import *
 
+import sys
+sys.path.append("../LeNet")
 
 import numpy as np
 import torch
 import torch.optim as optim
+import torch.nn.init as init
+
+
+def weights_init(m):
+    classname = m.__class__.__name__
+    # print(classname)
+    if classname.find('Conv2d') != -1:
+        init.xavier_normal_(m.weight.data)
+        init.constant_(m.bias.data, 0.0)
+    elif classname.find('Linear') != -1:
+        init.xavier_normal_(m.weight.data)
+        init.constant_(m.bias.data, 0.0)
+
 
 torch.manual_seed(10)
 
 bs = 64
 lr = 0.001
-epoch = 10
+epoch = 5
 
 data = dataLoader("train", "test", bs)
 
-import sys
-sys.path.append("../LeNet")
 # net = torch.load("../LeNet/model/net.pkl")
 net = myNet()
+net.apply(weights_init)
+# torch.initial_seed()
 # net = LeNet()
+
 criterion = nn.NLLLoss()
 optimizer = optim.Adam(net.parameters(), lr=lr)
 
 steps = data.get_rounds()
-print(steps)
 
 for e in range(epoch):
     sum_loss = 0.0
@@ -38,11 +53,11 @@ for e in range(epoch):
         loss.backward()
         optimizer.step()
 
-        # sum_loss += loss.item()
-        # if step % 2 == 0:
-        #     print('epoch %d /step %d: loss:%.03f'
-        #           % (e + 1, step + 1, sum_loss / 10))
-        #     sum_loss = 0.0
+        sum_loss += loss.item()
+        if step % 10 == 0:
+            print('epoch %d /step %d: loss:%.03f'
+                  % (e + 1, step + 1, sum_loss / 10))
+            sum_loss = 0.0
 
     testInputs, testLabels = data.readImages(data.testPath)
 

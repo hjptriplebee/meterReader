@@ -12,14 +12,13 @@ class dataLoader():
         self.pointer = 0
 
         self.trainData, self.trainLabel = self.readImages(self.trainPath)
-        # self.testData, self.testLabel = self.readImages(self.testPath)
 
     def readImages(self, path):
         images = os.listdir(path)
         data = torch.Tensor(cv2.imread(path+"/"+images[0])[:, :, 0]).view(1, 1, 28, 28)
         label = [int(images[0].split("_")[0])]
         for im in images:
-            if im.split(".")[-1] != "bmp" or im.split("_")[0] == "n":
+            if im.split(".")[-1] != "bmp": # or im.split("_")[0] == "n":
                 continue
             this = torch.Tensor(cv2.imread(path+"/"+im)[:, :, 0]).view(1, 1, 28, 28)
             data = torch.cat((data, this), 0)
@@ -50,8 +49,14 @@ class dataLoader():
         return int(self.trainData.shape[0]/self.bs)+1
 
 
-# dl = dataLoader("train_data", "test_data", 32)
-#
-# for i in range(20):
-#     input_, label = dl.next_batch()
-#     print(input_.shape, label)
+dl = dataLoader("train", "test", 64)
+
+for i in range(2):
+    input_, label = dl.next_batch()
+    if i == 1:
+        for n in range(input_.shape[0]):
+            img = np.array(input_[n].view(28, 28, 1))
+            cv2.imshow("img",img)
+            print(label[n])
+            cv2.waitKey(0)
+    print(input_.shape, label)
