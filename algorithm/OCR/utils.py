@@ -9,6 +9,7 @@ from algorithm.debug import *
 
 sys.path.append(".")
 
+
 def fillAndResize(image):
     """
     将输入图像填充为正方形且变换为（28，28）
@@ -22,6 +23,7 @@ def fillAndResize(image):
     ret[leftTop[1]:leftTop[1]+h, leftTop[0]:leftTop[0]+w] = image
     ret = cv2.resize(ret, (28, 28), interpolation=cv2.INTER_CUBIC)
     return ret
+
 
 class leNetOCR:
     def __init__(self):

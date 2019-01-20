@@ -49,14 +49,14 @@ class dataLoader():
         return int(self.trainData.shape[0]/self.bs)+1
 
 
-dl = dataLoader("train", "test", 64)
-
-for i in range(2):
-    input_, label = dl.next_batch()
-    if i == 1:
-        for n in range(input_.shape[0]):
-            img = np.array(input_[n].view(28, 28, 1))
-            cv2.imshow("img",img)
-            print(label[n])
-            cv2.waitKey(0)
-    print(input_.shape, label)
+# dl = dataLoader("train", "test", 64)
+#
+# for i in range(2):
+#     input_, label = dl.next_batch()
+#     if i == 1:
+#         for n in range(input_.shape[0]):
+#             img = np.array(input_[n].view(28, 28, 1))
+#             cv2.imshow("img",img)
+#             print(label[n])
+#             cv2.waitKey(0)
+#     print(input_.shape, label)
