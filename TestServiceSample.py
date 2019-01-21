@@ -34,6 +34,8 @@ def codecov():
     config = os.listdir("config")
     for im in images:
         image = cv2.imread("image/"+im)
+        print(im)
+
         for i in range(1, 6):
             cfg = im.split(".jpg")[0]+"_"+str(i)
             # print(cfg)

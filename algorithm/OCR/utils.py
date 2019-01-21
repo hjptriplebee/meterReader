@@ -139,6 +139,7 @@ class tfNet(object):
         # print("predict number:", prediction[0])
         return prediction[0]
 
+
 class newNet(object):
     def __init__(self):
         """
@@ -166,7 +167,8 @@ class newNet(object):
         if image.size != 784:
             print("检查输入图片大小！不为28*28")
             return None
-        image = torch.Tensor(image).view((1, 1, 28, 28))
+        image = torch.Tensor(image).view((1, 1, 28, 28))/255
+        # print(image)
         image = image.to("cpu")
         result = self.net.forward(image)
         _, predicted = torch.max(result.data, 1)

@@ -1,0 +1,38 @@
+{
+    "name": "7-1",
+    "type": "digitPressure",
+    "ROI": {
+        "x": 22,
+        "y": 24,
+        "w": 1876,
+        "h": 1034
+    },
+    "startPoint": {
+        "x": 221,
+        "y": 88
+    },
+    "endPoint": {
+        "x": 492,
+        "y": 239
+    },
+    "centerPoint": {
+        "x": 487,
+        "y": 69
+    },
+    "startPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "endPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "centerPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "startValue": 0,
+    "totalValue": 0,
+    "digitType": "VIDEO",
+    "result": 0.0
+}
