@@ -47,12 +47,19 @@ def meterReaderAPI():
 
     meterIDs = getMeterIDs(imageID)
 
-    imageByte = data["image"].encode("ascii")
-    imageByte = base64.b64decode(imageByte)
-    imageArray = np.asarray(bytearray(imageByte), dtype="uint8")
-    image = cv2.imdecode(imageArray, cv2.IMREAD_COLOR)
+    # imageByte = data["image"].encode("ascii")
+    # imageByte = base64.b64decode(imageByte)
+    # imageArray = np.asarray(bytearray(imageByte), dtype="uint8")
+    # image = cv2.imdecode(imageArray, cv2.IMREAD_COLOR)
 
-    result = meterReader(image, meterIDs)
+    path = data["path"]
+
+    if path[-4] != ".jpg":
+        recognitionData = cv2.VideoCapture(path)
+    else:
+        recognitionData = cv2.imread(path)
+
+    result = meterReader(recognitionData, meterIDs)
     sendData = json.dumps(result).encode("utf-8")
 
     return sendData
