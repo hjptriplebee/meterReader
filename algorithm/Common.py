@@ -161,6 +161,10 @@ def meterFinderBySIFT(image, info):
     averageDistance = np.average(distances)
     good2 = [good[i] for i in range(len(good)) if distances[i] < 2 * averageDistance]
 
+    # not match
+    if len(good2) < 3:
+        return "the template is not matched!"
+
     # 寻找转换矩阵 M
     src_pts = np.float32([templateKeyPoint[m[0].queryIdx].pt for m in good2]).reshape(-1, 1, 2)
     dst_pts = np.float32([imageKeyPoint[m[0].trainIdx].pt for m in good2]).reshape(-1, 1, 2)
