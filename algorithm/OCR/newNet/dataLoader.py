@@ -2,20 +2,30 @@ import numpy as np
 import torch
 import os
 import cv2
+import pickle
+import random
 
 
 class dataLoader():
+    # todo 调整batch，使每个batch顺序都不一样
     def __init__(self, trainPath, testPath, bs):
         self.trainPath = trainPath
         self.testPath = testPath
         self.bs = bs
         self.pointer = 0
 
-        self.trainData, self.trainLabel = self.readImages(self.trainPath)
+        if not os.path.exists("train"):
+            self.readImagesIntoPkl("train")
+        if not os.path.exists("test"):
+            self.readImagesIntoPkl("test")
 
-    def readImages(self, path):
+        self.trainData, self.trainLabel = self.readTrainFromPkl()
+
+    def readImagesIntoPkl(self, path):
         images = os.listdir(path)
-        data = torch.Tensor(cv2.imread(path+"/"+images[0])[:, :, 0]).view(1, 1, 28, 28)
+        image = cv2.imread(path+"/"+images[0])[:, :, 0]
+        _, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+        data = torch.Tensor(image).view(1, 1, 28, 28)
         label = [int(images[0].split("_")[0])]
         for im in images:
             if im.split(".")[-1] != "bmp": # or im.split("_")[0] == "n":
@@ -27,7 +37,26 @@ class dataLoader():
                 label.append(10)
             else:
                 label.append(int(thisLabel))
-        return data, torch.Tensor(np.array(label))
+
+        fp = open(path+".pkl", "wb")
+        pickle.dump([data, torch.Tensor(np.array(label)).long()], fp)
+        fp.close()
+
+    def readTrainFromPkl(self):
+        with open("train.pkl", "rb") as fp:
+            trainData, trainLabel = pickle.load(fp)
+            return trainData, trainLabel
+
+    def readTestFromPkl(self):
+        with open("test.pkl", "rb") as fp:
+            testData, testLable = pickle.load(fp)
+            return testData, testLable
+
+    def shuffle(self):
+        li = list(range(self.trainData.shape[0]))
+        random.shuffle(li)
+        self.trainData = self.trainData[li]
+        self.trainLabel = self.trainLabel[li]
 
     def next_batch(self):
         if self.pointer*self.bs == self.trainData.shape[0]:
@@ -49,14 +78,12 @@ class dataLoader():
         return int(self.trainData.shape[0]/self.bs)+1
 
 
-# dl = dataLoader("train", "test", 64)
+dl = dataLoader("train", "test", 64)
+dl.shuffle()
+# train, trl = dl.readTrainFromPkl()
+# test, tel = dl.readTestFromPkl()
 #
-# for i in range(2):
-#     input_, label = dl.next_batch()
-#     if i == 1:
-#         for n in range(input_.shape[0]):
-#             img = np.array(input_[n].view(28, 28, 1))
-#             cv2.imshow("img",img)
-#             print(label[n])
-#             cv2.waitKey(0)
-#     print(input_.shape, label)
+# print(train.shape, trl)
+# print(test.shape, tel)
+#
+

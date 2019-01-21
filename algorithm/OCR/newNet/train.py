@@ -26,8 +26,11 @@ torch.manual_seed(10)
 bs = 64
 lr = 0.001
 epoch = 5
+stepLength = 20
 
 data = dataLoader("train", "test", bs)
+testInputs, testLabels = data.readTestFromPkl()
+print("数据集加载完毕")
 
 net = myNet()
 net.apply(weights_init)
@@ -42,7 +45,6 @@ for e in range(epoch):
     sum_loss = 0.0
     for step in range(steps):
         inputs, labels = data.next_batch()
-
         optimizer.zero_grad()
 
         # forward + backward
@@ -52,12 +54,12 @@ for e in range(epoch):
         optimizer.step()
 
         sum_loss += loss.item()
-        if step % 10 == 0:
+        if step % stepLength == 0:
             print('epoch %d /step %d: loss:%.03f'
-                  % (e + 1, step + 1, sum_loss / 10))
+                  % (e + 1, step + 1, sum_loss / stepLength))
             sum_loss = 0.0
 
-    testInputs, testLabels = data.readImages(data.testPath)
+    data.shuffle()
 
     outputs = net.forward(testInputs)
     _, predicted = torch.max(outputs.data, 1)

@@ -1,0 +1,38 @@
+{
+    "name": "8-1",
+    "type": "digitPressure",
+    "ROI": {
+        "x": 48,
+        "y": 32,
+        "w": 1842,
+        "h": 1018
+    },
+    "startPoint": {
+        "x": 228,
+        "y": 51
+    },
+    "endPoint": {
+        "x": 519,
+        "y": 221
+    },
+    "centerPoint": {
+        "x": 515,
+        "y": 46
+    },
+    "startPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "endPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "centerPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "startValue": 0,
+    "totalValue": 0,
+    "digitType": "VIDEO",
+    "result": 0.0
+}
