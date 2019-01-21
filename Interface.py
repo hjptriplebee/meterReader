@@ -1,4 +1,5 @@
 import json
+import os
 
 import cv2
 from algorithm.absorb import absorb
@@ -19,6 +20,7 @@ from algorithm.pressure.colorPressure import colorPressure
 
 from algorithm.onoff.onoffIndoor import onoffIndoor
 from algorithm.onoff.onoffOutdoor import onoffOutdoor
+from algorithm.onoff.onoffBatteryScreen import onoffBattery
 
 
 
@@ -95,10 +97,13 @@ def getInfo(ID):
         info["type"] = onoffOutdoor
     elif info["type"] == "highlightDigit":
         info["type"] = highlightDigit
+    elif info["type"] == "onoffBattery":
+        info["type"] = onoffBattery
     else:
         info["type"] = None
-
     info["template"] = cv2.imread("template/" + ID + ".jpg")
+    if info["digitType"] != "False":
+        info.update(json.load(open(os.path.join("ocr_config", info["digitType"]+".json"))))
     return info
 
 
@@ -118,7 +123,6 @@ def meterReader(image, meterIDs):
         y = info["ROI"]["y"]
         w = info["ROI"]["w"]
         h = info["ROI"]["h"]
-
         ROI = image[y:y + h, x:x + w]
         # call back
         results[ID] = meterReaderCallBack(ROI, info)

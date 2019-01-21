@@ -26,6 +26,7 @@ def getBinary(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 100, 200, apertureSize=3)
     return edges
+
 def searchUpBlack(raw, img, x, y):
     """
     :param raw: 原图
@@ -87,7 +88,7 @@ def searchRightRed(raw, img, x, y):
     return y, a, y, b
 
 # 裁剪目标区域值
-def cutTarget(img, x1, y1, x2, y2,status):
+def cutTarget(img, x1, y1, x2, y2, status):
 
     if status=="left":
         len = y1 - y2
@@ -125,6 +126,7 @@ def getMatInt(Mat):
                 # print(Mat[n,m,i])
     Mat = Mat.astype(np.uint8)
     return Mat
+
 def gamma(image,thre):
     """
     :param image: numpy type
@@ -180,14 +182,6 @@ def onoffIndoor(image, info):
     :param info:bileiqi2 config
     :return:
     """
-    x1=0
-    y1=0
-    x2=0
-    y2=0
-    X=0
-    Y=0
-    img = None
-
     binary = getBinary(image)
     X, Y, _, _ = meterLocationFinderBySIFT(image, info['template'])
     if info['name']=="onoffIndoor1_1":
