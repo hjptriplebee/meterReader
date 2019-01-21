@@ -50,8 +50,11 @@ def onoffBattery(image, info):
     end = ([info["endPoint"]["x"], info["endPoint"]["y"]])
     center = ([info["centerPoint"]["x"], info["centerPoint"]["y"]])
 
-    width = info["rectangle"]["width"]
-    height = info["rectangle"]["height"]
+    # width = info["rectangle"]["width"]
+    # height = info["rectangle"]["height"]
+
+    width = 40
+    height = 80
 
     fourth = (start[0] + end[0] - center[0], start[1] + end[1] - center[1])
     pts1 = np.float32([start, center, end, fourth])
@@ -64,8 +67,8 @@ def onoffBattery(image, info):
     # thresh = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 17, 11)
 
     # 比较上下区域的色度和，若上部区域比下部区域小，则说明开关是向上打开
-    upRegion = np.mean(meter[:int(dst.shape[0]/2)])
-    downRegion = np.mean(meter[int(dst.shape[0]/2):])
+    upRegion = np.mean(thresh[:40])
+    downRegion = np.mean(thresh[40:])
 
     if ifShow:
         imgShow = np.hstack((dst, thresh))

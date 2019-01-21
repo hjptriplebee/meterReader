@@ -12,6 +12,9 @@ def digitPressure(image, info):
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
     template = cv2.equalizeHist(template)
 
+    # cv2.imshow("template", template)
+    # cv2.waitKey(0)
+
     # 读取标定信息
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = ([info["endPoint"]["x"], info["endPoint"]["y"]])
