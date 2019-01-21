@@ -1,6 +1,6 @@
 {
     "name": "7-1",
-    "type": "digitPressure",
+    "type": "videoDigit",
     "ROI": {
         "x": 22,
         "y": 24,
