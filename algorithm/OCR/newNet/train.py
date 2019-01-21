@@ -29,10 +29,8 @@ epoch = 5
 
 data = dataLoader("train", "test", bs)
 
-# net = torch.load("../LeNet/model/net.pkl")
 net = myNet()
 net.apply(weights_init)
-# torch.initial_seed()
 # net = LeNet()
 
 criterion = nn.NLLLoss()
