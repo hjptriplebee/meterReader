@@ -30,10 +30,14 @@ def videoDigit(video, info):
     M = cv2.getPerspectiveTransform(pts1, pts2)
 
     # 加载模型
-    clf = joblib.load("../algorithm/OCR/svm/train_model.m")
+    # clf = joblib.load("../algorithm/OCR/svm/train_model.m")
 
     pictures = getPictures(video)  # 获得视频的帧，有少量重复帧
+
     for i, frame in enumerate(pictures):
+        # cv2.imshow("dst2", frame)
+        # cv2.waitKey(0)
+        # print(np.shape(frame))
         template = meterFinderBySIFT(frame, info)
         template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
         template = cv2.equalizeHist(template)
@@ -43,7 +47,9 @@ def videoDigit(video, info):
         # imgType = cv2.adaptiveThreshold(imgType, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
 
         # print(imgType.shape)
+        print(i, np.shape(template))
         cv2.imshow("type", template)
+        cv2.imshow("dst", dst)
         cv2.waitKey(0)
         # nx, ny = imgType.shape
         # imgType = imgType.reshape((1, nx*ny))
@@ -54,14 +60,30 @@ def videoDigit(video, info):
 
 
 def getPictures(videoCapture):
-    fps = videoCapture.get(cv2.CAP_PROP_FPS)
-    frames = videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
-    #fps是帧率，意思是每一秒刷新图片的数量，frames是一整段视频中总的图片数量
     pictures = []
-    for i in range(int(frames)):
+    cnt = 0
+    skipFrameNum = 1
+    while True:
         ret, frame = videoCapture.read()
-        if i % int(fps):
+        # print(cnt, np.shape(frame))
+        cnt += 1
+        if frame is None:
+            break
+        if cnt % skipFrameNum:
             continue
         pictures.append(frame)
+
+    # fps = videoCapture.get(cv2.CAP_PROP_FPS)
+    # frames = videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
+    # #fps是帧率，意思是每一秒刷新图片的数量，frames是一整段视频中总的图片数量
+    # print(fps, frames)
+    # pictures = []
+    # for i in range(int(frames)):
+    #     ret, frame = videoCapture.read()
+    #     # if np.shape(frame) != (1080, 1920, 3):
+    #     print(i, np.shape(frame))
+    #     if i % int(fps):
+    #         continue
+    #     pictures.append(frame)
     videoCapture.release()
     return pictures
