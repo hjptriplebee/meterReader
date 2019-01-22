@@ -15,10 +15,9 @@ def startServer():
 def startClient(results):
     images = os.listdir("image")
     for im in images:
-        image = open("image/"+im, "rb")
-        imageByte = base64.b64encode(image.read())
+        path = "image/" + im
         data = json.dumps({
-            "image": imageByte.decode("ascii"),
+            "path": path,
             "imageID": im.split('.')[0]
         })
 
@@ -47,16 +46,16 @@ def codecov():
 
 if __name__ == "__main__":
 
-    # serverProcess = multiprocessing.Process(target=startServer)
-    # results = multiprocessing.Manager().list()
-    # clientProcess = multiprocessing.Process(target=startClient, args=(results,))
-    # serverProcess.start()
-    # time.sleep(30)
-    # clientProcess.start()
-    # clientProcess.join()
-    # serverProcess.terminate()
+    serverProcess = multiprocessing.Process(target=startServer)
+    results = multiprocessing.Manager().list()
+    clientProcess = multiprocessing.Process(target=startClient, args=(results,))
+    serverProcess.start()
+    time.sleep(30)
+    clientProcess.start()
+    clientProcess.join()
+    serverProcess.terminate()
 
-    codecov()
+    # codecov()
     #
     # for i in range(20):
     #     serverProcess = multiprocessing.Process(target=startServer)
