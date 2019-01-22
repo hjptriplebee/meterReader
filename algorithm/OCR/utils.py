@@ -167,7 +167,7 @@ class newNet(object):
         if image.size != 784:
             print("检查输入图片大小！不为28*28")
             return None
-        image = torch.Tensor(image).view((1, 1, 28, 28))/255
+        image = torch.Tensor(image).view((1, 1, 28, 28))
         # print(image)
         image = image.to("cpu")
         result = self.net.forward(image)
