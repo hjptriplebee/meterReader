@@ -4,9 +4,11 @@ import numpy as np
 from sklearn.externals import joblib
 from sklearn import svm
 from skimage import feature
+import torch
 
 from algorithm.Common import meterFinderBySIFT
 from algorithm.pressure.digitPressure import digitPressure
+from algorithm.OCR.svm.LeNet import LeNet
 
 sys.path.append("../")
 
@@ -35,7 +37,10 @@ def videoDigit(video, info):
     M = cv2.getPerspectiveTransform(pts1, pts2)
 
     # 加载模型
-    clf = joblib.load("algorithm/OCR/svm/svm_model.m")
+    # clf = joblib.load("algorithm/OCR/svm/svm_model.m")
+    net = LeNet()
+    net.load_state_dict(torch.load("algorithm/OCR/svm/character_22net.pkl"))
+
     pictures = getPictures(video)  # 获得视频的帧，有少量重复帧
     imageDict = {}
     predicts = {}
@@ -46,11 +51,21 @@ def videoDigit(video, info):
         dst = cv2.warpPerspective(template, M, (width, height))
 
         imgType = dst[characSplit[1][0]:characSplit[1][1], characSplit[0][0]:characSplit[0][1]]
+        imgType = cv2.resize(imgType, (28, 28), interpolation=cv2.INTER_CUBIC)  # LeNet
         imgType = cv2.adaptiveThreshold(imgType, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
-        hog_vec, hog_vis = feature.hog(imgType, orientations=8, pixels_per_cell=(16, 16),
-                                       cells_per_block=(1, 1), block_norm='L2', visualise=True)
-        hog_vec = hog_vec.reshape(1, -1)
-        type_probe = clf.predict_proba(hog_vec)
+
+        # # svm模型
+        # hog_vec, hog_vis = feature.hog(imgType, orientations=8, pixels_per_cell=(16, 16),
+        #                                cells_per_block=(1, 1), block_norm='L2', visualise=True)
+        # hog_vec = hog_vec.reshape(1, -1)
+        # type_probe = clf.predict_proba(hog_vec)
+
+        # LeNet 模型
+        imgType = torch.Tensor(np.array(imgType, dtype=np.float32))
+        imgType = torch.unsqueeze(imgType, 0)
+        imgType = torch.unsqueeze(imgType, 0)
+        type_probe = net.forward(imgType)
+        type_probe = type_probe.detach().numpy()
 
         # find max probability frame
         maxIndex = np.argmax(type_probe)
