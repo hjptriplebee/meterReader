@@ -63,7 +63,7 @@ def digitPressure(image, info):
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
-            myNum += str(MyNet.recognizeNet(img))
+            myNum += MyNet.recognizeNet(img)
             wnNum += str(WnNet.recognizeNet(img))
 
         myRes.append(myNum)

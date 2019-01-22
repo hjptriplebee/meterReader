@@ -1,6 +1,7 @@
 # pycharm
 .idea/
 .DS_Store
+numbers
 test.py
 szkPressure.py
 get_test.py
