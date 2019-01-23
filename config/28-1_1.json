@@ -2,21 +2,21 @@
     "name": "28-1",
     "type": "videoDigit",
     "ROI": {
-        "x": 30,
+        "x": 20,
         "y": 22,
-        "w": 1850,
-        "h": 1034
+        "w": 1864,
+        "h": 1032
     },
     "startPoint": {
-        "x": 182,
+        "x": 42,
         "y": 55
     },
     "endPoint": {
-        "x": 414,
-        "y": 214
+        "x": 273,
+        "y": 215
     },
     "centerPoint": {
-        "x": 409,
+        "x": 271,
         "y": 69
     },
     "startPointUp": {
