@@ -6,14 +6,7 @@ test.py
 szkPressure.py
 get_test.py
 pre_images/
-algorithm/OCR/newNet/test_data/
-algorithm/OCR/newNet/train_data/
-algorithm/OCR/newNet/number/
-algorithm/OCR/newNet/number_test/
 algorithm/OCR/newNet/images/
-algorithm/OCR/newNet/train/
-algorithm/OCR/newNet/test/
-algorithm/OCR/newNet/get_test.py
 
 
 # Byte-compiled / optimized / DLL files

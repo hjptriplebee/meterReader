@@ -79,7 +79,7 @@ class LeNet(nn.Module):
             nn.ReLU()
         )
         self.fc3 = nn.Linear(84, 4)
-        self.softmax = nn.LogSoftmax()
+        self.softmax = nn.LogSoftmax(dim=1)
 
     # 定义前向传播过程，输入为x
     def forward(self, x):
