@@ -154,7 +154,6 @@ class newNet(object):
         :return:
         """
         sys.path.append("newNet")
-        from algorithm.OCR.newNet.LeNet import LeNet
         from algorithm.OCR.newNet.LeNet import myNet
 
         self.count = defaultdict(

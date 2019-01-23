@@ -18,13 +18,12 @@ stepLength = 20
 classes = 11
 
 training = "LCD_enhanced"
-data = dataLoader("images/"+training, bs, ifUpdate=False)
+data = dataLoader("images/"+training, bs, ifUpdate=True)
 testInputs, testLabels = data.getTestData()
 print("数据集加载完毕")
 
 
 weight = np.zeros(classes)
-weight = weight/np.sum(weight)
 
 for i in range(classes):
     images = os.listdir("images/LCD_enhanced/train/"+str(i))
@@ -73,13 +72,13 @@ for e in range(epoch):
     print('第%d个epoch的识别准确率为：%d%%' % (e + 1, (100 * correct / testLabels.shape[0])))
 torch.save(net.state_dict(), "net.pkl")
 
-for i in range(testInputs.shape[0]):
-    test = np.array(testInputs[i].view(28, 28))
-    res = net.forward(testInputs[i].view(1,1,28,28))
-    cv2.imshow("test", test)
-    _, predicted = torch.max(res.data, 1)
-    print(predicted)
-    cv2.waitKey(0)
+# for i in range(testInputs.shape[0]):
+#     test = np.array(testInputs[i].view(28, 28))
+#     res = net.forward(testInputs[i].view(1,1,28,28))
+#     cv2.imshow("test", test)
+#     _, predicted = torch.max(res.data, 1)
+#     print(predicted)
+#     cv2.waitKey(0)
 
 
 
