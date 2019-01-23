@@ -9,6 +9,7 @@ sys.path.append("algorithm/OCR/LeNet")
 
 def digitPressure(image, info):
     template = meterFinderBySIFT(image, info)
+    template = cv2.GaussianBlur(template, (3, 3), 0)
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 
     # cv2.imshow("template", template)
@@ -45,9 +46,15 @@ def digitPressure(image, info):
                 wnNum += "."
                 continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
-            # img = cv2.equalizeHist(img)
-            # cv2.imshow("debug", img)
-            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
+            cv2.imshow("debug3", img)
+            if info["digitType"] != "TTC":
+                img = cv2.GaussianBlur(img, (3, 3), 0)
+                img = cv2.equalizeHist(img)
+                cv2.imshow("debug", img)
+                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 11)
+            elif info["digitType"] == "TTC":
+                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 11)
+            cv2.imshow("debug2", img)
 
             sum = 0
             for row in range(img.shape[0]):

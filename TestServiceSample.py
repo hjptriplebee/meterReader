@@ -33,15 +33,14 @@ def codecov():
     videos = os.listdir("video_")
     config = os.listdir("config")
 
-    # image = cv2.imread("image/13-1.jpg")
-    # print(meterReader(image, ["13-1_2"]))
+    # image = cv2.imread("image/14-1.jpg")
+    # print(meterReader(image, ["14-1_1"]))
     for im in images:
         image = cv2.imread("image/"+im)
         print(im)
 
         for i in range(1, 6):
             cfg = im.split(".jpg")[0]+"_"+str(i)
-            # print(cfg)
             if cfg+".json" in config:
                 receive2 = meterReader(image, [cfg])
                 print(cfg, receive2)
