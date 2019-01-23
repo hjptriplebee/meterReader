@@ -43,7 +43,7 @@ class myNet(nn.Module):
         self._set_init(self.fc1)
         self.fc2 = nn.Linear(128, 10)
         self._set_init(self.fc2)
-        self.softmax = nn.LogSoftmax()
+        self.softmax = nn.LogSoftmax(dim = 1)
 
     def _set_init(self, layer):  # 参数初始化
         init.normal_(layer.weight, mean=0., std=.1)
