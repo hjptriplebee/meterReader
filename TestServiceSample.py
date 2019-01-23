@@ -32,6 +32,9 @@ def codecov():
     images = os.listdir("image")
     videos = os.listdir("video_")
     config = os.listdir("config")
+
+    # image = cv2.imread("image/13-1.jpg")
+    # print(meterReader(image, ["13-1_2"]))
     for im in images:
         image = cv2.imread("image/"+im)
         print(im)
