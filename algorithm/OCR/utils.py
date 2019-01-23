@@ -154,7 +154,6 @@ class newNet(object):
         :return:
         """
         sys.path.append("newNet")
-        from algorithm.OCR.newNet.LeNet import LeNet
         from algorithm.OCR.newNet.LeNet import myNet
 
         self.count = defaultdict(
@@ -171,9 +170,8 @@ class newNet(object):
         :return: 识别的数字值
         """
         image = fillAndResize(image)
+        tensor = torch.Tensor(image).view((1, 1, 28, 28))/255
 
-        tensor = torch.Tensor(image).view((1, 1, 28, 28))
-        # print(image)
         tensor = tensor.to("cpu")
         result = self.net.forward(tensor)
         _, predicted = torch.max(result.data, 1)
@@ -186,8 +184,5 @@ class newNet(object):
             print(num)
             cv2.imshow("single", image)
             cv2.waitKey(0)
-        if image.size != 784:
-            print("检查输入图片大小！不为28*28")
-            return None
 
         return str(num) if num != 10 else "?"
