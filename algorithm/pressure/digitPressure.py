@@ -9,6 +9,7 @@ sys.path.append("algorithm/OCR/LeNet")
 
 def digitPressure(image, info):
     template = meterFinderBySIFT(image, info)
+    template = cv2.GaussianBlur(template, (3, 3), 0)
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 
     # 读取标定信息
@@ -40,23 +41,16 @@ def digitPressure(image, info):
                 myNum += "."
                 continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
-            # img = cv2.equalizeHist(img)
-            # cv2.imshow("debug", img)
-            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
+            cv2.imshow("debug3", img)
+            if info["digitType"] != "TTC":
+                img = cv2.GaussianBlur(img, (5, 5), 0)
+                img = cv2.equalizeHist(img)
+                cv2.imshow("debug", img)
+                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 13, 11)
+            elif info["digitType"] == "TTC":
+                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 11)
+            cv2.imshow("debug2", img)
 
-            sum = 0
-            for row in range(img.shape[0]):
-                if img[row][0] == 0:
-                    sum += 1
-                if img[row][img.shape[1] - 1] == 0:
-                    sum += 1
-            for col in range(img.shape[1]):
-                if img[0][col] == 0:
-                    sum += 1
-                if img[img.shape[0] - 1][col] == 0:
-                    sum += 1
-            if sum < (img.shape[0] + img.shape[1]):
-                img = cv2.bitwise_not(img)
 
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
