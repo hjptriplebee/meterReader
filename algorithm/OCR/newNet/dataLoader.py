@@ -28,7 +28,7 @@ class dataLoader():
             data = torch.Tensor(np.zeros((1, 1, 28, 28)))
             label = []
 
-            for i in range(10):
+            for i in range(11):
                 root = path + "/" + t + "/" + str(i) + "/"
                 images = os.listdir(root)
                 for im in images:

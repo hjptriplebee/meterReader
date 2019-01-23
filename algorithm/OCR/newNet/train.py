@@ -15,6 +15,7 @@ bs = 128
 lr = 0.001
 epoch = 40
 stepLength = 20
+classes = 11
 
 training = "LCD_enhanced"
 data = dataLoader("images/"+training, bs, ifUpdate=False)
@@ -22,10 +23,10 @@ testInputs, testLabels = data.getTestData()
 print("数据集加载完毕")
 
 
-weight = np.zeros(10)
+weight = np.zeros(classes)
 weight = weight/np.sum(weight)
 
-for i in range(10):
+for i in range(classes):
     images = os.listdir("images/LCD_enhanced/train/"+str(i))
     weight[i] = len(images)
 weight = weight/np.sum(weight)

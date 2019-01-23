@@ -41,7 +41,7 @@ class myNet(nn.Module):
         self.relu1 = nn.ReLU()
         self.dropout = nn.Dropout(0.2)
         self._set_init(self.fc1)
-        self.fc2 = nn.Linear(128, 10)
+        self.fc2 = nn.Linear(128, 11)
         self._set_init(self.fc2)
         self.softmax = nn.LogSoftmax()
 
