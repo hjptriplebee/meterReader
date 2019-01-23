@@ -1,9 +1,6 @@
 import cv2
 import sys
 import numpy as np
-from sklearn.externals import joblib
-from sklearn import svm
-from skimage import feature
 import torch
 
 from algorithm.Common import meterFinderBySIFT
