@@ -1,23 +1,23 @@
 {
     "name": "7-1",
-    "type": "digitPressure",
+    "type": "videoDigit",
     "ROI": {
-        "x": 22,
-        "y": 24,
-        "w": 1876,
-        "h": 1034
+        "x": 18,
+        "y": 20,
+        "w": 1882,
+        "h": 1036
     },
     "startPoint": {
-        "x": 221,
-        "y": 88
+        "x": 58,
+        "y": 85
     },
     "endPoint": {
-        "x": 492,
-        "y": 239
+        "x": 326,
+        "y": 233
     },
     "centerPoint": {
-        "x": 487,
-        "y": 69
+        "x": 325,
+        "y": 63
     },
     "startPointUp": {
         "x": 0,

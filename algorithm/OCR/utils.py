@@ -182,6 +182,7 @@ class newNet(object):
         cv2.imwrite("numbers/" + str(num) + "_" + str(self.count[str(num)])+".bmp", image)
 
         if ifShow:
+            print(num)
             cv2.imshow("single", image)
             cv2.waitKey(0)
 

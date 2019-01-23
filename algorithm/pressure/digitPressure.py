@@ -10,7 +10,6 @@ sys.path.append("algorithm/OCR/LeNet")
 def digitPressure(image, info):
     template = meterFinderBySIFT(image, info)
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
-    template = cv2.equalizeHist(template)
 
     # 读取标定信息
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
@@ -27,6 +26,7 @@ def digitPressure(image, info):
     pts2 = np.float32([[0, 0], [width, 0], [width, height], [0, height]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
     dst = cv2.warpPerspective(template, M, (width, height))
+    # dst = cv2.equalizeHist(dst)
 
     # 网络初始化
     MyNet = newNet()
@@ -40,6 +40,8 @@ def digitPressure(image, info):
                 myNum += "."
                 continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
+            # img = cv2.equalizeHist(img)
+            # cv2.imshow("debug", img)
             img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
 
             sum = 0

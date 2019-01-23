@@ -15,10 +15,9 @@ def startServer():
 def startClient(results):
     images = os.listdir("image")
     for im in images:
-        image = open("image/"+im, "rb")
-        imageByte = base64.b64encode(image.read())
+        path = "image/" + im
         data = json.dumps({
-            "image": imageByte.decode("ascii"),
+            "path": path,
             "imageID": im.split('.')[0]
         })
 
@@ -31,7 +30,11 @@ def startClient(results):
 
 def codecov():
     images = os.listdir("image")
+    videos = os.listdir("video_")
     config = os.listdir("config")
+
+    # image = cv2.imread("image/13-1.jpg")
+    # print(meterReader(image, ["13-1_2"]))
     for im in images:
         image = cv2.imread("image/"+im)
         print(im)
@@ -42,6 +45,22 @@ def codecov():
             if cfg+".json" in config:
                 receive2 = meterReader(image, [cfg])
                 print(cfg, receive2)
+
+    # for vi in videos:
+    #     video = cv2.VideoCapture("video_/"+vi)
+    #     print(vi)
+    #
+    #     for i in range(1, 6):
+    #         cfg = vi.split(".mp4")[0]+"_"+str(i)
+    #         # print(cfg)
+    #         if cfg+".json" in config:
+    #             receive2 = meterReader(video, [cfg])
+    #             print(cfg, receive2)
+
+    # video = cv2.VideoCapture("video_/5-1.mp4")
+    # receive2 = meterReader(video, ["5-1_1"])
+    # print(receive2)
+
     print("codecov done")
 
 

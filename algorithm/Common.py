@@ -141,7 +141,7 @@ def meterFinderBySIFT(image, info):
     matches = bf.knnMatch(templateDescriptor, imageDescriptor, k=2)
 
     # The first one is better than the second one
-    good = [[m] for m, n in matches if m.distance < 0.7 * n.distance]
+    good = [[m] for m, n in matches if m.distance < 0.8 * n.distance]
 
     # distance matrix
     templatePointMatrix = np.array([list(templateKeyPoint[p[0].queryIdx].pt) for p in good])
@@ -160,6 +160,15 @@ def meterFinderBySIFT(image, info):
 
     averageDistance = np.average(distances)
     good2 = [good[i] for i in range(len(good)) if distances[i] < 2 * averageDistance]
+
+    # for debug
+    # matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good2, None, flags=2)
+    # cv2.imshow("matchImage", matchImage)
+    # cv2.waitKey(0)
+
+    # not match
+    if len(good2) < 3:
+        return "the template is not matched!"
 
     # 寻找转换矩阵 M
     src_pts = np.float32([templateKeyPoint[m[0].queryIdx].pt for m in good2]).reshape(-1, 1, 2)
