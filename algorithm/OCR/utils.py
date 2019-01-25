@@ -1,5 +1,6 @@
 import sys
 import cv2
+import os
 import numpy as np
 import torch
 import random
@@ -148,6 +149,7 @@ def zero():
 
 
 class newNet(object):
+    count = defaultdict(zero)
     def __init__(self):
         """
         初始化LeNet模型
@@ -156,12 +158,13 @@ class newNet(object):
         sys.path.append("newNet")
         from algorithm.OCR.newNet.LeNet import myNet
 
-        self.count = defaultdict(
-            zero
-        )
         self.net = myNet()
         self.net.eval()
         self.net.load_state_dict(torch.load("algorithm/OCR/newNet/net.pkl"))
+
+    @staticmethod
+    def add(label):
+        newNet.count[label] += 1
 
     def recognizeNet(self, image):
         """
@@ -176,8 +179,10 @@ class newNet(object):
         result = self.net.forward(tensor)
         _, predicted = torch.max(result.data, 1)
         num = int(np.array(predicted[0]).astype(np.uint32))
-        self.count[str(num)] += 1
+        newNet.add(str(num))
 
+        if not os.path.exists("numbers"):
+            os.system("mkdir numbers")
         cv2.imwrite("numbers/" + str(num) + "_" + str(self.count[str(num)])+".bmp", image)
 
         if ifShow:
