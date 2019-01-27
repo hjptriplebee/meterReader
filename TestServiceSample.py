@@ -33,8 +33,8 @@ def codecov():
     videos = os.listdir("video_")
     config = os.listdir("config")
 
-    # image = cv2.imread("image/16-2.jpg")
-    # print(meterReader(image, ["16-2_1"]))
+    # image = cv2.imread("image/11-1-10040-1-15-23-2019-01-25-22-08-06.jpg")
+    # print(meterReader(image, ["11-1_1"]))
     for im in images:
         image = cv2.imread("image/"+im)
         print(im)
