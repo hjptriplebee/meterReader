@@ -2,8 +2,8 @@
 .idea/
 storeDigitData/
 .DS_Store
-numbers
 test.py
+numbers/
 szkPressure.py
 get_test.py
 pre_images/
