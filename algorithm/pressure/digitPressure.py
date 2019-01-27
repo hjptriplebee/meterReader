@@ -1,4 +1,5 @@
 import sys
+import os
 
 from algorithm.Common import *
 from algorithm.OCR.utils import *
@@ -41,6 +42,7 @@ def digitPressure(image, info):
                 myNum += "."
                 continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
+
             cv2.imshow("debug3", img)
             if info["digitType"] != "TTC":
                 img = cv2.GaussianBlur(img, (5, 5), 0)
@@ -51,6 +53,8 @@ def digitPressure(image, info):
                 img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 21, 11)
             cv2.imshow("debug2", img)
 
+            # imgNum = len(os.listdir("storeDigitData/"))
+            # cv2.imwrite("storeDigitData/" + str(imgNum) + ".jpg", img)
 
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
