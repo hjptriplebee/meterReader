@@ -1,5 +1,6 @@
 # pycharm
 .idea/
+storeDigitData/
 .DS_Store
 test.py
 numbers/
