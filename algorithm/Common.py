@@ -168,7 +168,7 @@ def meterFinderBySIFT(image, info):
 
     # not match
     if len(good2) < 3:
-        return "the template is not matched!"
+        return template
 
     # 寻找转换矩阵 M
     src_pts = np.float32([templateKeyPoint[m[0].queryIdx].pt for m in good2]).reshape(-1, 1, 2)
@@ -209,9 +209,24 @@ def meterFinderBySIFT(image, info):
         newpoints.append(point)
     src_correct = src_correct[int(round(newpoints[0][1])):int(round(newpoints[1][1])),
                   int(round(newpoints[0][0])):int(round(newpoints[3][0]))]
+
+    width = src_correct.shape[1]
+    height = src_correct.shape[0]
+    if width == 0 or height == 0:
+        return template
+
     startPoint = (int(round(newpoints[4][0]) - newpoints[0][0]), int(round(newpoints[4][1]) - newpoints[0][1]))
     endPoint = (int(round(newpoints[5][0]) - newpoints[0][0]), int(round(newpoints[5][1]) - newpoints[0][1]))
     centerPoint = (int(round(newpoints[6][0]) - newpoints[0][0]), int(round(newpoints[6][1]) - newpoints[0][1]))
+
+    def isOverflow(point, width, height):
+        if point[0] < 0 or point[1] < 0 or point[0] > height - 1 or point[1] > width - 1:
+            return True
+        return False
+
+    if isOverflow(startPoint, width, height) or isOverflow(endPoint, width, height) or isOverflow(centerPoint, width, height):
+        return template
+
     # startPointUp = (int(round(newpoints[7][0]) - newpoints[0][0]), int(round(newpoints[7][1]) - newpoints[0][1]))
     # endPointUp = (int(round(newpoints[8][0]) - newpoints[0][0]), int(round(newpoints[8][1]) - newpoints[0][1]))
     # centerPointUp = (int(round(newpoints[9][0]) - newpoints[0][0]), int(round(newpoints[9][1]) - newpoints[0][1]))
