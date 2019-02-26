@@ -7,6 +7,7 @@ from algorithm.Blenometer import checkBleno
 from algorithm.SF6 import SF6Reader
 from algorithm.oilTempreture import oilTempreture
 from algorithm.highlightDigitMeter import highlightDigit
+from algorithm.videoDigit import videoDigit
 
 
 from algorithm.arrest.countArrester import countArrester
@@ -99,6 +100,8 @@ def getInfo(ID):
         info["type"] = highlightDigit
     elif info["type"] == "onoffBattery":
         info["type"] = onoffBattery
+    elif info["type"] == "videoDigit":
+        info["type"] = videoDigit
     else:
         info["type"] = None
     info["template"] = cv2.imread("template/" + ID + ".jpg")
@@ -107,10 +110,10 @@ def getInfo(ID):
     return info
 
 
-def meterReader(image, meterIDs):
+def meterReader(recognitionData, meterIDs):
     """
     global interface
-    :param image: camera image
+    :param recognitionData: image or video
     :param meterIDs: list of meter ID
     :return:
     """
@@ -118,12 +121,22 @@ def meterReader(image, meterIDs):
     for ID in meterIDs:
         # get info from file
         info = getInfo(ID)
-        # ROI extract
-        x = info["ROI"]["x"]
-        y = info["ROI"]["y"]
-        w = info["ROI"]["w"]
-        h = info["ROI"]["h"]
-        ROI = image[y:y + h, x:x + w]
-        # call back
-        results[ID] = meterReaderCallBack(ROI, info)
+        if info["digitType"] == "VIDEO":
+            results[ID] = meterReaderCallBack(recognitionData, info)
+        else:
+            # ROI extract
+            x = info["ROI"]["x"]
+            y = info["ROI"]["y"]
+            w = info["ROI"]["w"]
+            h = info["ROI"]["h"]
+            # call back
+            # cv2.rectangle(recognitionData, (x, y), (x+w, y + h), (255, 0, 0), 3)
+            # cv2.imshow("d", recognitionData)
+            # cv2.waitKey(0)
+            if x != 0 or y != 0 or w != 0 or h != 0:
+                ROI = recognitionData[y:y + h, x:x + w]
+                results[ID] = meterReaderCallBack(ROI, info)
+            else:
+                results[ID] = meterReaderCallBack(recognitionData, info)
+
     return results

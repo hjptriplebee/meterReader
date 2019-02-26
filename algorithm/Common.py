@@ -141,7 +141,7 @@ def meterFinderBySIFT(image, info):
     matches = bf.knnMatch(templateDescriptor, imageDescriptor, k=2)
 
     # The first one is better than the second one
-    good = [[m] for m, n in matches if m.distance < 0.7 * n.distance]
+    good = [[m] for m, n in matches if m.distance < 0.8 * n.distance]
 
     # distance matrix
     templatePointMatrix = np.array([list(templateKeyPoint[p[0].queryIdx].pt) for p in good])
@@ -160,6 +160,15 @@ def meterFinderBySIFT(image, info):
 
     averageDistance = np.average(distances)
     good2 = [good[i] for i in range(len(good)) if distances[i] < 2 * averageDistance]
+
+    # for debug
+    # matchImage = cv2.drawMatchesKnn(template, templateKeyPoint, image, imageKeyPoint, good2, None, flags=2)
+    # cv2.imshow("matchImage", matchImage)
+    # cv2.waitKey(0)
+
+    # not match
+    if len(good2) < 3:
+        return template
 
     # 寻找转换矩阵 M
     src_pts = np.float32([templateKeyPoint[m[0].queryIdx].pt for m in good2]).reshape(-1, 1, 2)
@@ -200,9 +209,24 @@ def meterFinderBySIFT(image, info):
         newpoints.append(point)
     src_correct = src_correct[int(round(newpoints[0][1])):int(round(newpoints[1][1])),
                   int(round(newpoints[0][0])):int(round(newpoints[3][0]))]
+
+    width = src_correct.shape[1]
+    height = src_correct.shape[0]
+    if width == 0 or height == 0:
+        return template
+
     startPoint = (int(round(newpoints[4][0]) - newpoints[0][0]), int(round(newpoints[4][1]) - newpoints[0][1]))
     endPoint = (int(round(newpoints[5][0]) - newpoints[0][0]), int(round(newpoints[5][1]) - newpoints[0][1]))
     centerPoint = (int(round(newpoints[6][0]) - newpoints[0][0]), int(round(newpoints[6][1]) - newpoints[0][1]))
+
+    def isOverflow(point, width, height):
+        if point[0] < 0 or point[1] < 0 or point[0] > height - 1 or point[1] > width - 1:
+            return True
+        return False
+
+    if isOverflow(startPoint, width, height) or isOverflow(endPoint, width, height) or isOverflow(centerPoint, width, height):
+        return template
+
     # startPointUp = (int(round(newpoints[7][0]) - newpoints[0][0]), int(round(newpoints[7][1]) - newpoints[0][1]))
     # endPointUp = (int(round(newpoints[8][0]) - newpoints[0][0]), int(round(newpoints[8][1]) - newpoints[0][1]))
     # centerPointUp = (int(round(newpoints[9][0]) - newpoints[0][0]), int(round(newpoints[9][1]) - newpoints[0][1]))

@@ -1,7 +1,11 @@
 import sys
 import cv2
+import os
 import numpy as np
 import torch
+import random
+
+from collections import defaultdict
 import tensorflow as tf
 from keras.models import load_model
 from keras import backend as K
@@ -139,16 +143,23 @@ class tfNet(object):
         # print("predict number:", prediction[0])
         return prediction[0]
 
+
+def zero():
+    return 0
+
+
 class newNet(object):
+
     def __init__(self):
         """
         初始化LeNet模型
         :return:
         """
         sys.path.append("newNet")
-        from algorithm.OCR.newNet.LeNet import LeNet
         from algorithm.OCR.newNet.LeNet import myNet
+
         self.net = myNet()
+        self.net.eval()
         self.net.load_state_dict(torch.load("algorithm/OCR/newNet/net.pkl"))
 
     def recognizeNet(self, image):
@@ -157,18 +168,22 @@ class newNet(object):
         :param image: 输入图像
         :return: 识别的数字值
         """
-        if ifShow:
-            cv2.imshow("s", image)
         image = fillAndResize(image)
-        if ifShow:
-            cv2.imshow("single", image)
-            cv2.waitKey(0)
-        if image.size != 784:
-            print("检查输入图片大小！不为28*28")
-            return None
-        image = torch.Tensor(image).view((1, 1, 28, 28))
-        image = image.to("cpu")
-        result = self.net.forward(image)
+        tensor = torch.Tensor(image).view((1, 1, 28, 28))/255
+
+        tensor = tensor.to("cpu")
+        result = self.net.forward(tensor)
         _, predicted = torch.max(result.data, 1)
         num = int(np.array(predicted[0]).astype(np.uint32))
-        return num
+
+        if not os.path.exists("storeDigitData"):
+            os.system("mkdir storeDigitData")
+        imgNum = len(os.listdir("storeDigitData/"))
+        cv2.imwrite("storeDigitData/" + str(imgNum) + "_" + str(num) + ".bmp", image)
+
+        if ifShow:
+            print(num)
+            cv2.imshow("single", image)
+            cv2.waitKey(0)
+
+        return str(num) if num != 10 else "?"
