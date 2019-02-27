@@ -129,7 +129,14 @@ def meterReader(recognitionData, meterIDs):
             y = info["ROI"]["y"]
             w = info["ROI"]["w"]
             h = info["ROI"]["h"]
-            ROI = recognitionData[y:y + h, x:x + w]
             # call back
-            results[ID] = meterReaderCallBack(ROI, info)
+            # cv2.rectangle(recognitionData, (x, y), (x+w, y + h), (255, 0, 0), 3)
+            # cv2.imshow("d", recognitionData)
+            # cv2.waitKey(0)
+            if x != 0 or y != 0 or w != 0 or h != 0:
+                ROI = recognitionData[y:y + h, x:x + w]
+                results[ID] = meterReaderCallBack(ROI, info)
+            else:
+                results[ID] = meterReaderCallBack(recognitionData, info)
+
     return results
