@@ -11,7 +11,7 @@ sys.path.append("algorithm/OCR/LeNet")
 def digitPressure(image, info):
     template = meterFinderBySIFT(image, info)
     template = cv2.GaussianBlur(template, (3, 3), 0)
-    template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    # template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 
     # 读取标定信息
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
@@ -43,6 +43,14 @@ def digitPressure(image, info):
                 continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
 
+            if not os.path.exists("storeDigitData"):
+                os.system("mkdir storeDigitData")
+            imgNum = len(os.listdir("storeDigitData/"))
+            cv2.imwrite("storeDigitData/" + str(imgNum) + ".bmp", img)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            imgNum = len(os.listdir("storeDigitData/"))
+            cv2.imwrite("storeDigitData/" + str(imgNum) + ".bmp", img)
+
             # cv2.imshow("debug3", img)
             if info["digitType"] != "TTC":
                 img = cv2.GaussianBlur(img, (5, 5), 0)
@@ -53,8 +61,6 @@ def digitPressure(image, info):
                 img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 55, 11)
             # cv2.imshow("debug2", img)
 
-            # imgNum = len(os.listdir("storeDigitData/"))
-            # cv2.imwrite("storeDigitData/" + str(imgNum) + ".jpg", img)
 
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
