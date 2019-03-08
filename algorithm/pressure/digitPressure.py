@@ -30,6 +30,22 @@ def digitPressure(image, info):
     dst = cv2.warpPerspective(template, M, (width, height))
     # dst = cv2.equalizeHist(dst)
 
+    if not os.path.exists("storeDigitData"):
+        os.system("mkdir storeDigitData")
+    imgNum = len(os.listdir("storeDigitData/"))
+    cv2.imwrite("storeDigitData/" + str(imgNum) + ".bmp", dst)
+    dst = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+
+    if info["digitType"] != "TTC":
+        dst = cv2.GaussianBlur(dst, (5, 5), 0)
+        dst = cv2.equalizeHist(dst)
+        # cv2.imshow("debug", img)
+        dst = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 15, 11)
+    elif info["digitType"] == "TTC":
+        dst = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 55, 11)
+
+    imgNum = len(os.listdir("storeDigitData/"))
+    cv2.imwrite("storeDigitData/" + str(imgNum) + ".bmp", dst)
     # 网络初始化
     MyNet = newNet()
     myRes = []
@@ -43,22 +59,18 @@ def digitPressure(image, info):
                 continue
             img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
 
-            if not os.path.exists("storeDigitData"):
-                os.system("mkdir storeDigitData")
-            imgNum = len(os.listdir("storeDigitData/"))
-            cv2.imwrite("storeDigitData/" + str(imgNum) + ".bmp", img)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
             imgNum = len(os.listdir("storeDigitData/"))
             cv2.imwrite("storeDigitData/" + str(imgNum) + ".bmp", img)
 
             # cv2.imshow("debug3", img)
-            if info["digitType"] != "TTC":
-                img = cv2.GaussianBlur(img, (5, 5), 0)
-                img = cv2.equalizeHist(img)
-                # cv2.imshow("debug", img)
-                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 13, 11)
-            elif info["digitType"] == "TTC":
-                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 55, 11)
+            # if info["digitType"] != "TTC":
+            #     img = cv2.GaussianBlur(img, (5, 5), 0)
+            #     img = cv2.equalizeHist(img)
+            #     # cv2.imshow("debug", img)
+            #     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 13, 11)
+            # elif info["digitType"] == "TTC":
+            #     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 55, 11)
             # cv2.imshow("debug2", img)
 
 
