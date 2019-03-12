@@ -15,6 +15,7 @@ def normalPressure(image, info):
     """
     meter = meterFinderBySIFT(image, info)
     result = scanPointer(meter, info)
+    result = int(result*1000) / 1000
     return result
 
 def inc():

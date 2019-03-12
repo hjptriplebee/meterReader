@@ -6,6 +6,8 @@ import torch
 from algorithm.Common import meterFinderBySIFT
 from algorithm.pressure.digitPressure import digitPressure
 from algorithm.OCR.svm.LeNet import LeNet
+from algorithm.Common import *
+from algorithm.OCR.utils import *
 
 sys.path.append("../")
 
@@ -17,6 +19,8 @@ def videoDigit(video, info):
     """
     global num
     result = {}
+    # 网络初始化
+    MyNet = newNet()
 
     start = ([info["startPoint"]["x"], info["startPoint"]["y"]])
     end = ([info["endPoint"]["x"], info["endPoint"]["y"]])
@@ -36,12 +40,12 @@ def videoDigit(video, info):
     # 加载模型
     # clf = joblib.load("algorithm/OCR/svm/svm_model.m")
     net = LeNet()
-    net.load_state_dict(torch.load("algorithm/OCR/svm/character_22net.pkl"))
+    net.load_state_dict(torch.load("algorithm/OCR/svm/character_net.pkl"))
 
     pictures = getPictures(video)  # 获得视频的帧，有少量重复帧
     imageDict = {}
     predicts = {}
-    for i, frame in enumerate(pictures):
+    for frame in pictures:
         template = meterFinderBySIFT(frame, info)
         template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
         template = cv2.equalizeHist(template)
@@ -50,7 +54,9 @@ def videoDigit(video, info):
         imgType = dst[characSplit[1][0]:characSplit[1][1], characSplit[0][0]:characSplit[0][1]]
         imgType = cv2.resize(imgType, (28, 28), interpolation=cv2.INTER_CUBIC)  # LeNet
         imgType = cv2.adaptiveThreshold(imgType, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
+        imgType = cv2.bitwise_not(imgType)
 
+        oriimage = imgType.copy()
         # # svm模型
         # hog_vec, hog_vis = feature.hog(imgType, orientations=8, pixels_per_cell=(16, 16),
         #                                cells_per_block=(1, 1), block_norm='L2', visualise=True)
@@ -74,13 +80,39 @@ def videoDigit(video, info):
             predicts[maxIndex] = maxs
         elif predicts[maxIndex] < maxs:
             imageDict[maxIndex] = frame
-        # cv2.imshow(str(maxIndex), imgType)
+            predicts[maxIndex] = maxs
+        # cv2.imshow(str(maxIndex), oriimage)
         # cv2.waitKey(0)
     # read meter
     # print(predicts)
     # print(imageDict)
     for k, frame in imageDict.items():
-        result[chr(int(ord("A")+k))] = digitPressure(frame, info)
+        myRes = []
+        for i in range(len(heightSplit)):
+            split = widthSplit[i]
+            myNum = ""
+            for j in range(len(split) - 1):
+                if "decimal" in info.keys() and j == info["decimal"][i]:
+                    myNum += "."
+                    continue
+                img = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
+                img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 11)
+                img = cv2.bitwise_not(img)
+                kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
+                img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+
+                num = MyNet.recognizeNet(img)
+                myNum += num
+                # cv2.imshow("tem", template)
+                # cv2.imshow("rec", dst)
+                # cv2.imshow(str(num), img)
+                # cv2.waitKey(0)
+            myRes.append(myNum)
+        result[chr(int(ord("A")+k))] = myRes
+        # frame = cv2.resize(frame, (800, 600))
+        # frame = cv2.putText(frame, str(myRes), (50, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 3)
+        # cv2.imshow(str(chr(int(ord("A") + k))), frame)
+        # cv2.waitKey(0)
     return result
 
 
