@@ -2,22 +2,22 @@
     "name": "tet",
     "type": "digitPressure",
     "ROI": {
-        "x": 412,
-        "y": 240,
-        "w": 810,
-        "h": 768
+        "x": 50,
+        "y": 50,
+        "w": 1800,
+        "h": 900
     },
     "startPoint": {
-        "x": 164,
-        "y": 41
+        "x": 172,
+        "y": 59
     },
     "endPoint": {
-        "x": 392,
-        "y": 168
+        "x": 405,
+        "y": 191
     },
     "centerPoint": {
-        "x": 392,
-        "y": 27
+        "x": 405,
+        "y": 43
     },
     "startPointUp": {
         "x": 0,
