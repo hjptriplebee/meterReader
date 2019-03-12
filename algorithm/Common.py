@@ -112,6 +112,11 @@ def meterFinderBySIFT(image, info):
     :return: bbox image
     """
     template = info["template"]
+
+    # cv2.imshow("template", template)
+    # cv2.imshow("image", image)
+    # cv2.waitKey(0)
+
     startPoint = (info["startPoint"]["x"], info["startPoint"]["y"])
     centerPoint = (info["centerPoint"]["x"], info["centerPoint"]["y"])
     endPoint = (info["endPoint"]["x"], info["endPoint"]["y"])
@@ -168,6 +173,7 @@ def meterFinderBySIFT(image, info):
 
     # not match
     if len(good2) < 3:
+        print("not found!")
         return template
 
     # 寻找转换矩阵 M
@@ -220,11 +226,12 @@ def meterFinderBySIFT(image, info):
     centerPoint = (int(round(newpoints[6][0]) - newpoints[0][0]), int(round(newpoints[6][1]) - newpoints[0][1]))
 
     def isOverflow(point, width, height):
-        if point[0] < 0 or point[1] < 0 or point[0] > height - 1 or point[1] > width - 1:
+        if point[0] < 0 or point[1] < 0 or point[0] > width - 1or point[1] > height - 1:
             return True
         return False
 
     if isOverflow(startPoint, width, height) or isOverflow(endPoint, width, height) or isOverflow(centerPoint, width, height):
+        print("overflow!")
         return template
 
     # startPointUp = (int(round(newpoints[7][0]) - newpoints[0][0]), int(round(newpoints[7][1]) - newpoints[0][1]))

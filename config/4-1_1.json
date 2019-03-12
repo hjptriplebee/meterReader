@@ -2,10 +2,10 @@
     "name": "test",
     "type": "digitPressure",
     "ROI": {
-        "x": 504,
-        "y": 300,
-        "w": 870,
-        "h": 756
+        "x": 50,
+        "y": 50,
+        "w": 1900,
+        "h": 900
     },
     "startPoint": {
         "x": 164,

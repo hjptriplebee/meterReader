@@ -29,7 +29,7 @@ def startClient(results):
 
 
 def codecov():
-    images = os.listdir("image")
+    images = os.listdir("images")
     videos = os.listdir("video_")
     config = os.listdir("config")
 

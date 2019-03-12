@@ -24,8 +24,6 @@ from algorithm.onoff.onoffOutdoor import onoffOutdoor
 from algorithm.onoff.onoffBatteryScreen import onoffBattery
 
 
-
-
 def meterReaderCallBack(image, info):
     """call back function"""
     if info["type"] == None:
