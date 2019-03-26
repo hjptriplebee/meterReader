@@ -182,6 +182,7 @@ def meterFinderBySIFT(image, info):
     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
     matchesMask = mask.ravel().tolist()
     h, w, _ = template.shape
+
     # 找出匹配到的图形的四个点和标定信息里的所有点
     pts = np.float32(
         [[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0], [startPoint[0], startPoint[1]], [endPoint[0], endPoint[1]],

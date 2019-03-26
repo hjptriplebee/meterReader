@@ -36,6 +36,7 @@ def digitPressure(image, info):
     dst = cv2.warpPerspective(template, M, (width, height))
     # dst = cv2.equalizeHist(dst)
     dst = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+    cv2.imshow("huidutu", dst)
 
     # 存储图片
     if not os.path.exists("storeDigitData"):
@@ -45,9 +46,12 @@ def digitPressure(image, info):
 
     if info["digitType"] != "TTC":
         dst = cv2.GaussianBlur(dst, (5, 5), 0)
+        cv2.imshow("gaosilvbo", dst)
         dst = cv2.equalizeHist(dst)
+        cv2.imshow("junhenghua", dst)
         # cv2.imshow("debug", img)
         dst = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 15, 11)
+        cv2.imshow("erzhihua", dst)
     elif info["digitType"] == "TTC":
         dst = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 55, 11)
 
