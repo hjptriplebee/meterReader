@@ -5,6 +5,7 @@ import os
 import numpy as np
 from Interface import meterReader
 from flask import Flask, request
+from locator import *
 
 app = Flask(__name__)
 
@@ -95,6 +96,28 @@ def storeAPI():
         file.close()
 
         return "received!"
+
+
+@app.route('/locate', methods=['POST'])
+def locateAPI():
+    try:
+        data = request.get_data().decode("utf-8")
+        data = json.loads(data)
+        pointID = data["pointID"]
+        path = data["path"]
+
+
+        image = None
+
+        if path[-4:] == ".jpg":
+            image = cv2.imread(path)
+    except:
+        return json.dumps({"error":"json format error!"})
+    else:
+        result = locator(image, pointID)
+        location = json.dumps(result).encode("utf-8")
+
+        return location
 
 
 if __name__ == '__main__':
