@@ -10,10 +10,6 @@ from algorithm.Common import *
 from algorithm.pressure.normalPressure import normalPressure
 
 
-def countArrester_(image, info):
-    return normalPressure(image, info)
-
-
 def countArrester(image, info):
     meter = meterFinderByTemplate(image, info["template"])
 
