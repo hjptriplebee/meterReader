@@ -112,6 +112,11 @@ def meterFinderBySIFT(image, info):
     :return: bbox image
     """
     template = info["template"]
+
+    # cv2.imshow("template", template)
+    # cv2.imshow("image", image)
+    # cv2.waitKey(0)
+
     startPoint = (info["startPoint"]["x"], info["startPoint"]["y"])
     centerPoint = (info["centerPoint"]["x"], info["centerPoint"]["y"])
     endPoint = (info["endPoint"]["x"], info["endPoint"]["y"])
@@ -168,7 +173,8 @@ def meterFinderBySIFT(image, info):
 
     # not match
     if len(good2) < 3:
-        return "the template is not matched!"
+        print("not found!")
+        return template
 
     # 寻找转换矩阵 M
     src_pts = np.float32([templateKeyPoint[m[0].queryIdx].pt for m in good2]).reshape(-1, 1, 2)
@@ -176,6 +182,7 @@ def meterFinderBySIFT(image, info):
     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
     matchesMask = mask.ravel().tolist()
     h, w, _ = template.shape
+
     # 找出匹配到的图形的四个点和标定信息里的所有点
     pts = np.float32(
         [[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0], [startPoint[0], startPoint[1]], [endPoint[0], endPoint[1]],
@@ -209,9 +216,25 @@ def meterFinderBySIFT(image, info):
         newpoints.append(point)
     src_correct = src_correct[int(round(newpoints[0][1])):int(round(newpoints[1][1])),
                   int(round(newpoints[0][0])):int(round(newpoints[3][0]))]
+
+    width = src_correct.shape[1]
+    height = src_correct.shape[0]
+    if width == 0 or height == 0:
+        return template
+
     startPoint = (int(round(newpoints[4][0]) - newpoints[0][0]), int(round(newpoints[4][1]) - newpoints[0][1]))
     endPoint = (int(round(newpoints[5][0]) - newpoints[0][0]), int(round(newpoints[5][1]) - newpoints[0][1]))
     centerPoint = (int(round(newpoints[6][0]) - newpoints[0][0]), int(round(newpoints[6][1]) - newpoints[0][1]))
+
+    def isOverflow(point, width, height):
+        if point[0] < 0 or point[1] < 0 or point[0] > width - 1or point[1] > height - 1:
+            return True
+        return False
+
+    if isOverflow(startPoint, width, height) or isOverflow(endPoint, width, height) or isOverflow(centerPoint, width, height):
+        print("overflow!")
+        return template
+
     # startPointUp = (int(round(newpoints[7][0]) - newpoints[0][0]), int(round(newpoints[7][1]) - newpoints[0][1]))
     # endPointUp = (int(round(newpoints[8][0]) - newpoints[0][0]), int(round(newpoints[8][1]) - newpoints[0][1]))
     # centerPointUp = (int(round(newpoints[9][0]) - newpoints[0][0]), int(round(newpoints[9][1]) - newpoints[0][1]))
