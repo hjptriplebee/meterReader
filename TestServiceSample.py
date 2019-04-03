@@ -30,7 +30,6 @@ def startClient(results):
 
 def codecov():
     images = os.listdir("image")
-    videos = os.listdir("testImages/video")
     config = os.listdir("config")
 
     for im in images:
@@ -45,6 +44,18 @@ def codecov():
 
     print("codecov done")
 
+def testVideo():
+    video_path = ("video_")
+    config = os.listdir("config")
+
+    for file in os.listdir(video_path):
+        if file.startswith(".DS"):
+            continue
+        video = cv2.VideoCapture(os.path.join(video_path, file))
+        result = meterReader(video, [file[:-4] + "_1"])
+        print(file, result)
+    print("codecov done")
+
 
 if __name__ == "__main__":
     # serverProcess = multiprocessing.Process(target=startServer)
@@ -57,6 +68,7 @@ if __name__ == "__main__":
     # serverProcess.terminate()
 
     codecov()
+    testVideo()
     #
     # for i in range(20):
     #     serverProcess = multiprocessing.Process(target=startServer)
