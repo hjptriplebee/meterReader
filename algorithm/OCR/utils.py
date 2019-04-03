@@ -51,11 +51,6 @@ class newNet(object):
         _, predicted = torch.max(result.data, 1)
         num = int(np.array(predicted[0]).astype(np.uint32))
 
-        if not os.path.exists("storeDigitData"):
-            os.system("mkdir storeDigitData")
-        imgNum = len(os.listdir("storeDigitData/"))
-        cv2.imwrite("storeDigitData/" + str(imgNum) + "_" + str(num) + ".bmp", image)
-
         if ifShow:
             print(num)
             cv2.imshow("single", image)

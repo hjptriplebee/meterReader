@@ -11,9 +11,7 @@ from algorithm.videoDigit import videoDigit
 
 
 from algorithm.arrest.countArrester import countArrester
-from algorithm.arrest.digitArrester import digitArrester
 from algorithm.arrest.doubleArrester import doubleArrester
-from algorithm.arrest.insideArrest import insideArrest
 
 from algorithm.pressure.digitPressure import digitPressure
 from algorithm.pressure.normalPressure import normalPressure
@@ -78,14 +76,10 @@ def getInfo(ID):
         info["type"] = colorPressure
     elif info["type"] == "SF6":
         info["type"] = SF6Reader
-    elif info["type"] == "digitArrester":
-        info["type"] = digitArrester
     elif info["type"] == "countArrester":
         info["type"] = countArrester
     elif info["type"] == "doubleArrester":
         info["type"] = doubleArrester
-    elif info["type"] == "insideArrest":
-        info["type"] = insideArrest
     elif info["type"] == "oilTempreture":
         info["type"] = oilTempreture
     elif info["type"] == "blenometer":
@@ -102,7 +96,9 @@ def getInfo(ID):
         info["type"] = videoDigit
     else:
         info["type"] = None
+
     info["template"] = cv2.imread("template/" + ID + ".jpg")
+
     if info["digitType"] != "False":
         info.update(json.load(open(os.path.join("ocr_config", info["digitType"]+".json"))))
     return info
