@@ -1,12 +1,12 @@
-import sys
-import cv2
 import os
-import numpy as np
 import random
 
+import cv2
+import numpy as np
+
 from algorithm.Common import meterFinderBySIFT
-from algorithm.debug import *
 from algorithm.OCR.utils import newNet
+from configuration import *
 
 
 def digitPressure(image, info):

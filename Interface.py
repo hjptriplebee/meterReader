@@ -21,6 +21,8 @@ from algorithm.onoff.onoffIndoor import onoffIndoor
 from algorithm.onoff.onoffOutdoor import onoffOutdoor
 from algorithm.onoff.onoffBatteryScreen import onoffBattery
 
+from configuration import *
+
 
 def meterReaderCallBack(image, info):
     """call back function"""
@@ -63,7 +65,7 @@ def getInfo(ID):
             "totalValue": 2
         }
     """
-    file = open("config/" + ID + ".json")
+    file = open(configPath + "/" + ID + ".json")
     info = json.load(file)
     # string to pointer
     if info["type"] == "absorb":
@@ -97,7 +99,7 @@ def getInfo(ID):
     else:
         info["type"] = None
 
-    info["template"] = cv2.imread("template/" + ID + ".jpg")
+    info["template"] = cv2.imread(templatePath + "/" + ID + ".jpg")
 
     if info["digitType"] != "False":
         info.update(json.load(open(os.path.join("ocr_config", info["digitType"]+".json"))))
@@ -125,8 +127,9 @@ def meterReader(recognitionData, meterIDs):
             h = info["ROI"]["h"]
             # call back
             # cv2.rectangle(recognitionData, (x, y), (x+w, y + h), (255, 0, 0), 3)
-            # cv2.imshow("d", recognitionData)
+            # cv2.imshow("testInput", recognitionData)
             # cv2.waitKey(0)
+
             if x != 0 or y != 0 or w != 0 or h != 0:
                 ROI = recognitionData[y:y + h, x:x + w]
                 results[ID] = meterReaderCallBack(ROI, info)

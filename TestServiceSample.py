@@ -5,6 +5,7 @@ import os
 import time
 import cv2
 import multiprocessing
+from configuration import *
 
 from Interface import meterReader
 
@@ -29,12 +30,12 @@ def startClient(results):
 
 
 def codecov():
-    images = os.listdir("image")
-    videos = os.listdir("testImages/video")
-    config = os.listdir("config")
+    images = os.listdir("info/20190410/IMAGES/Pic")
+    # videos = os.listdir("testImages/video")
+    config = os.listdir(configPath)
 
     for im in images:
-        image = cv2.imread("image/"+im)
+        image = cv2.imread("testImages/20190410/Pic/"+im)
         print(im)
 
         for i in range(1, 6):

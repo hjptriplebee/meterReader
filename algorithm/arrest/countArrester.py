@@ -3,11 +3,7 @@ Created on Fri Jan  4 21:56:11 2019
 @author: maoyingxue
 """
 
-import json
-
-from algorithm.debug import *
 from algorithm.Common import *
-from algorithm.pressure.normalPressure import normalPressure
 
 
 def countArrester(image, info):

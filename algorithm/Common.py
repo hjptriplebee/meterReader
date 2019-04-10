@@ -1,9 +1,10 @@
+import math
+
 import cv2
 import numpy as np
-import math
 from sklearn.metrics.pairwise import pairwise_distances
 
-from algorithm.debug import *
+from configuration import *
 
 
 def meterFinderByTemplate(image, template):
@@ -227,11 +228,12 @@ def meterFinderBySIFT(image, info):
     centerPoint = (int(round(newpoints[6][0]) - newpoints[0][0]), int(round(newpoints[6][1]) - newpoints[0][1]))
 
     def isOverflow(point, width, height):
-        if point[0] < 0 or point[1] < 0 or point[0] > width - 1or point[1] > height - 1:
+        if point[0] < 0 or point[1] < 0 or point[0] > width - 1 or point[1] > height - 1:
             return True
         return False
 
-    if isOverflow(startPoint, width, height) or isOverflow(endPoint, width, height) or isOverflow(centerPoint, width, height):
+    if isOverflow(startPoint, width, height) or isOverflow(endPoint, width, height) or isOverflow(centerPoint, width,
+                                                                                                  height):
         print("overflow!")
         return template
 
@@ -389,8 +391,11 @@ def scanPointer(meter, info):
     thresh = cv2.bitwise_and(thresh, mask)
     cv2.circle(thresh, (center[0], center[1]), int(radious / 3), (0, 0, 0), -1)
 
-    thresh = cv2.erode(thresh, np.ones((3, 3), np.uint8), 3)
-    thresh = cv2.dilate(thresh, np.ones((5, 5), np.uint8))
+    # thresh = cv2.erode(thresh, np.ones((3, 3), np.uint8), 3)
+    # thresh = cv2.dilate(thresh, np.ones((5, 5), np.uint8))
+
+    # cv2.imshow("img", thresh)
+    # cv2.waitKey(1)
 
     thresh = cv2.ximgproc.thinning(thresh, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
 
@@ -431,8 +436,9 @@ def scanPointer(meter, info):
             end[1] -= 3
         degree = AngleFactory.calPointerValueByOuterPoint(start, end, center, outerPoint, startVal, endVal)
 
+    # print(degree, startVal, endVal)
     # small value to zero
-    if degree < 0.05 * endVal:
+    if degree-startVal < 0.05 * (endVal-startVal):
         degree = startVal
 
     if ifShow:
