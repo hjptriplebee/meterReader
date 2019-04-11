@@ -1,23 +1,23 @@
 {
     "name": "null",
-    "type": "Remember",
+    "type": "normalPressure",
     "ROI": {
-        "x": 40,
-        "y": 50,
-        "w": 1170,
-        "h": 640
+        "x": 50,
+        "y": 45,
+        "w": 1205,
+        "h": 655
     },
     "startPoint": {
-        "x": 37,
-        "y": 39
+        "x": 85,
+        "y": 235
     },
     "endPoint": {
-        "x": 148,
-        "y": 194
+        "x": 235,
+        "y": 197
     },
     "centerPoint": {
-        "x": 146,
-        "y": 38
+        "x": 139,
+        "y": 146
     },
     "startPointUp": {
         "x": 0,
@@ -32,7 +32,7 @@
         "y": 0
     },
     "startValue": 0.0,
-    "totalValue": 0.0,
-    "digitType": "TEST",
+    "totalValue": 1.0,
+    "digitType": "False",
     "result": 0.0
 }

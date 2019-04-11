@@ -298,9 +298,10 @@ class AngleFactory:
         :param totalValue: total value
         :return: value
         """
+        # print(startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue)
         angleRange = cls.calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.calAngleClockwise(startPoint, pointerPoint, centerPoint)
-        value = angle / angleRange * totalValue + startValue
+        value = angle / angleRange * (totalValue-startValue) + startValue
         if value > totalValue or value < startValue:
             return startValue if angle > np.pi + angleRange / 2 else totalValue
         return value
@@ -393,7 +394,6 @@ def scanPointer(meter, info):
 
     # thresh = cv2.erode(thresh, np.ones((3, 3), np.uint8), 3)
     # thresh = cv2.dilate(thresh, np.ones((5, 5), np.uint8))
-
     # cv2.imshow("img", thresh)
     # cv2.waitKey(1)
 
@@ -431,18 +431,17 @@ def scanPointer(meter, info):
     elif end[0] == outerPoint[0] and end[1] == outerPoint[1]:
         degree = endVal
     else:
-        if start.all() == end.all():
+        if start[0] == end[0] and start[1] == end[1]:
             end[0] -= 1
             end[1] -= 3
         degree = AngleFactory.calPointerValueByOuterPoint(start, end, center, outerPoint, startVal, endVal)
 
-    # print(degree, startVal, endVal)
     # small value to zero
     if degree-startVal < 0.05 * (endVal-startVal):
         degree = startVal
 
     if ifShow:
-        # print(degree, start, center, outerPoint)
+        print(degree, start, center, outerPoint)
         cv2.circle(meter, (outerPoint[0], outerPoint[1]), 10, (0, 0, 255), -1)
         cv2.line(meter, (center[0], center[1]), (outerPoint[0], outerPoint[1]), (0, 0, 255), 5)
         cv2.line(meter, (center[0], center[1]), (start[0], start[1]), (255, 0, 0), 3)

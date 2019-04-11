@@ -93,7 +93,7 @@ def digitPressure(image, info):
                 temp += c
             elif j != 0:
                 temp += str(random.randint(0, 9))
-        myRes[i] = temp
+        myRes[i] = float(temp)
 
     if ifShow:
         cv2.circle(template, (start[0], start[1]), 5, (0, 0, 255), -1)

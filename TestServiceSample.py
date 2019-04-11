@@ -9,20 +9,23 @@ from configuration import *
 
 from Interface import meterReader
 
+
 def startServer():
     os.system("python FlaskService.py")
 
 
 def startClient(results):
-    images = os.listdir("image")
+    images = os.listdir("info/20190410/IMAGES/Pic_2")
     for im in images:
-        path = "image/" + im
+        path = "info/20190410/IMAGES/Pic_2/" + im
         data = json.dumps({
             "path": path,
-            "pointID": im.split('.')[0]+"_1"
+            "imageID": im.split('.')[0] + "_1"
         })
         print(path, im)
-        r = requests.post("http://127.0.0.1:5000/locate", data=data.encode("utf-8"))
+        print(data)
+        r = requests.post("http://127.0.0.1:5000/", data=data.encode("utf-8"))
+        print(r.text)
         receive = json.loads(r.text)
         print(im, receive)
 
@@ -30,17 +33,20 @@ def startClient(results):
 
 
 def codecov():
-    images = os.listdir("info/20190410/IMAGES/Pic")
+    imgPath = "info/20190410/IMAGES/Pic_2"
+    # imgPath = "info/20190128/IMAGES/image"
+    images = os.listdir(imgPath)
     # videos = os.listdir("testImages/video")
     config = os.listdir(configPath)
 
     for im in images:
-        image = cv2.imread("testImages/20190410/Pic/"+im)
+        image = cv2.imread(imgPath + "/" + im)
         print(im)
+        pos = im.split(".")[0].split("-")
 
         for i in range(1, 6):
-            cfg = im.split(".jpg")[0]+"_"+str(i)
-            if cfg+".json" in config:
+            cfg = pos[0] + "-" + pos[1] + "_" + str(i)
+            if cfg + ".json" in config:
                 receive2 = meterReader(image, [cfg])
                 print(cfg, receive2)
 
@@ -75,6 +81,3 @@ if __name__ == "__main__":
     #     print(result)
     #     if not result:
     #         exit(100)
-
-
-

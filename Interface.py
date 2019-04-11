@@ -113,8 +113,9 @@ def meterReader(recognitionData, meterIDs):
     :param meterIDs: list of meter ID
     :return:
     """
-    results = {}
-    for ID in meterIDs:
+    # results = {}
+    results = []
+    for i, ID in enumerate(meterIDs):
         # get info from file
         info = getInfo(ID)
         if info["digitType"] == "VIDEO":
@@ -132,8 +133,10 @@ def meterReader(recognitionData, meterIDs):
 
             if x != 0 or y != 0 or w != 0 or h != 0:
                 ROI = recognitionData[y:y + h, x:x + w]
-                results[ID] = meterReaderCallBack(ROI, info)
-            else:
-                results[ID] = meterReaderCallBack(recognitionData, info)
+                # results[ID] = meterReaderCallBack(ROI, info)
+                results.append(meterReaderCallBack(ROI, info))
+            # else:
+                # results[ID] = meterReaderCallBack(recognitionData, info)
+                results.append(meterReaderCallBack(recognitionData, info))
 
     return results

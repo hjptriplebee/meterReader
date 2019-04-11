@@ -1,6 +1,6 @@
 {
     "name": "null",
-    "type": "Remember",
+    "type": "normalPressure",
     "ROI": {
         "x": 55,
         "y": 55,
