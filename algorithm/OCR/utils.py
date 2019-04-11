@@ -1,10 +1,10 @@
 import sys
+
 import cv2
-import os
 import numpy as np
 import torch
 
-from algorithm.debug import *
+from configuration import *
 
 sys.path.append(".")
 
