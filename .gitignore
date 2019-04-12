@@ -3,8 +3,7 @@
 storeDigitData/
 .DS_Store
 test.py
-algorithm/OCR/newNet/images/
-testImages
+IMAGES
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

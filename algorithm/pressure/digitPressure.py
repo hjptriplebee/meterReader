@@ -1,12 +1,12 @@
-import sys
-import cv2
 import os
-import numpy as np
 import random
 
+import cv2
+import numpy as np
+
 from algorithm.Common import meterFinderBySIFT
-from algorithm.debug import *
 from algorithm.OCR.utils import newNet
+from configuration import *
 
 
 def digitPressure(image, info):
@@ -93,7 +93,7 @@ def digitPressure(image, info):
                 temp += c
             elif j != 0:
                 temp += str(random.randint(0, 9))
-        myRes[i] = temp
+        myRes[i] = float(temp)
 
     if ifShow:
         cv2.circle(template, (start[0], start[1]), 5, (0, 0, 255), -1)

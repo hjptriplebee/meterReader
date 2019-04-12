@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import math
 from sklearn.metrics.pairwise import pairwise_distances
+from configuration import *
 
 def getPointTemplate(pointID):
     """
@@ -9,7 +10,7 @@ def getPointTemplate(pointID):
     :param pointID: ID
     :return: the template for location
     """
-    return cv2.imread("template/"+pointID+".jpg")
+    return cv2.imread(templatePath + "/"+pointID+".jpg")
     # return cv2.imread("templateForLocation/"+pointID+".jpg")
 
 
