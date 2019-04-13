@@ -2,13 +2,54 @@ import numpy as np
 import time
 import cv2
 from algorithm.Common import meterFinderBySIFT, meterFinderByTemplate
-import os
-import Interface
+
+
+def isDark(img):
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    r, c = gray_img.shape[:2]
+    # dark num
+    dark_sum = 0
+    # dark ration
+    dark_prop = 0
+    # pixels n7m of gray image
+    piexs_sum = r * c
+    for row in gray_img:
+        for colum in row:
+            if colum < 120:
+                dark_sum += 1
+    dark_prop = dark_sum / (piexs_sum)
+    # print("dark_sum:" + str(dark_sum))
+    # print("piexs_sum:" + str(piexs_sum))
+    # print("dark_prop=dark_sum/piexs_sum:" + str(dark_prop))
+    if dark_prop >= 0.70:
+        return True
+    else:
+        return False
+
+    # def hist(pic_path):
+    #     img = cv2.imread(pic_path, 0)
+    #     hist = cv2.calcHist([img], [0], None, [256], [0, 256])
+    #     plt.subplot(121)
+    #     plt.imshow(img, 'gray')
+    #     plt.xticks([])
+    #     plt.yticks([])
+    #     plt.title("Original")
+    #     plt.subplot(122)
+    #     plt.hist(img.ravel(), 256, [0, 256])
+    #     plt.show()
+    #
 
 
 def readyStatus(img, info):
     template = info['template']
     image = meterFinderByTemplate(img, info['template'])
+    # if image is dark enough, do gamma correction for enhancing dark details
+    if isDark(image):
+        max = np.max(image)
+        image = np.power(image / float(max), 1/3) * max
+        image = image.astype(np.uint8)
+        # cv2.imshow('Gamma', image)
+        # cv2.waitKey(0)
     t_shape = template.shape[:2]
     # image = meterFinderBySIFT(img, info)
     orig = image.copy()
