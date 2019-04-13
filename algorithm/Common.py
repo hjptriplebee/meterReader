@@ -136,10 +136,11 @@ def meterFinderBySIFT(image, info):
     imageKeyPoint, imageDescriptor = sift.detectAndCompute(imageBlurred, None)
 
     # for debug
-    # templateBlurred = cv2.drawKeypoints(templateBlurred, templateKeyPoint, templateBlurred)
-    # imageBlurred = cv2.drawKeypoints(imageBlurred, imageKeyPoint, imageBlurred)
+    templateBlurred = cv2.drawKeypoints(templateBlurred, templateKeyPoint, templateBlurred)
+    imageBlurred = cv2.drawKeypoints(imageBlurred, imageKeyPoint, imageBlurred)
     # cv2.imshow("template", templateBlurred)
-    # cv2.imshow("image", imageBlurred)
+    cv2.imshow("image", imageBlurred)
+    cv2.waitKey(0)
 
     # match
     bf = cv2.BFMatcher()
@@ -148,7 +149,6 @@ def meterFinderBySIFT(image, info):
 
     # The first one is better than the second one
     good = [[m] for m, n in matches if m.distance < 0.8 * n.distance]
-
     # distance matrix
     templatePointMatrix = np.array([list(templateKeyPoint[p[0].queryIdx].pt) for p in good])
     imagePointMatrix = np.array([list(imageKeyPoint[p[0].trainIdx].pt) for p in good])
@@ -301,7 +301,7 @@ class AngleFactory:
         # print(startPoint, endPoint, centerPoint, pointerPoint, startValue, totalValue)
         angleRange = cls.calAngleClockwise(startPoint, endPoint, centerPoint)
         angle = cls.calAngleClockwise(startPoint, pointerPoint, centerPoint)
-        value = angle / angleRange * (totalValue-startValue) + startValue
+        value = angle / angleRange * (totalValue - startValue) + startValue
         if value > totalValue or value < startValue:
             return startValue if angle > np.pi + angleRange / 2 else totalValue
         return value
@@ -437,7 +437,7 @@ def scanPointer(meter, info):
         degree = AngleFactory.calPointerValueByOuterPoint(start, end, center, outerPoint, startVal, endVal)
 
     # small value to zero
-    if degree-startVal < 0.05 * (endVal-startVal):
+    if degree - startVal < 0.05 * (endVal - startVal):
         degree = startVal
 
     if ifShow:
