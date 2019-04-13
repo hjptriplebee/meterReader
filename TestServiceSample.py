@@ -88,8 +88,8 @@ if __name__ == "__main__":
     # clientProcess.start()
     # clientProcess.join()
     # serverProcess.terminate()
-    testReadyStatus()
-    # codecov()
+    # testReadyStatus()
+    codecov()
     # testVideo()
     #
     # for i in range(20):

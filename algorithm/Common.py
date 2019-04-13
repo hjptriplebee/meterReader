@@ -136,11 +136,11 @@ def meterFinderBySIFT(image, info):
     imageKeyPoint, imageDescriptor = sift.detectAndCompute(imageBlurred, None)
 
     # for debug
-    templateBlurred = cv2.drawKeypoints(templateBlurred, templateKeyPoint, templateBlurred)
-    imageBlurred = cv2.drawKeypoints(imageBlurred, imageKeyPoint, imageBlurred)
-    # cv2.imshow("template", templateBlurred)
-    cv2.imshow("image", imageBlurred)
-    cv2.waitKey(0)
+    # templateBlurred = cv2.drawKeypoints(templateBlurred, templateKeyPoint, templateBlurred)
+    # imageBlurred = cv2.drawKeypoints(imageBlurred, imageKeyPoint, imageBlurred)
+    # # cv2.imshow("template", templateBlurred)
+    # cv2.imshow("image", imageBlurred)
+    # cv2.waitKey(0)
 
     # match
     bf = cv2.BFMatcher()
