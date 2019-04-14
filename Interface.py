@@ -9,7 +9,6 @@ from algorithm.oilTempreture import oilTempreture
 from algorithm.highlightDigitMeter import highlightDigit
 from algorithm.videoDigit import videoDigit
 
-
 from algorithm.arrest.countArrester import countArrester
 from algorithm.arrest.doubleArrester import doubleArrester
 
@@ -20,6 +19,7 @@ from algorithm.pressure.colorPressure import colorPressure
 from algorithm.onoff.onoffIndoor import onoffIndoor
 from algorithm.onoff.onoffOutdoor import onoffOutdoor
 from algorithm.onoff.onoffBatteryScreen import onoffBattery
+from algorithm.onoff.readyStatus import readyStatus
 
 from configuration import *
 
@@ -96,13 +96,14 @@ def getInfo(ID):
         info["type"] = onoffBattery
     elif info["type"] == "videoDigit":
         info["type"] = videoDigit
+    elif info["type"] == "ready":
+        info["type"] = readyStatus
     else:
         info["type"] = None
 
     info["template"] = cv2.imread(templatePath + "/" + ID + ".jpg")
-
     if info["digitType"] != "False":
-        info.update(json.load(open(os.path.join("ocr_config", info["digitType"]+".json"))))
+        info.update(json.load(open(os.path.join("ocr_config", info["digitType"] + ".json"))))
     return info
 
 
@@ -135,7 +136,7 @@ def meterReader(recognitionData, meterIDs):
                 ROI = recognitionData[y:y + h, x:x + w]
                 # results[ID] = meterReaderCallBack(ROI, info)
                 results.append(meterReaderCallBack(ROI, info))
-            # else:
+                # else:
                 # results[ID] = meterReaderCallBack(recognitionData, info)
                 results.append(meterReaderCallBack(recognitionData, info))
 
