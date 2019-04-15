@@ -20,6 +20,7 @@ from algorithm.onoff.onoffIndoor import onoffIndoor
 from algorithm.onoff.onoffOutdoor import onoffOutdoor
 from algorithm.onoff.onoffBatteryScreen import onoffBattery
 from algorithm.onoff.readyStatus import readyStatus
+from algorithm.onoff.springStatus import springStatus
 
 from configuration import *
 
@@ -98,6 +99,8 @@ def getInfo(ID):
         info["type"] = videoDigit
     elif info["type"] == "ready":
         info["type"] = readyStatus
+    elif info["type"] == "spring":
+        info["type"] = springStatus
     else:
         info["type"] = None
 
