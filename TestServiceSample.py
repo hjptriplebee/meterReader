@@ -32,10 +32,25 @@ def startClient(results):
         results.append(True)
 
 
+def testReadyStatus():
+    imgPath = "image"
+    configPath = "info/20190410/config"
+    images = os.listdir(imgPath)
+    config = os.listdir(configPath)
+    for im in images:
+        filename, extention = os.path.splitext(im.lower())
+        if extention == '.jpg' or extention == '.png':
+            image = cv2.imread(imgPath + "/" + im)
+            for i in range(1, 6):
+                cfg = filename + "_" + str(i)
+                if cfg + ".json" in config:
+                    receive2 = meterReader(image, [cfg])
+                    print(cfg, receive2)
+
+
 def codecov():
     images = os.listdir("image")
     config = os.listdir("config")
-
 
     for im in images:
         image = cv2.imread(imgPath + "/" + im)
@@ -49,6 +64,7 @@ def codecov():
                 print(cfg, receive2)
 
     print("codecov done")
+
 
 def testVideo():
     video_path = ("video_")
@@ -72,9 +88,9 @@ if __name__ == "__main__":
     # clientProcess.start()
     # clientProcess.join()
     # serverProcess.terminate()
-
+    # testReadyStatus()
     codecov()
-    testVideo()
+    # testVideo()
     #
     # for i in range(20):
     #     serverProcess = multiprocessing.Process(target=startServer)
