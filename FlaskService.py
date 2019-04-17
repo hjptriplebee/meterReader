@@ -6,6 +6,7 @@ import numpy as np
 from Interface import meterReader
 from flask import Flask, request
 from locator import *
+from configuration import *
 
 app = Flask(__name__)
 
@@ -13,7 +14,7 @@ app = Flask(__name__)
 def getMeterNum(imageID):
     """get meter num in an image"""
     num = 0
-    rootdir = 'template/'
+    rootdir = templatePath
     list = os.listdir(rootdir)
     for i in range(0, len(list)):
         path = os.path.join(rootdir, list[i])
@@ -28,7 +29,7 @@ def getMeterNum(imageID):
 def getMeterIDs(imageID):
     """get id of meters in an image"""
     meterIDs = []
-    templateDir = 'template/'
+    templateDir = templatePath
     list = os.listdir(templateDir)
     for i in range(0, len(list)):
         path = os.path.join(templateDir, list[i])
@@ -46,7 +47,8 @@ def meterReaderAPI():
         data = request.get_data().decode("utf-8")
         data = json.loads(data)
         imageID = data["imageID"]
-
+        path = data["path"]
+        # print(imageID)
         meterIDs = getMeterIDs(imageID)
 
         # imageByte = data["image"].encode("ascii")
@@ -54,20 +56,19 @@ def meterReaderAPI():
         # imageArray = np.asarray(bytearray(imageByte), dtype="uint8")
         # image = cv2.imdecode(imageArray, cv2.IMREAD_COLOR)
 
-        path = data["path"]
-        recognitionData = None
 
+        # recognitionData = None
+        #
         if path[-4:] != ".jpg":
             recognitionData = cv2.VideoCapture(path)
         else:
             recognitionData = cv2.imread(path)
         # print(path, np.shape(recognitionData))
     except:
-        return json.dumps({"error":"json format error!"})
+        return json.dumps({"error": "json format error!"})
     else:
         result = meterReader(recognitionData, meterIDs)
         sendData = json.dumps(result).encode("utf-8")
-
         return sendData
 
 
@@ -84,14 +85,14 @@ def storeAPI():
         imageByte = base64.b64decode(imageByte)
         imageArray = np.asarray(bytearray(imageByte), dtype="uint8")
         image = cv2.imdecode(imageArray, cv2.IMREAD_COLOR)
-        cv2.imwrite("template/" + meterID + ".jpg", image)
+        cv2.imwrite(templatePath + "/" + meterID + ".jpg", image)
 
         config = data["config"]
         # print(config)
     except:
         return json.dumps({"error": "json format error!"})
     else:
-        file = open("config/" + meterID + ".json", "w")
+        file = open(configPath + "/" + meterID + ".json", "w")
         file.write(json.dumps(config))
         file.close()
 
@@ -105,8 +106,6 @@ def locateAPI():
         data = json.loads(data)
         pointID = data["pointID"]
         path = data["path"]
-
-
         image = None
 
         if path[-4:] == ".jpg":
