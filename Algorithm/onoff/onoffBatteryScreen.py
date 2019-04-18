@@ -76,4 +76,4 @@ def onoffBattery(image, info):
         cv2.waitKey(0)
         print(upRegion, downRegion)
 
-    return 1 if upRegion < downRegion else 0
+    return "on" if upRegion < downRegion else "off"

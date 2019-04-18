@@ -147,6 +147,6 @@ def readyStatus(img, info):
             rects.append((startX, startY, endX, endY))
             confidences.append(scoresData[x])
     if len(rects) > 0:
-        return True
+        return "on"
     else:
-        return False
+        return "off"
