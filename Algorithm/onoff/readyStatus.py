@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 
-from Algorithm.utils.Finder import meterFinderByTemplate
+from Algorithm.utils.Finder import meterFinderByTemplate, meterFinderBySIFT
 from Algorithm.utils.boxRectifier import boxRectifier
 
 
@@ -45,7 +45,8 @@ def isDark(img):
 
 def readyStatus(img, info):
     template = info['template']
-    match_res = meterFinderByTemplate(img, info['template'])
+    # match_res =meterFinderByTemplate(img, info['template'])
+    match_res = meterFinderBySIFT(img, info)
     image = boxRectifier(match_res, info)
     cv2.imshow('Image', image)
     cv2.waitKey(0)
