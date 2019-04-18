@@ -1,26 +1,26 @@
 {
-    "name": "test",
-    "type": "spring",
-    "ROI": {
-        "x": 510,
-        "y": 760,
-        "w": 230,
-        "h": 140
-    },
-		"startPoint": {
-			"x": 23,
-			"y": 149
-    },
-		"endPoint": {
-			"x": 148,
-			"y": 35
-    },
-		"centerPoint": {
-			"x": 147,
-			"y": 150
-    },
-    "startValue": 0,
-    "totalValue": 12,
-    "digitType": "False",
-    "result": 0.0
+  "name": "test",
+  "type": "spring",
+  "ROI": {
+    "x": 471,
+    "y": 725,
+    "w": 322,
+    "h": 261
+  },
+  "startPoint": {
+    "x": 57,
+    "y": 50
+  },
+  "endPoint": {
+    "x": 246,
+    "y": 140
+  },
+  "centerPoint": {
+    "x": 244,
+    "y": 47
+  },
+  "startValue": 0,
+  "totalValue": 12,
+  "digitType": "False",
+  "result": 0.0
 }
