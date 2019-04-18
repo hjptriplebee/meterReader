@@ -33,7 +33,7 @@ def startClient(results):
 
 
 def testReadyStatus():
-    imgPath =  "info/20190416/IMAGES/image"
+    imgPath = "info/20190416/IMAGES/image"
     configPath = "info/20190416/config"
     images = os.listdir(imgPath)
     config = os.listdir(configPath)
@@ -49,7 +49,8 @@ def testReadyStatus():
 
 
 def codecov():
-    imgPath = "info/20190128/IMAGES/Pic_0225"
+    # imgPath = "info/20190128/IMAGES/Pic_0225"
+    imgPath = "info/image"
     images = os.listdir(imgPath)
     config = os.listdir(configPath)
 
