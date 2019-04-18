@@ -48,8 +48,8 @@ def readyStatus(img, info):
     # match_res =meterFinderByTemplate(img, info['template'])
     match_res = meterFinderBySIFT(img, info)
     image = boxRectifier(match_res, info)
-    cv2.imshow('Image', image)
-    cv2.waitKey(0)
+    # cv2.imshow('Image', image)
+    # cv2.waitKey(0)
     # if image is dark enough, do gamma correction for enhancing dark details
     if isDark(image):
         max = np.max(image)
