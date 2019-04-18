@@ -1,10 +1,13 @@
-from Algorithm.utils.Finder import meterFinderByTemplate
+from Algorithm.utils.Finder import meterFinderByTemplate, meterFinderBySIFT
+from Algorithm.utils.boxRectifier import boxRectifier
 
 
 # 识别弹簧状态
 def springStatus(ROI, info):
-    template = info['template']
-    img = meterFinderByTemplate(ROI, template)
+    # template = info['template']
+    # img = meterFinderByTemplate(ROI, template)
+    img = meterFinderBySIFT(ROI, info)
+    img = boxRectifier(img, info)
     high, width = img.shape[:2]
     i = 0
     y = 2 * high // 5  # y坐标大约是2/5的高度

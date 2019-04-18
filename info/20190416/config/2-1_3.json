@@ -1,23 +1,23 @@
 {
   "name": "test",
-  "type": "ready",
+  "type": "spring",
   "ROI": {
-    "x": 584,
-    "y": 1098,
-    "w": 302,
-    "h": 257
+    "x": 217,
+    "y": 3,
+    "w": 175,
+    "h": 142
   },
   "startPoint": {
-    "x": 23,
-    "y": 149
+    "x": 24,
+    "y": 50
   },
   "endPoint": {
-    "x": 148,
-    "y": 35
+    "x": 112,
+    "y": 96
   },
   "centerPoint": {
-    "x": 147,
-    "y": 150
+    "x": 112,
+    "y": 48
   },
   "startValue": 0,
   "totalValue": 12,
