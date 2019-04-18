@@ -73,6 +73,8 @@ def getInfo(ID):
         info["type"] = digitPressure
     elif info["type"] == "normalPressure":
         info["type"] = normalPressure
+    elif info["type"] == "contact":
+        info["type"] = contactStatus
     elif info["type"] == "colorPressure":
         info["type"] = colorPressure
     elif info["type"] == "SF6":
