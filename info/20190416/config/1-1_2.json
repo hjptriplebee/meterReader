@@ -1,0 +1,26 @@
+{
+  "name": "test",
+  "type": "ready",
+  "ROI": {
+    "x": 343,
+    "y": 620,
+    "w": 340,
+    "h": 351
+  },
+  "startPoint": {
+    "x": 49,
+    "y": 102
+  },
+  "endPoint": {
+    "x": 130,
+    "y": 181
+  },
+  "centerPoint": {
+    "x": 129,
+    "y": 97
+  },
+  "startValue": 0,
+  "totalValue": 12,
+  "digitType": "False",
+  "result": 0.0
+}

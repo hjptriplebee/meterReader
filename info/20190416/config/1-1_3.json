@@ -1,0 +1,26 @@
+{
+  "name": "test",
+  "type": "spring",
+  "ROI": {
+    "x": 532,
+    "y": 626,
+    "w": 307,
+    "h": 293
+  },
+  "startPoint": {
+    "x": 45,
+    "y": 84
+  },
+  "endPoint": {
+    "x": 190,
+    "y": 164
+  },
+  "centerPoint": {
+    "x": 188,
+    "y": 83
+  },
+  "startValue": 0,
+  "totalValue": 12,
+  "digitType": "False",
+  "result": 0.0
+}

@@ -32,10 +32,27 @@ def startClient(results):
         results.append(True)
 
 
-def codecov():
-    images = os.listdir("image")
-    config = os.listdir("config")
+def testReadyStatus():
+    imgPath = "info/20190416/IMAGES/image"
+    configPath = "info/20190416/config"
+    images = os.listdir(imgPath)
+    config = os.listdir(configPath)
+    for im in images:
+        filename, extention = os.path.splitext(im.lower())
+        if extention == '.jpg' or extention == '.png':
+            image = cv2.imread(imgPath + "/" + im)
+            for i in range(1, 6):
+                cfg = filename + "_" + str(i)
+                if cfg + ".json" in config:
+                    receive2 = meterReader(image, [cfg])
+                    print(cfg, receive2)
 
+
+def codecov():
+    # imgPath = "info/20190128/IMAGES/Pic_0225"
+    imgPath = "info/image"
+    images = os.listdir(imgPath)
+    config = os.listdir(configPath)
 
     for im in images:
         image = cv2.imread(imgPath + "/" + im)
@@ -47,13 +64,11 @@ def codecov():
             if cfg + ".json" in config:
                 receive2 = meterReader(image, [cfg])
                 print(cfg, receive2)
-
     print("codecov done")
 
-def testVideo():
-    video_path = ("video_")
-    config = os.listdir("config")
 
+def testVideo():
+    video_path = "info/20190128/IMAGES/video_"
     for file in os.listdir(video_path):
         if file.startswith(".DS"):
             continue
@@ -64,6 +79,8 @@ def testVideo():
 
 
 if __name__ == "__main__":
+    # Service Test
+
     # serverProcess = multiprocessing.Process(target=startServer)
     # results = multiprocessing.Manager().list()
     # clientProcess = multiprocessing.Process(target=startClient, args=(results,))
@@ -73,22 +90,8 @@ if __name__ == "__main__":
     # clientProcess.join()
     # serverProcess.terminate()
 
-    codecov()
-    testVideo()
-    #
-    # for i in range(20):
-    #     serverProcess = multiprocessing.Process(target=startServer)
-    #     results = multiprocessing.Manager().list()
-    #     clientProcess = multiprocessing.Process(target=startClient, args=(results,))
-    #     serverProcess.start()
-    #     time.sleep(30)
-    #     clientProcess.start()
-    #     clientProcess.join()
-    #     serverProcess.terminate()
-    #
-    #     codecov()
+    # Single Test
 
-    # for result in results:
-    #     print(result)
-    #     if not result:
-    #         exit(100)
+    testReadyStatus()
+    # codecov()
+    # testVideo()
