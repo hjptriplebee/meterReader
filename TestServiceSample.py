@@ -31,25 +31,7 @@ def startClient(results):
 
         results.append(True)
 
-
-def testReadyStatus():
-    imgPath =  "info/20190416/IMAGES/image"
-    configPath = "info/20190416/config"
-    images = os.listdir(imgPath)
-    config = os.listdir(configPath)
-    for im in images:
-        filename, extention = os.path.splitext(im.lower())
-        if extention == '.jpg' or extention == '.png':
-            image = cv2.imread(imgPath + "/" + im)
-            for i in range(1, 6):
-                cfg = filename + "_" + str(i)
-                if cfg + ".json" in config:
-                    receive2 = meterReader(image, [cfg])
-                    print(cfg, receive2)
-
-
-def codecov():
-    imgPath = "info/20190128/IMAGES/Pic_0225"
+def codecov(imgPath):
     images = os.listdir(imgPath)
     config = os.listdir(configPath)
 
@@ -91,6 +73,15 @@ if __name__ == "__main__":
 
     # Single Test
 
-    testReadyStatus()
-    # codecov()
+    # testReadyStatus()
+    # codecov("info/20190128/IMAGES/image")
+    # codecov("info/20190128/IMAGES/Pic_0225")
+    # codecov("info/20190128/IMAGES/Pic_0226")
+    # codecov("info/20190128/IMAGES/video_")
+
+    codecov("info/20190410/IMAGES/Pic")
+    codecov("info/20190410/IMAGES/Pic_2")
+    #
+    # codecov("info/20190416/IMAGES/image")
+
     # testVideo()

@@ -18,6 +18,12 @@ def digitPressure(image, info):
     widthSplit = info["widthSplit"]
     heightSplit = info["heightSplit"]
 
+    # 将info中的参数加入代码中
+    # block = info["thresh"]["block"]
+    # type = info["thresh"]["type"]
+    # ifOpen = info["open"]
+    # .........
+
     # 由标定点得到液晶区域
     dst = boxRectifier(template, info)
 
@@ -35,8 +41,20 @@ def digitPressure(image, info):
     # 存储图片
     if not os.path.exists("storeDigitData"):
         os.mkdir("storeDigitData")
-    if not os.path.exists("storeDigitData/digits"):
-        os.mkdir("storeDigitData/digits")
+
+    try:
+        os.mkdir("storeDigitData/thresh")
+        os.mkdir("storeDigitData/rgb")
+    except IOError:
+        pass
+
+    for i in range(11):
+        try:
+            os.mkdir("storeDigitData/thresh/"+str(i))
+            os.mkdir("storeDigitData/rgb/"+str(i))
+        except IOError:
+            continue
+
     imgNum = int((len(os.listdir("storeDigitData/"))-1)/3)
     cv2.imwrite("storeDigitData/" + str(imgNum) + "_dst.bmp", dst)
     cv2.imwrite("storeDigitData/" + str(imgNum) + "_gray.bmp", gray)
@@ -55,7 +73,7 @@ def digitPressure(image, info):
                 continue
             # 得到分割的图片区域
             img = thresh[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
-
+            rgb_ = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
             # 增强
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
             img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
@@ -64,12 +82,21 @@ def digitPressure(image, info):
             myNum = myNum + num
 
             # 存储图片
-            cv2.imwrite("storeDigitData/digits/{}_{}{}_p{}.bmp".format(
+            cv2.imwrite("storeDigitData/thresh/{}/{}_{}{}_p{}.bmp".format(
+                num,
                 imgNum,
                 i,
                 j,
                 num
             ), img)
+
+            cv2.imwrite("storeDigitData/rgb/{}/{}_{}{}_p{}.bmp".format(
+                num,
+                imgNum,
+                i,
+                j,
+                num
+            ), rgb_)
 
         myRes.append(myNum)
 
