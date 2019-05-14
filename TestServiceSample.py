@@ -39,12 +39,14 @@ def codecov(imgPath):
         image = cv2.imread(imgPath + "/" + im)
         print(im)
         pos = im.split(".")[0].split("-")
-
-        for i in range(1, 6):
-            cfg = pos[0] + "-" + pos[1] + "_" + str(i)
-            if cfg + ".json" in config:
-                receive2 = meterReader(image, [cfg])
-                print(cfg, receive2)
+        cfg = im.split(".")[0]+"_1"
+        # for i in range(1, 6):
+        #     cfg = pos[0] + "-" + pos[1] + "_" + str(i)
+        #     if cfg + ".json" in config:
+        #         receive2 = meterReader(image, [cfg])
+        #         print(cfg, receive2)
+        receive2 = meterReader(image, [cfg])
+        print(cfg, receive2)
     print("codecov done")
 
 
@@ -79,8 +81,10 @@ if __name__ == "__main__":
     # codecov("info/20190128/IMAGES/Pic_0226")
     # codecov("info/20190128/IMAGES/video_")
 
-    codecov("info/20190410/IMAGES/Pic")
-    codecov("info/20190410/IMAGES/Pic_2")
+    # codecov("info/20190410/IMAGES/Pic")
+    # codecov("info/20190410/IMAGES/Pic_2")
+    codecov("info/20190514/image/")
+    codecov("info/20190514/image/")
     #
     # codecov("info/20190416/IMAGES/image")
 

@@ -1,0 +1,56 @@
+{
+    "name": "null",
+    "type": "digitPressure",
+    "ROI": {
+        "x": 336,
+        "y": 157,
+        "w": 703,
+        "h": 454
+    },
+    "startPoint": {
+        "x": 52,
+        "y": 103
+    },
+    "endPoint": {
+        "x": 397,
+        "y": 97
+    },
+    "centerPoint": {
+        "x": 388,
+        "y": 36
+    },
+    "startPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "endPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "centerPointUp": {
+        "x": 0,
+        "y": 0
+    },
+    "startValue": 0.0,
+    "totalValue": 0.0,
+    "digitType": "False",
+    "result": 0.0,
+    "rectangle": {
+    "width": 165,
+     "height": 30
+  },
+  "widthSplit": [
+    [1,8,21,35,49,62,76,91,105,120,135,150,164]
+  ],
+  "heightSplit": [
+    [1,29]
+  ],
+  "decimal":[
+    2
+  ],
+  "thresh":{
+    "block":31,
+    "param":1
+  },
+  "ifopen":"close"
+}
