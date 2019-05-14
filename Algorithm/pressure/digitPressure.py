@@ -19,9 +19,9 @@ def digitPressure(image, info):
     heightSplit = info["heightSplit"]
 
     # 将info中的参数加入代码中
-    # block = info["thresh"]["block"]
-    # type = info["thresh"]["type"]
-    # ifOpen = info["open"]
+    block = info["thresh"]["block"]
+    param = info["thresh"]["param"]
+    ifOpen = info["ifopen"]
     # .........
 
     # 由标定点得到液晶区域
@@ -36,7 +36,10 @@ def digitPressure(image, info):
         Hist = cv2.equalizeHist(Blur)
         thresh = cv2.adaptiveThreshold(Hist, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 15, 11)
     else:
-        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 55, 11)
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, block, param)
+        if ifOpen=="close":
+            p = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+            res1 = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, p)
 
     # 存储图片
     if not os.path.exists("storeDigitData"):
@@ -75,28 +78,28 @@ def digitPressure(image, info):
             img = thresh[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
             rgb_ = dst[heightSplit[i][0]:heightSplit[i][1], split[j]:split[j + 1]]
             # 增强
-            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
-            img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+            # kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
+            # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
             num = MyNet.recognizeNet(img)
             myNum = myNum + num
 
             # 存储图片
-            cv2.imwrite("storeDigitData/thresh/{}/{}_{}{}_p{}.bmp".format(
-                num,
-                imgNum,
-                i,
-                j,
-                num
-            ), img)
-
-            cv2.imwrite("storeDigitData/rgb/{}/{}_{}{}_p{}.bmp".format(
-                num,
-                imgNum,
-                i,
-                j,
-                num
-            ), rgb_)
+            # cv2.imwrite("storeDigitData/thresh/{}/{}_{}{}_p{}.bmp".format(
+            #     num,
+            #     imgNum,
+            #     i,
+            #     j,
+            #     num
+            # ), img)
+            #
+            # cv2.imwrite("storeDigitData/rgb/{}/{}_{}{}_p{}.bmp".format(
+            #     num,
+            #     imgNum,
+            #     i,
+            #     j,
+            #     num
+            # ), rgb_)
 
         myRes.append(myNum)
 
