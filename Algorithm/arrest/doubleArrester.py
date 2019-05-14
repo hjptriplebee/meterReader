@@ -38,8 +38,10 @@ def doubleArrester(image, info):
     ovalEnd = np.array([ovalEnd[0] - x, ovalEnd[1] - y])
     ovalMeter = meter[y:height, x:width]
 
-    result["ovalMeter"] = scanPointer(ovalMeter, [ovalStart, ovalEnd, ovalCenter], info["startValueUp"],
-                                      info["totalValueUp"])
+    # needs to modify changed input
+    # result["ovalMeter"] = scanPointer(ovalMeter,
+    #                                   [ovalStart, ovalEnd, ovalCenter], info["startValueUp"],
+    #                                   info["totalValueUp"])
     if ifShow:
         cv2.circle(ovalMeter, (ovalStart[0], ovalStart[1]), 5, (0, 0, 255), -1)
         cv2.circle(ovalMeter, (ovalCenter[0], ovalCenter[1]), 5, (0, 255, 0), -1)
@@ -58,8 +60,10 @@ def doubleArrester(image, info):
     rectStart = np.array([rectStart[0] - x, rectStart[1] - y])
     rectEnd = np.array([rectEnd[0] - x, rectEnd[1] - y])
     rectMeter = meter[y:height, x:width]
-    result["rectMeter"] = scanPointer(rectMeter, [rectStart, rectEnd, rectCenter], info["startValue"],
-                                      info["totalValue"])
+
+    # needs to modify changed input
+    # result["rectMeter"] = scanPointer(rectMeter, [rectStart, rectEnd, rectCenter], info["startValue"],
+    #                                   info["totalValue"])
 
     if ifShow:
         cv2.circle(rectMeter, (rectStart[0], rectStart[1]), 5, (0, 0, 255), -1)
