@@ -19,6 +19,11 @@ from Algorithm.onoff.onoffOutdoor import onoffOutdoor
 from Algorithm.onoff.onoffBatteryScreen import onoffBattery
 from Algorithm.onoff.readyStatus import readyStatus
 from Algorithm.onoff.springStatus import springStatus
+from Algorithm.onoff.contactStatus import contactStatus
+
+from Algorithm.others.colordetect import colordetect
+from Algorithm.others.Cabinet_indicator import indicatorimg
+from Algorithm.others.Knob_status import knobstatus
 
 from configuration import *
 
@@ -99,6 +104,12 @@ def getInfo(ID):
         info["type"] = readyStatus
     elif info["type"] == "spring":
         info["type"] = springStatus
+    elif info["type"] == "colordetect":
+        info["type"] = colordetect
+    elif info["type"] == "cabinetindicator":
+        info["type"] = indicatorimg
+    elif info["type"] == "Knob":
+        info["type"] = knobstatus
     else:
         info["type"] = None
 
@@ -134,7 +145,11 @@ def meterReader(recognitionData, meterIDs):
             # cv2.waitKey(0)
             if x != 0 or y != 0 or w != 0 or h != 0:
                 ROI = recognitionData[y:y + h, x:x + w]
-                results.append(meterReaderCallBack(ROI, info))
             else:
-                results.append(meterReaderCallBack(recognitionData, info))
+                ROI = recognitionData
+            try:
+                results.append(meterReaderCallBack(ROI, info))
+            except AttributeError:
+                print("Error in ", ID)
+                results = [0]
     return results

@@ -4,9 +4,6 @@ import cv2
 import numpy as np
 
 
-# type transform
-
-
 def getMatInt(Mat):
     d = Mat.shape
     for i in range(d[2]):
@@ -170,7 +167,6 @@ def absorb(image, info):
             color = "blue"
             num = blue_num
             per = blue_per
-
     res = {
         'color': color,
         'num': num,
