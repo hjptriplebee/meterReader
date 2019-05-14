@@ -12,5 +12,3 @@ ifShow = False
 
 configPath = "info/20190514/config"
 templatePath = "info/20190514/template"
-
-
